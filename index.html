@@ -282,7 +282,7 @@ body { background:#fdfbf8; }
 }
 .intro-photo {
   position:absolute; inset:0 0 0 auto; width:67%;
-  background-image:url('https://www.jakgastudio.com/assets/author_ambient.webp');
+  background-image:url('/assets/brand-author.webp');
   background-size:cover; background-position:56% 52%; z-index:-1;
 }
 .intro-photo::before {
@@ -528,25 +528,45 @@ strong,b{font-weight:700}
 .space-section .approved-grid .mosaic-1{grid-row:span 2!important}
 .full-hours{padding-bottom:58px}
 }
+
+/* Final approved high-quality source images, responsive mosaic, brand CI */
+#kv-hero .kv-img{object-fit:cover;object-position:center center}
+#kv-hero .kv-text{max-width:420px}
+#brand-story .intro-ci{max-width:305px;filter:none}
+#brand-story .intro-photo{background-position:55% 52%}
+.space-section .approved-grid{grid-template-rows:180px 110px 135px 130px}
+.space-section .approved-grid .mosaic-1{grid-column:1;grid-row:1/span 2}
+.space-section .approved-grid .mosaic-2{grid-column:2;grid-row:1}
+.space-section .approved-grid .mosaic-3{grid-column:3;grid-row:1}
+.space-section .approved-grid .mosaic-4{grid-column:4;grid-row:1}
+.space-section .approved-grid .mosaic-5{grid-column:2;grid-row:2}
+.space-section .approved-grid .mosaic-6{grid-column:3;grid-row:2}
+.space-section .approved-grid .mosaic-7{grid-column:4;grid-row:2}
+.space-section .approved-grid .mosaic-8{grid-column:1;grid-row:3}
+.space-section .approved-grid .mosaic-9{grid-column:2/span 3;grid-row:3}
+.space-section .approved-grid .mosaic-10{grid-column:1;grid-row:4}
+.space-section .approved-grid .mosaic-11{grid-column:2;grid-row:4}
+.space-section .approved-grid .mosaic-12{grid-column:3/span 2;grid-row:4}
+@media(max-width:760px){.space-section .approved-grid{grid-template-rows:none;grid-auto-rows:135px}}
 </style></head><body class="variant-a">
 <main id="top">
 <section aria-label="작가작업실 JEJU 대표 사진" class="hero" id="kv-hero">
   <div class="kv-frame" aria-live="off">
-    <img class="kv-img active" src="https://www.jakgastudio.com/assets/final_reading.webp" alt="작가작업실 모임 공간" />
-    <img class="kv-img" src="https://www.jakgastudio.com/assets/photo_6c3ddbc805.webp" alt="작가작업실 외관" />
-    <img class="kv-img" src="https://www.jakgastudio.com/assets/photo_f1aa724bbf.webp" alt="작가작업실 책장과 글쓰기 공간" />
+    <img class="kv-img active" src="/assets/kv-01.webp" alt="작가작업실 모임 공간" />
+    <img class="kv-img" src="/assets/kv-02.webp" alt="작가작업실 외관" />
+    <img class="kv-img" src="/assets/kv-03.webp" alt="작가작업실 책장과 글쓰기 공간" />
   </div>
-  <div class="kv-text"><h1 class="sr-only">작가작업실 JEJU</h1><img src="https://www.jakgastudio.com/assets/JEJU_Standard_two_line.svg" alt="작가작업실 JEJU | 책방 그리고 글쓰기와 독서모임"/></div>
+  <div class="kv-text"><h1 class="sr-only">작가작업실 JEJU</h1><img src="/assets/ci-two-line.svg" alt="작가작업실 JEJU | 책방 그리고 글쓰기와 독서모임"/></div>
   <div class="kv-pages" role="group" aria-label="대표 이미지 선택"><button type="button" class="sel" data-kv="0" aria-label="첫 번째 사진">01</button><button type="button" data-kv="1" aria-label="두 번째 사진">02</button><button type="button" data-kv="2" aria-label="세 번째 사진">03</button></div>
   <button class="hero-arrow hero-prev" type="button" aria-label="이전 사진">‹</button><button class="hero-arrow hero-forward" type="button" aria-label="다음 사진">›</button>
 </section>
 <!-- Approved introduction: brand image only; all copy is searchable HTML -->
 <section aria-labelledby="intro-title" class="intro-section" id="brand-story">
-<div class="brand-nav"><div class="content-width"><img src="https://www.jakgastudio.com/assets/sticky_one_line_CI.svg" alt="작가작업실 JEJU"></div></div>
+<div class="brand-nav"><div class="content-width"><img src="/assets/ci-one-line.svg" alt="작가작업실 JEJU"></div></div>
 <div class="content-width brand-container"><div class="section-heading brand-section-heading"><p class="eyebrow">01 <span>BRAND</span><i></i></p><div class="heading-line"><h2>브랜드</h2><span class="section-tagline">| 제주 이호테우에 마련한 책방 그리고 글쓰기와 독서모임</span></div></div><div class="brand-art"><div aria-hidden="true" class="intro-photo"></div>
 <div class="intro-inner">
 <h2 class="sr-only" id="intro-title">작가작업실 JEJU 소개</h2>
-<img alt="작가작업실 JEJU" class="intro-ci" height="53" loading="eager" src="https://www.jakgastudio.com/assets/brand_only.svg" width="305"/>
+<img alt="작가작업실 JEJU" class="intro-ci" height="53" loading="eager" src="/assets/ci-one-line.svg" width="305"/>
 <div class="intro-primary">
 <ol class="intro-list">
 <li>작가가 추천하는 베스트셀러를 만나고</li>
@@ -566,7 +586,7 @@ strong,b{font-weight:700}
 <header aria-label="상단 고정 브랜드" class="sticky-brand-header">
 <div class="content-width sticky-brand-inner">
 <a aria-label="작가작업실 JEJU — 홈페이지 맨 위로 이동" class="sticky-brand-home" href="#top" title="맨 위로 이동">
-<img alt="작가작업실 JEJU | 책방 그리고 글쓰기와 독서모임" height="53" src="https://www.jakgastudio.com/assets/sticky_one_line_CI.svg" width="609"/>
+<img alt="작가작업실 JEJU | 책방 그리고 글쓰기와 독서모임" height="53" src="/assets/ci-one-line.svg" width="609"/>
 </a>
 </div>
 </header>
@@ -587,7 +607,9 @@ strong,b{font-weight:700}
 <button aria-label="작가작업실 JEJU 책장 속 책들 사진 확대" class="gallery-photo mosaic-item mosaic-6" data-alt="작가작업실 JEJU 책장 속 책들" data-full="https://www.jakgastudio.com/assets/photo_f1aa724bbf.webp" type="button"><img alt="작가작업실 JEJU 책장 속 책들" class="" decoding="async" loading="lazy" src="https://www.jakgastudio.com/assets/photo_f1aa724bbf.webp"/></button>
 <button aria-label="유리컵과 노란색 빈티지 전화기 사진 확대" class="gallery-photo mosaic-item mosaic-7" data-alt="유리컵과 노란색 빈티지 전화기" data-full="https://www.jakgastudio.com/assets/photo_0056fd3650.webp" type="button"><img alt="유리컵과 노란색 빈티지 전화기" class="" decoding="async" loading="lazy" src="https://www.jakgastudio.com/assets/photo_0056fd3650.webp"/></button>
 <button aria-label="와인병이 놓인 테이블 사진 확대" class="gallery-photo mosaic-item mosaic-8" data-alt="와인병이 놓인 테이블" data-full="https://www.jakgastudio.com/assets/photo_635bd4f5d2.webp" type="button"><img alt="와인병이 놓인 테이블" class="" decoding="async" loading="lazy" src="https://www.jakgastudio.com/assets/photo_635bd4f5d2.webp"/></button>
-<button aria-label="보라색 꽃병과 흰 책상, 책장이 있는 공간 사진 원본 확대" class="gallery-photo mosaic-item mosaic-9" data-alt="보라색 꽃병과 흰 책상, 책장과 검은 조명이 있는 작가작업실 JEJU 공간 전체 원본" data-full="https://www.jakgastudio.com/assets/space_flower_table_original.jpg" type="button"><img alt="보라색 꽃병을 올린 흰 책상과 책장이 보이는 작가작업실 제주 공간" class="flower-wide-natural" decoding="async" loading="lazy" src="https://www.jakgastudio.com/assets/space_flower_table_thumb.webp"/></button></div>
+<button aria-label="보라색 꽃병과 흰 책상, 책장이 있는 공간 사진 원본 확대" class="gallery-photo mosaic-item mosaic-9" data-alt="보라색 꽃병과 흰 책상, 책장과 검은 조명이 있는 작가작업실 JEJU 공간 전체 원본" data-full="https://www.jakgastudio.com/assets/space_flower_table_original.jpg" type="button"><img alt="보라색 꽃병을 올린 흰 책상과 책장이 보이는 작가작업실 제주 공간" class="flower-wide-natural" decoding="async" loading="lazy" src="https://www.jakgastudio.com/assets/space_flower_table_thumb.webp"/></button><button type="button" class="gallery-photo mosaic-item mosaic-10" data-full="/assets/space-other.webp" data-alt="종이등이 있는 모임 공간" aria-label="종이등이 있는 모임 공간 사진 확대"><img loading="lazy" src="/assets/space-other.webp" alt="종이등이 있는 모임 공간"></button>
+<button type="button" class="gallery-photo mosaic-item mosaic-11" data-full="/assets/space-portrait.webp" data-alt="책을 고르는 작가" aria-label="책을 고르는 작가 사진 확대"><img loading="lazy" src="/assets/space-portrait.webp" alt="책을 고르는 작가"></button>
+<button type="button" class="gallery-photo mosaic-item mosaic-12" data-full="/assets/kv-03.webp" data-alt="서가의 책" aria-label="서가의 책 사진 확대"><img loading="lazy" src="/assets/kv-03.webp" alt="서가의 책"></button></div>
 </div>
 </section>
 <section aria-labelledby="program-title" class="section program-section" id="program">
