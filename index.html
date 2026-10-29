@@ -548,6 +548,62 @@ strong,b{font-weight:700}
 .space-section .approved-grid .mosaic-11{grid-column:2;grid-row:4}
 .space-section .approved-grid .mosaic-12{grid-column:3/span 2;grid-row:4}
 @media(max-width:760px){.space-section .approved-grid{grid-template-rows:none;grid-auto-rows:135px}}
+
+/* BRAND section correction: full-width top bar above centered content.
+   The previous inherited .intro-section display:flex caused the bar and
+   content to appear side by side. Keep this scoped to BRAND only. */
+#brand-story.intro-section {
+  display:block;
+  width:100%;
+  min-height:0;
+  height:auto;
+  padding-bottom:70px;
+  background:#fff;
+}
+#brand-story .brand-nav {
+  width:100%;
+  height:66px;
+  display:block;
+  margin:0;
+  background:#302d2a;
+}
+#brand-story .brand-nav .content-width {
+  width:calc(100% - 112px);
+  max-width:1120px;
+  height:100%;
+  margin-inline:auto;
+  display:flex;
+  align-items:center;
+}
+#brand-story .brand-nav img {
+  display:block;
+  width:min(420px,60vw);
+  height:auto;
+  filter:brightness(0) invert(1);
+}
+#brand-story .brand-container {
+  display:block;
+  width:calc(100% - 112px);
+  max-width:1120px;
+  padding-top:38px;
+  margin:0 auto;
+}
+#brand-story .brand-art {
+  display:block;
+  width:100%;
+  margin:0 auto;
+}
+#brand-story .brand-art .intro-inner {
+  width:100%;
+  margin:0;
+  padding:60px 7%;
+}
+@media (max-width:760px) {
+  #brand-story .brand-nav .content-width,
+  #brand-story .brand-container {width:calc(100% - 34px);}
+  #brand-story .brand-nav img {width:min(400px,85vw);}
+  #brand-story .brand-art .intro-inner {padding:34px 7%;}
+}
 </style></head><body class="variant-a">
 <main id="top">
 <section aria-label="작가작업실 JEJU 대표 사진" class="hero" id="kv-hero">
