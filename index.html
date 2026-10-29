@@ -838,7 +838,7 @@ strong,b{font-weight:700}
 })();
 </script><script>
 (()=>{const hero=document.getElementById('kv-hero');const slides=[...hero.querySelectorAll('.kv-img')],dots=[...hero.querySelectorAll('[data-kv]')];
-let current=0,fadeTimer=null;
+let current=0,fadeTimer=null,scrollDownPending=false;
 const seen=new Set([0]);
 const reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const fadeMs=reduced?0:2750; // Same duration as existing CSS
@@ -853,13 +853,23 @@ function show(i){
   const next=Math.min(2,Math.max(0,i));if(next===current)return;
   current=next;
   seen.add(current);
+  if(current!==2)scrollDownPending=false;
   slides.forEach((img,j)=>img.classList.toggle('active',j===current));
   dots.forEach((dot,j)=>dot.classList.toggle('sel',j===current));
   // The CSS fade remains 2.75s, but the input is no longer locked
   // during that animation. Only the third image's page-unlock is timed.
   clearTimeout(fadeTimer);
   fadeTimer=setTimeout(()=>{
-    if(current===2&&seen.size===3){completed=true;syncScrollLock();}
+    if(current===2){
+      completed=true;
+      syncScrollLock();
+      if(scrollDownPending){
+        scrollDownPending=false;
+        // Preserve the user's continued downward wheel gesture.
+        // Scroll exactly to the boundary after the Key Visual.
+        window.scrollTo({top:window.scrollY+hero.getBoundingClientRect().bottom,behavior:'smooth'});
+      }
+    }
   },fadeMs);
 }
 dots.forEach(dot=>dot.addEventListener('click',()=>show(+dot.dataset.kv)));
@@ -878,6 +888,11 @@ window.addEventListener('wheel',e=>{
     return;
   }
   if(e.cancelable)e.preventDefault();
+  if(current===2&&direction>0){
+    // Scrolling during the final fade must not be lost.
+    scrollDownPending=true;
+    return;
+  }
   if(current+direction>=0&&current+direction<slides.length)show(current+direction);
 },{passive:false,capture:true});
 let touchStartY=null;
