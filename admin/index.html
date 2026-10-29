@@ -164,7 +164,7 @@ tbody tr:last-child td{border-bottom:0}
             <option value="noto-serif">Noto Serif KR</option>
             <option value="malgun">맑은 고딕</option>
           </select>
-          <span class="editor-size-box"><label for="fontSize">크기(px)</label><input id="fontSize" type="number" min="10" max="72" step="1" value="16" inputmode="numeric" aria-label="선택한 글자의 크기(px)"><button type="button" class="format-btn" id="applyFontSize">적용</button></span>
+          <span class="editor-size-box"><label for="fontSize">크기(px)</label><input id="fontSize" type="number" min="10" max="72" step="1" value="16" inputmode="numeric" aria-label="선택한 글자의 크기(px)"></span>
           <button type="button" class="format-btn" data-command="bold" aria-label="굵게"><strong>B</strong></button>
           <button type="button" class="format-btn" data-command="italic" aria-label="기울임"><em>I</em></button>
           <button type="button" class="format-btn" data-command="underline" aria-label="밑줄"><u>U</u></button>
@@ -179,7 +179,7 @@ tbody tr:last-child td{border-bottom:0}
           <button type="button" class="format-btn" data-command="removeFormat">서식 지우기</button>
         </div>
         <div id="content" class="rich-editor" contenteditable="true" role="textbox" aria-label="운영 소식 본문" aria-multiline="true" data-placeholder="운영 소식의 상세 내용을 입력하세요."></div>
-        <p class="note" id="editorFormatHint" aria-live="polite">글자를 선택한 뒤 글꼴·크기·서식을 적용하세요. 저장 후 상세페이지에도 유지됩니다.</p>
+        <p class="note" id="editorFormatHint" aria-live="polite">글자를 선택한 뒤 글꼴이나 크기를 바꾸면 바로 적용됩니다. 저장 후에도 유지됩니다.</p>
       </div>
       <div class="form-grid">
         <div class="form-row"><label class="label" for="status">게시 상태</label><select class="field" id="status"><option value="ongoing">진행중 · 메인과 지난 소식에 표시</option><option value="ended">종료 · 지난 소식에만 표시</option></select></div>
@@ -319,7 +319,7 @@ tbody tr:last-child td{border-bottom:0}
     $('editForm').reset();
     $('content').innerHTML='';
     selectedRange=null;
-    $('editorFormatHint').textContent='글자를 선택한 뒤 글꼴·크기·서식을 적용하세요. 저장 후 상세페이지에도 유지됩니다.';
+    $('editorFormatHint').textContent='글자를 선택한 뒤 글꼴이나 크기를 바꾸면 바로 적용됩니다. 저장 후에도 유지됩니다.';
     $('postId').value = '';
     $('sort').value = 0;
     $('status').value='ongoing';
@@ -398,39 +398,44 @@ tbody tr:last-child td{border-bottom:0}
     document.execCommand('formatBlock',false,e.target.value);
   });
   let selectedRange=null;
-  function captureEditorRange(){
-    const sel=window.getSelection();
-    if(!sel||!sel.rangeCount)return;
-    const range=sel.getRangeAt(0);
-    if(editor.contains(range.startContainer)&&editor.contains(range.endContainer))
-      selectedRange=range.cloneRange();
+  function currentEditorRange(){
+    const selection=window.getSelection();
+    if(!selection||!selection.rangeCount)return null;
+    const range=selection.getRangeAt(0);
+    return editor.contains(range.startContainer)&&editor.contains(range.endContainer)?range:null;
   }
-  editor.addEventListener('mouseup',captureEditorRange);
-  editor.addEventListener('keyup',captureEditorRange);
-  editor.addEventListener('input',captureEditorRange);
-  document.addEventListener('selectionchange',()=>{
-    const sel=window.getSelection();
-    if(sel&&sel.anchorNode&&sel.focusNode&&editor.contains(sel.anchorNode)&&editor.contains(sel.focusNode))
-      captureEditorRange();
-  });
-  function markInline(kind,rawValue){
-    // Toolbar controls can steal focus; restore the most recent editor selection.
-    const current=window.getSelection();
-    const active=current&&current.rangeCount?current.getRangeAt(0):null;
-    const inEditor=r=>r&&editor.contains(r.startContainer)&&editor.contains(r.endContainer);
-    const range=(inEditor(active)&&!active.collapsed?active:inEditor(selectedRange)?selectedRange:null);
-    if(!range||range.collapsed){
-      $('editorFormatHint').textContent='서식을 적용할 글자를 먼저 마우스로 선택해 주세요.';
-      return false;
+  function captureEditorRange(clearCollapsed=false){
+    const range=currentEditorRange();
+    if(!range)return;
+    if(range.collapsed){
+      if(clearCollapsed)selectedRange=null;
+      return;
     }
+    selectedRange=range.cloneRange();
+  }
+  // Freeze the text range before toolbar inputs take focus. Do not replace it
+  // with a collapsed caret when the user opens a select or clicks the size field.
+  const formatToolbar=editor.previousElementSibling;
+  formatToolbar.addEventListener('pointerdown',()=>captureEditorRange(false));
+  formatToolbar.addEventListener('mousedown',()=>captureEditorRange(false));
+  editor.addEventListener('mouseup',()=>captureEditorRange(true));
+  editor.addEventListener('keyup',()=>captureEditorRange(true));
+  editor.addEventListener('input',()=>captureEditorRange(true));
+  document.addEventListener('selectionchange',()=>captureEditorRange(false));
+  function markInline(kind,rawValue){
     const fontIds=['default','kakao','noto-sans','noto-serif','malgun'];
     const size=Number(rawValue);
     if(kind==='font'&&!fontIds.includes(rawValue))return false;
-    if(kind==='size'&&(!/^\d{1,3}$/.test(String(rawValue))||!Number.isInteger(size)||size<10||size>72)){
-      $('editorFormatHint').textContent='글자 크기는 10~72 사이의 숫자(px)로 입력해 주세요.';
+    if(kind==='size'&&(!/^\d{1,3}$/.test(String(rawValue))||!Number.isInteger(size)||size<10||size>72))
+      return false;
+    const active=currentEditorRange();
+    const valid=r=>r&&!r.collapsed&&editor.contains(r.startContainer)&&editor.contains(r.endContainer);
+    // A live selection takes priority; otherwise apply to the saved range.
+    const range=(valid(active)?active:valid(selectedRange)?selectedRange:null);
+    if(!range){
+      $('editorFormatHint').textContent='먼저 본문에서 서식을 바꿀 글자를 선택해 주세요.';
       return false;
     }
-    // Wrap only selected text runs; preserve bold, links, lists, and headings.
     const walker=document.createTreeWalker(editor,NodeFilter.SHOW_TEXT);
     const parts=[];
     let node;
@@ -441,37 +446,52 @@ tbody tr:last-child td{border-bottom:0}
       if(end>start)parts.push({node,start,end});
     }
     if(!parts.length){
-      $('editorFormatHint').textContent='서식을 적용할 글자를 선택해 주세요.';
+      $('editorFormatHint').textContent='서식을 적용할 글자를 다시 선택해 주세요.';
       return false;
     }
     const styled=[];
     for(const item of parts){
       let textNode=item.node;
       if(item.start>0)textNode=textNode.splitText(item.start);
-      const length=item.end-item.start;
-      if(length<textNode.nodeValue.length)textNode.splitText(length);
-      const wrapper=document.createElement('span');
-      if(kind==='font')wrapper.dataset.font=rawValue;
-      else wrapper.style.fontSize=size+'px';
-      textNode.replaceWith(wrapper);
-      wrapper.appendChild(textNode);
+      const count=item.end-item.start;
+      if(count<textNode.nodeValue.length)textNode.splitText(count);
+      // Reuse an existing one-text-node span so using the size spinner
+      // repeatedly updates the same element instead of nesting spans.
+      let span=textNode.parentNode;
+      if(!(span&&span.nodeType===1&&span.tagName==='SPAN'&&span.childNodes.length===1&&span.firstChild===textNode)){
+        span=document.createElement('span');
+        textNode.replaceWith(span);
+        span.appendChild(textNode);
+      }
+      if(kind==='font')span.dataset.font=rawValue;
+      else span.style.fontSize=size+'px';
       styled.push(textNode);
     }
-    editor.focus({preventScroll:true});
-    const sel=window.getSelection(),selection=document.createRange();
+    // Keep focus on the font-size input for repeated +/- adjustments.
+    // The range stays usable even when the live browser selection disappears.
+    const selection=document.createRange();
     selection.setStart(styled[0],0);
     selection.setEnd(styled[styled.length-1],styled[styled.length-1].nodeValue.length);
-    sel.removeAllRanges();sel.addRange(selection);
     selectedRange=selection.cloneRange();
-    $('editorFormatHint').textContent='선택한 글자에 서식이 적용되었습니다. 저장하면 상세페이지에도 유지됩니다.';
+    $('editorFormatHint').textContent='선택한 글자에 서식이 적용되었습니다. 저장 후에도 유지됩니다.';
     return true;
   }
   $('fontFamily').addEventListener('change',e=>{
     if(e.target.value)markInline('font',e.target.value);
   });
-  function applySize(){markInline('size',$('fontSize').value.trim());}
-  $('applyFontSize').addEventListener('click',applySize);
-  $('fontSize').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();applySize();}});
+  const fontSizeInput=$('fontSize');
+  function applySize(){
+    const raw=fontSizeInput.value.trim();
+    if(/^\d{1,3}$/.test(raw)&&Number(raw)>=10&&Number(raw)<=72)
+      markInline('size',raw);
+  }
+  // Changing a number or using the up/down spinner applies immediately.
+  // No extra "적용" click is required.
+  fontSizeInput.addEventListener('input',applySize);
+  fontSizeInput.addEventListener('change',applySize);
+  fontSizeInput.addEventListener('keydown',e=>{
+    if(e.key==='Enter'){e.preventDefault();applySize();}
+  });
 
   $('addLink').addEventListener('mousedown',e=>e.preventDefault());
   $('addLink').addEventListener('click',()=>{
