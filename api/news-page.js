@@ -19,8 +19,16 @@ module.exports=async(req,res)=>{
   const slug=(typeof req.query?.slug==='string'?req.query.slug:'')|| (urlPath.includes('/news/')?decodeURIComponent(urlPath.split('/news/')[1]||''):'');
   const listing=!slug||slug==='news';
   if(!listing&&!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug))return res.status(404).send('소식을 찾을 수 없습니다.');
-  const q='/rest/v1/news_posts?select='+selected+(listing?'&order=sort_order.desc,published_at.desc.nullslast,created_at.desc&limit=300':'&slug=eq.'+encodeURIComponent(slug)+'&limit=1');
-  const rows=await query(q);
+  const q='/rest/v1/news_posts?select='+selected+(listing?'&order=sort_order.desc,published_at.desc.nullslast,created_at.desc':'&slug=eq.'+encodeURIComponent(slug)+'&limit=1');
+  let rows;
+  if(listing){
+    rows=[];
+    for(let offset=0;offset<100000;offset+=500){
+      const batch=await query(q+'&limit=500&offset='+offset);
+      rows.push(...batch);
+      if(batch.length<500)break;
+    }
+  }else rows=await query(q);
   if(!listing&&!rows.length)return res.status(404).send('소식이 없습니다.');
   let body='',script='';
   if(listing){
