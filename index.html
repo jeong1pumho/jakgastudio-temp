@@ -838,7 +838,7 @@ strong,b{font-weight:700}
 })();
 </script><script>
 (()=>{const hero=document.getElementById('kv-hero');const slides=[...hero.querySelectorAll('.kv-img')],dots=[...hero.querySelectorAll('[data-kv]')];
-let current=0,transitioning=false,fadeTimer=null;
+let current=0,transitioning=false,fadeTimer=null,queuedWheel=0,lastWheelAt=0;
 const seen=new Set([0]);
 const reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const fadeMs=reduced?0:2750; // Same duration as existing CSS
@@ -856,20 +856,39 @@ function show(i){
   slides.forEach((img,j)=>img.classList.toggle('active',j===current));
   dots.forEach((dot,j)=>dot.classList.toggle('sel',j===current));
   clearTimeout(fadeTimer);
+  queuedWheel=0;lastWheelAt=0;
   fadeTimer=setTimeout(()=>{
     transitioning=false;seen.add(current);
-    if(seen.size===3){completed=true;syncScrollLock();}
-  },fadeMs+35);
+    const pending=queuedWheel&&Date.now()-lastWheelAt<650?queuedWheel:0;
+    queuedWheel=0;
+    // Release scrolling only after the last photo has fully faded in.
+    // An upward wheel gesture during that fade keeps the hero active.
+    if(current===2&&seen.size===3&&pending>=0){completed=true;syncScrollLock();}
+    if(pending&&current+pending>=0&&current+pending<slides.length)show(current+pending);
+  },fadeMs);
 }
 dots.forEach(dot=>dot.addEventListener('click',()=>show(+dot.dataset.kv)));
 hero.querySelector('.hero-prev').addEventListener('click',()=>show((current+2)%3));
 hero.querySelector('.hero-forward').addEventListener('click',()=>show((current+1)%3));
 window.addEventListener('wheel',e=>{
-  if(completed)return;
+  const dy=e.deltaY;
+  if(Math.abs(dy)<3){if(!completed&&e.cancelable)e.preventDefault();return;}
+  const direction=dy>0?1:-1;
+  if(completed){
+    // On returning to the top, reverse through the same three photos.
+    if(direction<0&&current>0&&window.scrollY<=2){
+      if(e.cancelable)e.preventDefault();
+      completed=false;syncScrollLock();show(current-1);
+    }
+    return;
+  }
   if(e.cancelable)e.preventDefault();
-  if(transitioning||Math.abs(e.deltaY)<3)return;
-  if(e.deltaY>0&&current<2)show(current+1);
-  else if(e.deltaY<0&&current>0)show(current-1);
+  if(transitioning){
+    // Wheel activity continues while fading. Consume it at fade completion
+    // rather than forcing a fresh gesture after the transition ends.
+    queuedWheel=direction;lastWheelAt=Date.now();return;
+  }
+  if(current+direction>=0&&current+direction<slides.length)show(current+direction);
 },{passive:false,capture:true});
 let touchStartY=null;
 hero.addEventListener('touchstart',e=>{if(e.touches.length===1)touchStartY=e.touches[0].screenY;},{passive:true});
