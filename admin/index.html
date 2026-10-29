@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
 <title>운영 소식 관리 | 작가작업실 JEJU</title>
-<style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&amp;family=Noto+Serif+KR:wght@400;700&amp;display=swap"><style>
 :root{--ink:#35302c;--muted:#817970;--light:#faf8f4;--edge:#e7e1d8;--accent:#9d765e;--button:#3c3530;--bg:#f7f5f1}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;font-size:15px;line-height:1.55}
@@ -77,6 +77,20 @@ tbody tr:last-child td{border-bottom:0}
 .rich-editor:focus{box-shadow:inset 0 0 0 1px #ad8c72}.rich-editor:empty::before{content:attr(data-placeholder);color:#aaa29a}
 .rich-editor h2{margin:16px 0 8px;font-size:24px}.rich-editor h3{margin:14px 0 7px;font-size:19px}
 .rich-editor ul,.rich-editor ol{padding-left:25px}.rich-editor a{color:#89664e;text-decoration:underline}
+
+/* NEWS rich text font choices, matched in visitor NEWS detail pages. */
+@font-face{font-family:"KakaoNews";src:url("https://www.jakgastudio.com/assets/fonts/KakaoRegular.ttf") format("truetype");font-weight:400;font-display:swap}
+@font-face{font-family:"KakaoNews";src:url("https://www.jakgastudio.com/assets/fonts/KakaoBold.ttf") format("truetype");font-weight:700;font-display:swap}
+.rich-editor [data-font="default"]{font-family:"Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+.rich-editor [data-font="kakao"]{font-family:"KakaoNews","Malgun Gothic",sans-serif}
+.rich-editor [data-font="noto-sans"]{font-family:"Noto Sans KR","Malgun Gothic",sans-serif}
+.rich-editor [data-font="noto-serif"]{font-family:"Noto Serif KR","Batang",serif}
+.rich-editor [data-font="malgun"]{font-family:"Malgun Gothic","Apple SD Gothic Neo",sans-serif}
+.editor-font-select{min-width:155px;max-width:200px}
+.editor-size-box{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.editor-size-box label{font-size:12px;color:#6e6057}
+.editor-size-box input{height:33px;width:73px;border:1px solid #dfd9d2;border-radius:3px;padding:5px 6px;font-size:13px;background:white;color:#42352c}
+.editor-size-box button{min-height:33px}
 </style>
 </head>
 <body>
@@ -140,6 +154,17 @@ tbody tr:last-child td{border-bottom:0}
         <label class="label" for="content">상세 내용</label>
         <div class="editor-toolbar" role="toolbar" aria-label="본문 서식 도구">
           <select id="formatBlock" aria-label="문단 서식" class="editor-select"><option value="p">본문</option><option value="h2">큰 제목</option><option value="h3">작은 제목</option></select>
+
+          <span class="toolbar-divider"></span>
+          <select id="fontFamily" aria-label="선택한 글자의 글꼴" class="editor-select editor-font-select">
+            <option value="">글꼴 선택</option>
+            <option value="default">기본 글꼴</option>
+            <option value="kakao">카카오체</option>
+            <option value="noto-sans">Noto Sans KR</option>
+            <option value="noto-serif">Noto Serif KR</option>
+            <option value="malgun">맑은 고딕</option>
+          </select>
+          <span class="editor-size-box"><label for="fontSize">크기(px)</label><input id="fontSize" type="number" min="10" max="72" step="1" value="16" inputmode="numeric" aria-label="선택한 글자의 크기(px)"><button type="button" class="format-btn" id="applyFontSize">적용</button></span>
           <button type="button" class="format-btn" data-command="bold" aria-label="굵게"><strong>B</strong></button>
           <button type="button" class="format-btn" data-command="italic" aria-label="기울임"><em>I</em></button>
           <button type="button" class="format-btn" data-command="underline" aria-label="밑줄"><u>U</u></button>
@@ -154,7 +179,7 @@ tbody tr:last-child td{border-bottom:0}
           <button type="button" class="format-btn" data-command="removeFormat">서식 지우기</button>
         </div>
         <div id="content" class="rich-editor" contenteditable="true" role="textbox" aria-label="운영 소식 본문" aria-multiline="true" data-placeholder="운영 소식의 상세 내용을 입력하세요."></div>
-        <p class="note">글자를 선택한 뒤 서식 버튼을 사용하세요. 실제 상세페이지에도 서식이 반영됩니다.</p>
+        <p class="note" id="editorFormatHint" aria-live="polite">글자를 선택한 뒤 글꼴·크기·서식을 적용하세요. 저장 후 상세페이지에도 유지됩니다.</p>
       </div>
       <div class="form-grid">
         <div class="form-row"><label class="label" for="status">게시 상태</label><select class="field" id="status"><option value="ongoing">진행중 · 메인과 지난 소식에 표시</option><option value="ended">종료 · 지난 소식에만 표시</option></select></div>
@@ -293,6 +318,8 @@ tbody tr:last-child td{border-bottom:0}
   function resetForm() {
     $('editForm').reset();
     $('content').innerHTML='';
+    selectedRange=null;
+    $('editorFormatHint').textContent='글자를 선택한 뒤 글꼴·크기·서식을 적용하세요. 저장 후 상세페이지에도 유지됩니다.';
     $('postId').value = '';
     $('sort').value = 0;
     $('status').value='ongoing';
@@ -371,7 +398,81 @@ tbody tr:last-child td{border-bottom:0}
     document.execCommand('formatBlock',false,e.target.value);
   });
   let selectedRange=null;
-  editor.addEventListener('mouseup',()=>{const s=window.getSelection();if(s&&s.rangeCount&&editor.contains(s.anchorNode))selectedRange=s.getRangeAt(0).cloneRange();});
+  function captureEditorRange(){
+    const sel=window.getSelection();
+    if(!sel||!sel.rangeCount)return;
+    const range=sel.getRangeAt(0);
+    if(editor.contains(range.startContainer)&&editor.contains(range.endContainer))
+      selectedRange=range.cloneRange();
+  }
+  editor.addEventListener('mouseup',captureEditorRange);
+  editor.addEventListener('keyup',captureEditorRange);
+  editor.addEventListener('input',captureEditorRange);
+  document.addEventListener('selectionchange',()=>{
+    const sel=window.getSelection();
+    if(sel&&sel.anchorNode&&sel.focusNode&&editor.contains(sel.anchorNode)&&editor.contains(sel.focusNode))
+      captureEditorRange();
+  });
+  function markInline(kind,rawValue){
+    // Toolbar controls can steal focus; restore the most recent editor selection.
+    const current=window.getSelection();
+    const active=current&&current.rangeCount?current.getRangeAt(0):null;
+    const inEditor=r=>r&&editor.contains(r.startContainer)&&editor.contains(r.endContainer);
+    const range=(inEditor(active)&&!active.collapsed?active:inEditor(selectedRange)?selectedRange:null);
+    if(!range||range.collapsed){
+      $('editorFormatHint').textContent='서식을 적용할 글자를 먼저 마우스로 선택해 주세요.';
+      return false;
+    }
+    const fontIds=['default','kakao','noto-sans','noto-serif','malgun'];
+    const size=Number(rawValue);
+    if(kind==='font'&&!fontIds.includes(rawValue))return false;
+    if(kind==='size'&&(!/^\d{1,3}$/.test(String(rawValue))||!Number.isInteger(size)||size<10||size>72)){
+      $('editorFormatHint').textContent='글자 크기는 10~72 사이의 숫자(px)로 입력해 주세요.';
+      return false;
+    }
+    // Wrap only selected text runs; preserve bold, links, lists, and headings.
+    const walker=document.createTreeWalker(editor,NodeFilter.SHOW_TEXT);
+    const parts=[];
+    let node;
+    while((node=walker.nextNode())){
+      if(!node.nodeValue||!range.intersectsNode(node))continue;
+      const start=node===range.startContainer?range.startOffset:0;
+      const end=node===range.endContainer?range.endOffset:node.nodeValue.length;
+      if(end>start)parts.push({node,start,end});
+    }
+    if(!parts.length){
+      $('editorFormatHint').textContent='서식을 적용할 글자를 선택해 주세요.';
+      return false;
+    }
+    const styled=[];
+    for(const item of parts){
+      let textNode=item.node;
+      if(item.start>0)textNode=textNode.splitText(item.start);
+      const length=item.end-item.start;
+      if(length<textNode.nodeValue.length)textNode.splitText(length);
+      const wrapper=document.createElement('span');
+      if(kind==='font')wrapper.dataset.font=rawValue;
+      else wrapper.style.fontSize=size+'px';
+      textNode.replaceWith(wrapper);
+      wrapper.appendChild(textNode);
+      styled.push(textNode);
+    }
+    editor.focus({preventScroll:true});
+    const sel=window.getSelection(),selection=document.createRange();
+    selection.setStart(styled[0],0);
+    selection.setEnd(styled[styled.length-1],styled[styled.length-1].nodeValue.length);
+    sel.removeAllRanges();sel.addRange(selection);
+    selectedRange=selection.cloneRange();
+    $('editorFormatHint').textContent='선택한 글자에 서식이 적용되었습니다. 저장하면 상세페이지에도 유지됩니다.';
+    return true;
+  }
+  $('fontFamily').addEventListener('change',e=>{
+    if(e.target.value)markInline('font',e.target.value);
+  });
+  function applySize(){markInline('size',$('fontSize').value.trim());}
+  $('applyFontSize').addEventListener('click',applySize);
+  $('fontSize').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();applySize();}});
+
   $('addLink').addEventListener('mousedown',e=>e.preventDefault());
   $('addLink').addEventListener('click',()=>{
     const href=window.prompt('링크 주소를 입력하세요 (https://...)');if(!href)return;
