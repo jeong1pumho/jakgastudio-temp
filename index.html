@@ -799,6 +799,76 @@ strong,b{font-weight:700}
   }
 }
 </style>
+
+<style id="hours-lunch-20261029">
+/* OPEN HOURS: maintain original page width, photo position, and section typography. */
+#hours .full-hours{
+  position:relative;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);
+  align-items:center;
+  gap:16px;
+  min-height:165px;
+  padding:24px 29px;
+}
+#hours .full-hours .hours-total-label{min-width:0}
+#hours .full-hours .hours-total-right{
+  display:flex;flex-direction:column;align-items:flex-end;
+  text-align:right;min-width:0;
+}
+#hours .full-hours .hours-total-right>strong{
+  display:block;font-size:clamp(30px,3vw,47px);
+  line-height:1.2;letter-spacing:-.07em;white-space:nowrap;
+}
+#hours .full-hours .hours-lunch{
+  display:flex;flex-direction:column;align-items:flex-end;
+  gap:1px;margin-top:11px;
+  font-size:13px;line-height:1.55;
+  color:#7b6b60;letter-spacing:-.035em;word-break:keep-all;
+}
+#hours .full-hours .hours-lunch span:last-child{
+  font-size:12.5px;
+}
+#hours .hours-cards{
+  gap:12px;
+  margin-top:12px;
+}
+#hours .hours-card{
+  display:flex;flex-direction:column;
+  min-height:216px;padding:28px 26px;
+}
+#hours .hours-card h3{margin:24px 0 12px}
+#hours .hours-card p{margin-top:auto}
+@media(max-width:1050px){
+  #hours .full-hours{padding:22px 20px;gap:10px}
+  #hours .full-hours .hours-lunch{font-size:12px}
+  #hours .full-hours .hours-lunch span:last-child{font-size:11.5px}
+  #hours .hours-card{min-height:194px;padding:24px 20px}
+}
+@media(max-width:700px){
+  #hours .full-hours{
+    grid-template-columns:minmax(0,1fr);
+    align-items:start;
+    gap:12px;
+    min-height:0;
+    padding:19px 16px 20px;
+  }
+  #hours .full-hours .hours-total-right{
+    align-items:flex-start;text-align:left;
+  }
+  #hours .full-hours .hours-total-right>strong{font-size:clamp(29px,7vw,39px)}
+  #hours .full-hours .hours-lunch{align-items:flex-start;margin-top:10px;font-size:12.5px}
+  #hours .full-hours .hours-lunch span:last-child{font-size:12px}
+  #hours .hours-cards{gap:9px;margin-top:10px}
+  #hours .hours-card{min-height:165px;padding:19px 14px}
+  #hours .hours-card h3{margin:15px 0 10px}
+  #hours .hours-card p{font-size:clamp(21px,5.5vw,26px)}
+}
+@media(max-width:390px){
+  #hours .hours-card{padding:17px 11px;min-height:159px}
+  #hours .hours-card p{font-size:clamp(20px,5.3vw,24px)}
+}
+</style>
 </head><body class="variant-a">
 <main id="top">
 <section aria-label="작가작업실 JEJU 영상 소개" class="hero video-keyvisual" id="kv-hero">
@@ -930,7 +1000,13 @@ strong,b{font-weight:700}
 <div class="hours-info">
 <p class="overline">OPERATING DAYS</p>
 <div class="days-line"><strong>화요일~토요일</strong><span>일·월 휴무</span></div>
-<div class="full-hours"><div><small>전체 운영시간</small><p>10시~17시</p></div><strong>10:00 – 17:00</strong><span class="lunch-note">점심시간 12:00 – 13:00</span></div>
+<div class="full-hours">
+  <div class="hours-total-label"><small>전체 운영시간</small><p>10시~17시</p></div>
+  <div class="hours-total-right"><strong>10:00 – 17:00</strong><div class="hours-lunch">
+    <span>점심시간 12:00~13:00</span>
+    <span>(점심시간 방문 가능합니다. 사전 연락 주세요~)</span>
+  </div></div>
+</div>
 <div class="hours-cards">
 <div class="hours-card"><small>01 / 오전</small><h3>모임 시간</h3><p>10:00–12:00</p></div>
 <div class="hours-card"><small>02 / 오후</small><h3>자유 방문 시간</h3><p>13:00–17:00</p></div>
