@@ -47,6 +47,6 @@ module.exports=async(req,res)=>{
   res.setHeader('Content-Type','text/html; charset=utf-8');
   res.setHeader('Cache-Control','no-store');
   res.setHeader('X-Robots-Tag','noindex, nofollow');
-  res.end('<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>소식 | 진행 중인 프로그램과 새로운 소식 · 작가작업실 JEJU</title><style>'+style+'</style></head><body><header class="top"><div class="top-inner"><a href="/#news">작가작업실 JEJU</a><a href="/news">지난 소식 보기</a></div></header><main class="wrap"><div class="section-title"><p class="eyebrow">02 <b>NEWS</b></p><div class="heading"><h1>소식</h1><span>| 진행 중인 프로그램과 새로운 소식</span></div></div>'+body+'<a class="back" href="/#news">돌아가기</a></main>'+script+'</body></html>');
+  res.end('<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>소식 | 진행 중인 프로그램과 새로운 소식 · 작가작업실 JEJU</title><style>'+style+'</style></head><body><header class="top"><div class="top-inner"><a href="/#news">작가작업실 JEJU</a><a href="/news">지난 소식 보기</a></div></header><main class="wrap"><div class="section-title"><p class="eyebrow">02 <b>NEWS</b></p><div class="heading"><h1>소식</h1></div></div>'+body+'<a class="back" href="/#news">돌아가기</a></main>'+script+'</body></html>');
  }catch(e){res.status(e.status||500).send('운영 소식을 불러오지 못했습니다.');}
 };
