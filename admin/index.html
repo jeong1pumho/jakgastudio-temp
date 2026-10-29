@@ -44,8 +44,7 @@ tbody tr:last-child td{border-bottom:0}
 .post-title{font-weight:600;overflow-wrap:anywhere}
 .post-sub{font-size:12px;color:var(--muted);margin-top:3px}
 .badge{display:inline-block;border-radius:3px;padding:3px 8px;background:#f2f0ed;font-size:12px;white-space:nowrap}
-.badge.public{background:#ebf4ec;color:#376748}.badge.draft{background:#f6efe2;color:#765e30}
-.badge.archived{background:#efeff1;color:#686875}
+.badge.public{background:#ebf4ec;color:#376748}.badge.ended{background:#efeff1;color:#686875}
 .actions{display:flex;gap:6px;white-space:nowrap}
 .counter{color:var(--muted);font-size:13px;margin-top:16px}
 .empty-state{text-align:center;padding:68px 12px;color:var(--muted)}
@@ -63,6 +62,21 @@ tbody tr:last-child td{border-bottom:0}
 .list-head-actions{display:flex;gap:8px;align-items:center}
 @media(max-width:800px){.container{padding:18px 14px 55px}.panel{padding:22px 16px}.wordmark small{display:none}.page-heading{align-items:flex-start;gap:12px}h1{font-size:23px}.form-grid{grid-template-columns:1fr}.photos{grid-template-columns:repeat(2,minmax(0,1fr))}table{min-width:670px}.toolbar .filter{width:100%}}
 @media(max-width:470px){.page-heading{flex-direction:column;align-items:stretch}.list-head-actions{justify-content:space-between}.page-heading .btn{align-self:stretch}.photos{grid-template-columns:1fr}.site-header{gap:8px}.wordmark{font-size:18px}}
+
+/* Rich editor and drag-and-drop image upload */
+.visually-hidden{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+.dropzone{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;min-height:150px;border:2px dashed #bdb1a4;border-radius:6px;background:#fdfbf8;cursor:pointer;text-align:center;padding:24px}
+.dropzone .drop-icon{font-size:34px;color:#92765c;line-height:1}.dropzone span{color:#756a60;font-size:13px}.dropzone strong{font-size:15px}
+.dropzone.over{border-color:#825d43;background:#f1e7da}.dropzone.uploading{opacity:.65;pointer-events:none}
+.editor-toolbar{display:flex;gap:5px;flex-wrap:wrap;align-items:center;padding:10px;background:#f7f5f2;border:1px solid #cec6bc;border-radius:5px 5px 0 0}
+.format-btn{background:#fff;border:1px solid #dfd9d2;border-radius:3px;color:#42352c;padding:6px 9px;min-height:33px;font-size:13px}
+.format-btn:hover{background:#ebe0d3}.format-btn:focus-visible{outline:2px solid #9d765e}
+.editor-select{background:#fff;border:1px solid #dfd9d2;border-radius:3px;padding:5px;font-size:13px;min-height:33px}
+.toolbar-divider{height:22px;border-left:1px solid #d2c8bb;margin:0 4px}
+.rich-editor{min-height:260px;padding:18px;border:1px solid #cec6bc;border-top:0;border-radius:0 0 5px 5px;outline:none;line-height:1.8;white-space:pre-wrap;overflow-wrap:anywhere}
+.rich-editor:focus{box-shadow:inset 0 0 0 1px #ad8c72}.rich-editor:empty::before{content:attr(data-placeholder);color:#aaa29a}
+.rich-editor h2{margin:16px 0 8px;font-size:24px}.rich-editor h3{margin:14px 0 7px;font-size:19px}
+.rich-editor ul,.rich-editor ol{padding-left:25px}.rich-editor a{color:#89664e;text-decoration:underline}
 </style>
 </head>
 <body>
@@ -93,9 +107,8 @@ tbody tr:last-child td{border-bottom:0}
       <input class="field search" id="search" type="search" placeholder="소식 제목 검색" aria-label="소식 제목 검색">
       <select class="field filter" id="filter" aria-label="게시 상태 필터">
         <option value="all">전체 상태</option>
-        <option value="published">공개</option>
-        <option value="draft">임시저장</option>
-        <option value="archived">게시중단</option>
+        <option value="ongoing">진행중</option>
+        <option value="ended">종료</option>
       </select>
     </div>
     <div id="listArea" class="list-wrap"></div>
@@ -114,14 +127,37 @@ tbody tr:last-child td{border-bottom:0}
       <div class="form-row"><label class="label" for="title">소식 제목</label><input class="field" id="title" required minlength="2" maxlength="150"></div>
       <div class="form-row"><label class="label" for="slug">상세페이지 주소 (영문, 선택사항)</label><input class="field" id="slug" placeholder="비워 두면 자동 생성" pattern="[a-z0-9]+(-[a-z0-9]+)*"><p class="note">기존 글을 수정할 때는 주소를 변경하지 않는 편이 좋습니다.</p></div>
       <div class="form-row">
-        <label class="label" for="files">사진 등록 · 최대 9장</label>
-        <input class="field" id="files" type="file" multiple accept="image/jpeg,image/png,image/webp,image/avif">
-        <p class="note">대표사진 선택, 순서 변경, 제외가 가능합니다. 한 장당 최대 10MB.</p>
+        <label class="label" for="files">사진 등록 · 최대 20장</label>
+        <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="사진을 드래그하거나 클릭해서 추가">
+          <span class="drop-icon" aria-hidden="true">+</span><strong>사진을 이곳에 끌어다 놓으세요</strong><span>또는 클릭하여 파일 선택</span>
+          <span class="note" id="photoCount">0 / 20장</span>
+        </div>
+        <input class="visually-hidden" id="files" type="file" multiple accept="image/jpeg,image/png,image/webp,image/avif">
+        <p class="note">JPG·PNG·WEBP·AVIF / 한 장당 최대 10MB. 대표사진 선택, 순서 변경, 제외 가능.</p>
         <div id="photos" class="photos"></div>
       </div>
-      <div class="form-row"><label class="label" for="content">상세 내용</label><textarea class="field" id="content" placeholder="운영 소식의 상세 내용을 입력하세요. 줄바꿈은 그대로 표시됩니다."></textarea></div>
+      <div class="form-row">
+        <label class="label" for="content">상세 내용</label>
+        <div class="editor-toolbar" role="toolbar" aria-label="본문 서식 도구">
+          <select id="formatBlock" aria-label="문단 서식" class="editor-select"><option value="p">본문</option><option value="h2">큰 제목</option><option value="h3">작은 제목</option></select>
+          <button type="button" class="format-btn" data-command="bold" aria-label="굵게"><strong>B</strong></button>
+          <button type="button" class="format-btn" data-command="italic" aria-label="기울임"><em>I</em></button>
+          <button type="button" class="format-btn" data-command="underline" aria-label="밑줄"><u>U</u></button>
+          <span class="toolbar-divider"></span>
+          <button type="button" class="format-btn" data-command="justifyLeft" aria-label="왼쪽 정렬">≡</button>
+          <button type="button" class="format-btn" data-command="justifyCenter" aria-label="가운데 정렬">☷</button>
+          <button type="button" class="format-btn" data-command="justifyRight" aria-label="오른쪽 정렬">≣</button>
+          <span class="toolbar-divider"></span>
+          <button type="button" class="format-btn" data-command="insertUnorderedList" aria-label="글머리 기호">• 목록</button>
+          <button type="button" class="format-btn" data-command="insertOrderedList" aria-label="번호 목록">1. 목록</button>
+          <button type="button" class="format-btn" id="addLink">링크</button>
+          <button type="button" class="format-btn" data-command="removeFormat">서식 지우기</button>
+        </div>
+        <div id="content" class="rich-editor" contenteditable="true" role="textbox" aria-label="운영 소식 본문" aria-multiline="true" data-placeholder="운영 소식의 상세 내용을 입력하세요."></div>
+        <p class="note">글자를 선택한 뒤 서식 버튼을 사용하세요. 실제 상세페이지에도 서식이 반영됩니다.</p>
+      </div>
       <div class="form-grid">
-        <div class="form-row"><label class="label" for="status">게시 상태</label><select class="field" id="status"><option value="draft">임시저장</option><option value="published">공개</option><option value="archived">게시중단</option></select></div>
+        <div class="form-row"><label class="label" for="status">게시 상태</label><select class="field" id="status"><option value="ongoing">진행중 · 메인과 지난 소식에 표시</option><option value="ended">종료 · 지난 소식에만 표시</option></select></div>
         <div class="form-row"><label class="label" for="sort">게시 순서</label><input class="field" id="sort" type="number" step="1" value="0"><p class="note">값이 클수록 목록 상단에 표시됩니다.</p></div>
       </div>
       <div class="edit-footer">
@@ -142,7 +178,7 @@ tbody tr:last-child td{border-bottom:0}
   let imgs = [];
   let cover = 0;
   let saving = false;
-  const statusNames = { published:'공개', draft:'임시저장', archived:'게시중단' };
+  const statusNames = { ongoing:'진행중', ended:'종료' };
 
   function message(s, error) {
     $('message').textContent = s || '';
@@ -205,7 +241,7 @@ tbody tr:last-child td{border-bottom:0}
         desc.appendChild(el('div','post-sub','사진 ' + (p.images?.length || 0) + '장'));
         info.appendChild(desc); td0.appendChild(info); tr.appendChild(td0);
         const td1 = el('td');
-        td1.appendChild(el('span','badge ' + (p.status === 'published' ? 'public' : p.status === 'draft' ? 'draft' : 'archived'), statusNames[p.status] || p.status));
+        td1.appendChild(el('span','badge ' + (p.status === 'ongoing' ? 'public' : 'ended'), statusNames[p.status] || p.status));
         tr.appendChild(td1);
         tr.appendChild(el('td','note',dateText(p.updated_at)));
         const td3 = el('td');
@@ -239,6 +275,7 @@ tbody tr:last-child td{border-bottom:0}
   }
   function renderPhotos() {
     const root = $('photos');root.replaceChildren();
+    $('photoCount').textContent=imgs.length+' / 20장';
     imgs.forEach((src,i) => {
       const item = el('div','photo-card');
       const pic = el('img');pic.src=src;pic.alt='등록 사진 '+(i+1);pic.loading='lazy';item.appendChild(pic);
@@ -255,9 +292,10 @@ tbody tr:last-child td{border-bottom:0}
   }
   function resetForm() {
     $('editForm').reset();
+    $('content').innerHTML='';
     $('postId').value = '';
     $('sort').value = 0;
-    $('status').value='draft';
+    $('status').value='ongoing';
     imgs=[];cover=0;renderPhotos();
   }
   function newPost() {
@@ -272,10 +310,11 @@ tbody tr:last-child td{border-bottom:0}
     $('postId').value=p.id;
     $('title').value=p.title||'';
     $('slug').value=p.slug||'';
-    $('content').value=p.content||'';
-    $('status').value=p.status||'draft';
+    if(/<\s*\/?\s*(p|div|h2|h3|b|strong|em|i|u|ul|ol|li|span|a|br)\b/i.test(p.content||''))$('content').innerHTML=p.content||'';
+    else $('content').textContent=p.content||'';
+    $('status').value=p.status||'ongoing';
     $('sort').value=p.sort_order||0;
-    imgs=Array.isArray(p.images)?p.images.slice(0,9):[];
+    imgs=Array.isArray(p.images)?p.images.slice(0,20):[];
     cover=Math.max(0,Math.min(Number(p.cover_index)||0,imgs.length-1));
     renderPhotos();
     $('editHeading').textContent='운영 소식 수정';
@@ -317,31 +356,65 @@ tbody tr:last-child td{border-bottom:0}
       else {message('게시물 목록을 불러오지 못했습니다: '+err.message,true);}
     } finally { $('loginBtn').disabled=false; }
   });
-  $('files').addEventListener('change', async e => {
-    const files=Array.from(e.target.files || []);
-    e.target.value='';
-    if(!files.length) return;
-    if(imgs.length+files.length>9) return message('사진은 최대 9장까지 등록할 수 있습니다.',true);
-    const types=['image/jpeg','image/png','image/webp','image/avif'];
-    if(files.some(f=>!types.includes(f.type)||f.size>10*1024*1024)) return message('JPG·PNG·WEBP·AVIF만 가능하며 파일당 10MB 이하로 등록해 주세요.',true);
-    message('사진 업로드 중…');
-    try {
-      const cfg=await api('/api/admin?action=config');
-      if(!cfg.configured) throw Error('이미지 저장소 연결 정보가 없습니다.');
-      for(const f of files) {
-        const ext={'image/jpeg':'jpg','image/png':'png','image/webp':'webp','image/avif':'avif'}[f.type];
-        const name='posts/'+Date.now()+'-'+crypto.randomUUID()+'.'+ext;
-        const r=await fetch(cfg.url+'/storage/v1/object/news-media/'+name,{method:'POST',headers:{apikey:cfg.key,Authorization:'Bearer '+token,'Content-Type':f.type,'x-upsert':'false'},body:f});
-        if(!r.ok) throw Error('이미지 업로드 실패 ('+r.status+')');
-        imgs.push(cfg.url+'/storage/v1/object/public/news-media/'+name);
-      }
-      renderPhotos();message('사진 '+files.length+'장 업로드를 완료했습니다.');
-    }catch(err){renderPhotos();message(err.message,true);}
+
+  // Native contenteditable is intentionally self-contained; server sanitizes accepted markup.
+  const editor=$('content');
+  document.querySelectorAll('[data-command]').forEach(btn => {
+    btn.addEventListener('mousedown',e=>e.preventDefault());
+    btn.addEventListener('click',()=>{
+      editor.focus();
+      document.execCommand(btn.dataset.command,false,null);
+    });
   });
+  $('formatBlock').addEventListener('change',e=>{
+    editor.focus();
+    document.execCommand('formatBlock',false,e.target.value);
+  });
+  let selectedRange=null;
+  editor.addEventListener('mouseup',()=>{const s=window.getSelection();if(s&&s.rangeCount&&editor.contains(s.anchorNode))selectedRange=s.getRangeAt(0).cloneRange();});
+  $('addLink').addEventListener('mousedown',e=>e.preventDefault());
+  $('addLink').addEventListener('click',()=>{
+    const href=window.prompt('링크 주소를 입력하세요 (https://...)');if(!href)return;
+    try{const url=new URL(href.trim());if(!['https:','http:','mailto:'].includes(url.protocol))throw Error('프로토콜'); 
+      editor.focus();if(selectedRange){const s=window.getSelection();s.removeAllRanges();s.addRange(selectedRange);}
+      document.execCommand('createLink',false,url.href);
+    }catch{message('http 또는 https 주소만 입력해 주세요.',true);}
+  });
+  const drop=$('dropzone');
+  drop.addEventListener('click',()=>$('files').click());
+  drop.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('files').click();}});
+  ['dragenter','dragover'].forEach(type=>drop.addEventListener(type,e=>{e.preventDefault();drop.classList.add('over');}));
+  ['dragleave','drop'].forEach(type=>drop.addEventListener(type,e=>{e.preventDefault();drop.classList.remove('over');}));
+  drop.addEventListener('drop',e=>{if(e.dataTransfer?.files?.length)uploadPhotos(Array.from(e.dataTransfer.files));});
+  // Image chooser and drop zone share exactly the same validation and upload routine.
+  $('files').addEventListener('change',e=>{const files=Array.from(e.target.files||[]);e.target.value='';uploadPhotos(files);});
+  async function uploadPhotos(files){
+    if(!files.length)return;
+    if(imgs.length+files.length>20)return message('사진은 최대 20장까지 등록할 수 있습니다.',true);
+    const types=['image/jpeg','image/png','image/webp','image/avif'];
+    if(files.some(f=>!types.includes(f.type)||f.size>10*1024*1024))return message('JPG·PNG·WEBP·AVIF만 가능하며 파일당 10MB 이하로 등록해 주세요.',true);
+    if(drop.dataset.busy==='1')return message('기존 사진 업로드가 끝나면 추가해 주세요.',true);
+    drop.dataset.busy='1';drop.classList.add('uploading');
+    message('사진 '+files.length+'장 업로드 중…');
+    try{
+      const cfg=await api('/api/admin?action=config');
+      if(!cfg.configured)throw Error('이미지 저장소 연결 정보가 없습니다.');
+      for(const file of files){
+        const ext={'image/jpeg':'jpg','image/png':'png','image/webp':'webp','image/avif':'avif'}[file.type];
+        const name='posts/'+Date.now()+'-'+crypto.randomUUID()+'.'+ext;
+        const url=cfg.url+'/storage/v1/object/news-media/'+name;
+        const resp=await fetch(url,{method:'POST',headers:{apikey:cfg.key,Authorization:'Bearer '+token,'Content-Type':file.type,'x-upsert':'false'},body:file});
+        if(!resp.ok)throw Error('사진 업로드 실패 (HTTP '+resp.status+')');
+        imgs.push(cfg.url+'/storage/v1/object/public/news-media/'+name);
+        renderPhotos();
+      }
+      message('사진 '+files.length+'장 등록 완료');
+    }catch(e){message('업로드 오류: '+e.message,true);}finally{drop.dataset.busy='0';drop.classList.remove('uploading');}
+  }
   $('editForm').addEventListener('submit', async e => {
     e.preventDefault();if(saving)return;
     const id=$('postId').value;
-    const payload={id,title:$('title').value.trim(),slug:$('slug').value.trim(),content:$('content').value,images:imgs.slice(),cover_index:cover,status:$('status').value,sort_order:Number($('sort').value)||0};
+    const payload={id,title:$('title').value.trim(),slug:$('slug').value.trim(),content:$('content').innerHTML,images:imgs.slice(),cover_index:cover,status:$('status').value,sort_order:Number($('sort').value)||0};
     saving=true;$('saveBtn').disabled=true;message('게시물을 저장하는 중…');
     try {
       await api('/api/admin',{method:id?'PATCH':'POST',body:JSON.stringify(payload)});
