@@ -756,6 +756,49 @@ strong,b{font-weight:700}
   #brand-story .brand-container{width:calc(100% - 34px)}
 }
 </style>
+
+<style id="space-gallery-layout-20261029">
+/* Test-only responsive SPACE collage, extensible by appending .gallery-photo. */
+#space .space-grid.approved-grid.space-gallery-20261029{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  grid-template-rows:repeat(2,clamp(190px,16.5vw,236px));
+  grid-auto-rows:clamp(150px,13vw,205px);
+  grid-auto-flow:row;
+  column-gap:10px;row-gap:10px;
+  height:auto;overflow:visible;align-items:stretch;
+}
+#space .space-gallery-20261029 > .gallery-photo{
+  display:block;min-width:0;min-height:0;width:100%;height:100%;
+  grid-column:auto!important;grid-row:auto!important;
+  cursor:zoom-in;overflow:hidden;
+}
+#space .space-gallery-20261029 > .gallery-photo.space-photo-primary{
+  grid-column:span 2!important;grid-row:span 2!important;
+}
+#space .space-gallery-20261029 .gallery-photo img{
+  width:100%;height:100%;object-fit:cover;
+  object-position:center center;
+  display:block;
+}
+#space .space-gallery-20261029 .gallery-photo:nth-child(1) img{object-position:center 53%}
+#space .space-gallery-20261029 .gallery-photo:nth-child(2) img{object-position:center 43%}
+#space .space-gallery-20261029 .gallery-photo:nth-child(3) img{object-position:center 50%}
+#space .space-gallery-20261029 .gallery-photo:nth-child(6) img{object-position:center 43%}
+#space .space-gallery-20261029 .gallery-photo:nth-child(9) img{object-position:center 40%}
+#space .space-gallery-20261029 .gallery-photo:nth-child(13) img{object-position:center 40%}
+@media(max-width:760px){
+  #space .space-grid.approved-grid.space-gallery-20261029{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    grid-template-rows:clamp(260px,65vw,450px);
+    grid-auto-rows:clamp(160px,42vw,245px);
+    gap:9px;
+  }
+  #space .space-gallery-20261029 > .gallery-photo.space-photo-primary{
+    grid-column:1 / -1!important;grid-row:span 1!important;
+  }
+}
+</style>
 </head><body class="variant-a">
 <main id="top">
 <section aria-label="작가작업실 JEJU 영상 소개" class="hero video-keyvisual" id="kv-hero">
@@ -814,17 +857,19 @@ strong,b{font-weight:700}
 <p class="eyebrow">03 <span>SPACE</span><i></i></p>
 <div class="heading-line"><h2 id="space-title">공간소개</h2></div>
 </div>
-<div class="space-grid approved-grid"><button aria-label="긴 테이블과 책장이 있는 작가작업실 JEJU 공간 사진 확대" class="gallery-photo mosaic-item mosaic-1" data-alt="긴 테이블과 책장이 있는 작가작업실 JEJU 공간" data-full="/assets/kv-01.webp" type="button"><img alt="긴 테이블과 책장이 있는 작가작업실 JEJU 공간" class="" decoding="async" loading="lazy" src="/assets/kv-01.webp"/></button>
-<button aria-label="종이등 조명과 다양한 의자가 놓인 모임 공간 사진 원본 확대" class="gallery-photo mosaic-item mosaic-2" data-alt="종이등 조명과 다양한 의자가 놓인 작가작업실 JEJU 모임 공간 전체 원본" data-full="https://www.jakgastudio.com/assets/space_lantern_tables_original.jpg" type="button"><img alt="종이등 조명 아래 긴 책상과 의자가 있는 작가작업실 제주 모임 공간" class="" decoding="async" loading="lazy" src="https://www.jakgastudio.com/assets/space_lantern_tables_thumb.webp"/></button>
-<button aria-label="작가작업실 JEJU 건물의 외부 전경 사진 확대" class="gallery-photo mosaic-item mosaic-3" data-alt="작가작업실 JEJU 건물의 외부 전경" data-full="/assets/kv-02.webp" type="button"><img alt="작가작업실 JEJU 건물의 외부 전경" class="" decoding="async" loading="lazy" src="/assets/kv-02.webp"/></button>
-<button aria-label="여러 권의 책을 표지가 보이도록 진열한 작가작업실 제주 책장 사진 확대" class="gallery-photo mosaic-item mosaic-4" data-alt="여러 권의 책을 표지가 보이도록 진열한 작가작업실 제주 책장" data-full="/assets/space-portrait.webp" type="button"><img alt="여러 권의 책을 표지가 보이도록 진열한 작가작업실 제주 책장" class="book-wall-complete" decoding="async" loading="lazy" src="/assets/space-portrait.webp"/></button>
-<button aria-label="빛나는 전구 조명 세 개 사진 확대" class="gallery-photo mosaic-item mosaic-5" data-alt="빛나는 전구 조명 세 개" data-full="https://www.jakgastudio.com/assets/photo_0479a9ddec.webp" type="button"><img alt="빛나는 전구 조명 세 개" class="" decoding="async" loading="lazy" src="https://www.jakgastudio.com/assets/photo_0479a9ddec.webp"/></button>
-<button aria-label="작가작업실 JEJU 책장 속 책들 사진 확대" class="gallery-photo mosaic-item mosaic-6" data-alt="작가작업실 JEJU 책장 속 책들" data-full="https://www.jakgastudio.com/assets/photo_f1aa724bbf.webp" type="button"><img alt="작가작업실 JEJU 책장 속 책들" class="" decoding="async" loading="lazy" src="https://www.jakgastudio.com/assets/photo_f1aa724bbf.webp"/></button>
-<button aria-label="유리컵과 노란색 빈티지 전화기 사진 확대" class="gallery-photo mosaic-item mosaic-7" data-alt="유리컵과 노란색 빈티지 전화기" data-full="https://www.jakgastudio.com/assets/photo_0056fd3650.webp" type="button"><img alt="유리컵과 노란색 빈티지 전화기" class="" decoding="async" loading="lazy" src="https://www.jakgastudio.com/assets/photo_0056fd3650.webp"/></button>
-<button aria-label="와인병이 놓인 테이블 사진 확대" class="gallery-photo mosaic-item mosaic-8" data-alt="와인병이 놓인 테이블" data-full="https://www.jakgastudio.com/assets/photo_635bd4f5d2.webp" type="button"><img alt="와인병이 놓인 테이블" class="" decoding="async" loading="lazy" src="https://www.jakgastudio.com/assets/photo_635bd4f5d2.webp"/></button>
-<button aria-label="보라색 꽃병과 흰 책상, 책장이 있는 공간 사진 원본 확대" class="gallery-photo mosaic-item mosaic-9" data-alt="보라색 꽃병과 흰 책상, 책장과 검은 조명이 있는 작가작업실 JEJU 공간 전체 원본" data-full="/assets/space-other.webp" type="button"><img alt="보라색 꽃병을 올린 흰 책상과 책장이 보이는 작가작업실 제주 공간" class="flower-wide-natural" decoding="async" loading="lazy" src="/assets/space-other.webp"/></button><button type="button" class="gallery-photo mosaic-item mosaic-10" data-full="/assets/space-other.webp" data-alt="종이등이 있는 모임 공간" aria-label="종이등이 있는 모임 공간 사진 확대"><img loading="lazy" src="/assets/space-other.webp" alt="종이등이 있는 모임 공간"></button>
-<button type="button" class="gallery-photo mosaic-item mosaic-11" data-full="/assets/space-portrait.webp" data-alt="책을 고르는 작가" aria-label="책을 고르는 작가 사진 확대"><img loading="lazy" src="/assets/space-portrait.webp" alt="책을 고르는 작가"></button>
-<button type="button" class="gallery-photo mosaic-item mosaic-12" data-full="/assets/kv-03.webp" data-alt="서가의 책" aria-label="서가의 책 사진 확대"><img loading="lazy" src="/assets/kv-03.webp" alt="서가의 책"></button></div>
+<div class="space-grid approved-grid space-gallery-20261029"><button type="button" class="gallery-photo space-gallery-item space-photo-primary" aria-label="전체 공간과 둥근 종이등 사진 확대" data-alt="전체 공간과 둥근 종이등" data-full="/assets/kv-01.webp"><img src="/assets/kv-01.webp" alt="전체 공간과 둥근 종이등" loading="lazy" decoding="async"/></button>
+<button type="button" class="gallery-photo space-gallery-item" aria-label="책장과 장식 조명 사진 확대" data-alt="책장과 장식 조명" data-full="https://www.jakgastudio.com/assets/photo_8c1c5d1cfa.webp"><img src="https://www.jakgastudio.com/assets/photo_8c1c5d1cfa.webp" alt="책장과 장식 조명" loading="lazy" decoding="async"/></button>
+<button type="button" class="gallery-photo space-gallery-item" aria-label="작가작업실 JEJU 외부 전경 사진 확대" data-alt="작가작업실 JEJU 외부 전경" data-full="/assets/kv-02.webp"><img src="/assets/kv-02.webp" alt="작가작업실 JEJU 외부 전경" loading="lazy" decoding="async"/></button>
+<button type="button" class="gallery-photo space-gallery-item" aria-label="종이등과 모임 테이블 정면 사진 확대" data-alt="종이등과 모임 테이블 정면" data-full="https://www.jakgastudio.com/assets/space_lantern_tables_original.jpg"><img src="https://www.jakgastudio.com/assets/space_lantern_tables_thumb.webp" alt="종이등과 모임 테이블 정면" loading="lazy" decoding="async"/></button>
+<button type="button" class="gallery-photo space-gallery-item" aria-label="커피잔과 노란 전화기 사진 확대" data-alt="커피잔과 노란 전화기" data-full="https://www.jakgastudio.com/assets/photo_0056fd3650.webp"><img src="https://www.jakgastudio.com/assets/photo_0056fd3650.webp" alt="커피잔과 노란 전화기" loading="lazy" decoding="async"/></button>
+<button type="button" class="gallery-photo space-gallery-item" aria-label="책장 앞에서 책을 읽는 작가 사진 확대" data-alt="책장 앞에서 책을 읽는 작가" data-full="/assets/space-portrait.webp"><img src="/assets/space-portrait.webp" alt="책장 앞에서 책을 읽는 작가" loading="lazy" decoding="async"/></button>
+<button type="button" class="gallery-photo space-gallery-item" aria-label="전시된 와인병 사진 확대" data-alt="전시된 와인병" data-full="https://www.jakgastudio.com/assets/photo_635bd4f5d2.webp"><img src="https://www.jakgastudio.com/assets/photo_635bd4f5d2.webp" alt="전시된 와인병" loading="lazy" decoding="async"/></button>
+<button type="button" class="gallery-photo space-gallery-item" aria-label="책이 꽂힌 서가 사진 확대" data-alt="책이 꽂힌 서가" data-full="https://www.jakgastudio.com/assets/photo_f1aa724bbf.webp"><img src="https://www.jakgastudio.com/assets/photo_f1aa724bbf.webp" alt="책이 꽂힌 서가" loading="lazy" decoding="async"/></button>
+<button type="button" class="gallery-photo space-gallery-item" aria-label="둥근 조명 아래 모임 공간 사진 확대" data-alt="둥근 조명 아래 모임 공간" data-full="/assets/space-other.webp"><img src="/assets/space-other.webp" alt="둥근 조명 아래 모임 공간" loading="lazy" decoding="async"/></button>
+<button type="button" class="gallery-photo space-gallery-item" aria-label="표지가 보이도록 진열한 도서 사진 확대" data-alt="표지가 보이도록 진열한 도서" data-full="https://www.jakgastudio.com/assets/space_bookshelf_display_final.webp"><img src="https://www.jakgastudio.com/assets/space_bookshelf_display_final.webp" alt="표지가 보이도록 진열한 도서" loading="lazy" decoding="async"/></button>
+<button type="button" class="gallery-photo space-gallery-item" aria-label="보라색 꽃과 흰 테이블 사진 확대" data-alt="보라색 꽃과 흰 테이블" data-full="https://www.jakgastudio.com/assets/space_flower_table_original.jpg"><img src="https://www.jakgastudio.com/assets/space_flower_table_thumb.webp" alt="보라색 꽃과 흰 테이블" loading="lazy" decoding="async"/></button>
+<button type="button" class="gallery-photo space-gallery-item" aria-label="따뜻하게 빛나는 세 개의 전구 사진 확대" data-alt="따뜻하게 빛나는 세 개의 전구" data-full="https://www.jakgastudio.com/assets/photo_0479a9ddec.webp"><img src="https://www.jakgastudio.com/assets/photo_0479a9ddec.webp" alt="따뜻하게 빛나는 세 개의 전구" loading="lazy" decoding="async"/></button>
+<button type="button" class="gallery-photo space-gallery-item" aria-label="둥근 조명 아래 모임 공간 사진 확대" data-alt="둥근 조명 아래 모임 공간" data-full="/assets/space-other.webp"><img src="/assets/space-other.webp" alt="둥근 조명 아래 모임 공간" loading="lazy" decoding="async"/></button></div>
 </div>
 </section>
 <section aria-labelledby="program-title" class="section program-section" id="program">
