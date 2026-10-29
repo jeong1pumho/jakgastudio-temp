@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
 <title>운영 소식 관리 | 작가작업실 JEJU</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&amp;family=Noto+Serif+KR:wght@400;700&amp;display=swap"><style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&amp;family=IBM+Plex+Sans+KR&amp;family=Gothic+A1&amp;family=Nanum+Gothic&amp;family=Gowun+Dodum&amp;family=Black+Han+Sans&amp;family=Do+Hyeon&amp;family=Jua&amp;family=Sunflower&amp;family=Noto+Serif+KR&amp;family=Nanum+Myeongjo&amp;family=Gowun+Batang&amp;family=Hahmlet&amp;family=Song+Myung&amp;family=Gaegu&amp;family=Gamja+Flower&amp;family=Single+Day&amp;family=Yeon+Sung&amp;family=Nanum+Pen+Script&amp;family=Nanum+Brush+Script&amp;family=Poor+Story&amp;family=Hi+Melody&amp;family=Cute+Font&amp;display=swap"><style>
 :root{--ink:#35302c;--muted:#817970;--light:#faf8f4;--edge:#e7e1d8;--accent:#9d765e;--button:#3c3530;--bg:#f7f5f1}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;font-size:15px;line-height:1.55}
@@ -81,16 +81,44 @@ tbody tr:last-child td{border-bottom:0}
 /* NEWS rich text font choices, matched in visitor NEWS detail pages. */
 @font-face{font-family:"KakaoNews";src:url("https://www.jakgastudio.com/assets/fonts/KakaoRegular.ttf") format("truetype");font-weight:400;font-display:swap}
 @font-face{font-family:"KakaoNews";src:url("https://www.jakgastudio.com/assets/fonts/KakaoBold.ttf") format("truetype");font-weight:700;font-display:swap}
-.rich-editor [data-font="default"]{font-family:"Apple SD Gothic Neo","Malgun Gothic",sans-serif}
-.rich-editor [data-font="kakao"]{font-family:"KakaoNews","Malgun Gothic",sans-serif}
-.rich-editor [data-font="noto-sans"]{font-family:"Noto Sans KR","Malgun Gothic",sans-serif}
-.rich-editor [data-font="noto-serif"]{font-family:"Noto Serif KR","Batang",serif}
-.rich-editor [data-font="malgun"]{font-family:"Malgun Gothic","Apple SD Gothic Neo",sans-serif}
+.rich-editor [data-font="noto-sans"]{font-family:"Noto Sans KR","Noto Sans KR",sans-serif}
+.rich-editor [data-font="ibm-plex"]{font-family:"IBM Plex Sans KR","Noto Sans KR",sans-serif}
+.rich-editor [data-font="gothic-a1"]{font-family:"Gothic A1","Noto Sans KR",sans-serif}
+.rich-editor [data-font="nanum-gothic"]{font-family:"Nanum Gothic","Noto Sans KR",sans-serif}
+.rich-editor [data-font="gowun-dodum"]{font-family:"Gowun Dodum","Noto Sans KR",sans-serif}
+.rich-editor [data-font="black-han"]{font-family:"Black Han Sans","Noto Sans KR",sans-serif}
+.rich-editor [data-font="do-hyeon"]{font-family:"Do Hyeon","Noto Sans KR",sans-serif}
+.rich-editor [data-font="jua"]{font-family:"Jua","Noto Sans KR",sans-serif}
+.rich-editor [data-font="sunflower"]{font-family:"Sunflower","Noto Sans KR",sans-serif}
+.rich-editor [data-font="noto-serif"]{font-family:"Noto Serif KR","Noto Sans KR",sans-serif}
+.rich-editor [data-font="nanum-myeongjo"]{font-family:"Nanum Myeongjo","Noto Sans KR",sans-serif}
+.rich-editor [data-font="gowun-batang"]{font-family:"Gowun Batang","Noto Sans KR",sans-serif}
+.rich-editor [data-font="hahmlet"]{font-family:"Hahmlet","Noto Sans KR",sans-serif}
+.rich-editor [data-font="song-myung"]{font-family:"Song Myung","Noto Sans KR",sans-serif}
+.rich-editor [data-font="gaegu"]{font-family:"Gaegu","Noto Sans KR",sans-serif}
+.rich-editor [data-font="gamja-flower"]{font-family:"Gamja Flower","Noto Sans KR",sans-serif}
+.rich-editor [data-font="single-day"]{font-family:"Single Day","Noto Sans KR",sans-serif}
+.rich-editor [data-font="yeon-sung"]{font-family:"Yeon Sung","Noto Sans KR",sans-serif}
+.rich-editor [data-font="nanum-pen"]{font-family:"Nanum Pen Script","Noto Sans KR",sans-serif}
+.rich-editor [data-font="nanum-brush"]{font-family:"Nanum Brush Script","Noto Sans KR",sans-serif}
+.rich-editor [data-font="poor-story"]{font-family:"Poor Story","Noto Sans KR",sans-serif}
+.rich-editor [data-font="hi-melody"]{font-family:"Hi Melody","Noto Sans KR",sans-serif}
+.rich-editor [data-font="cute-font"]{font-family:"Cute Font","Noto Sans KR",sans-serif}
+.rich-editor [data-font="kakao"]{font-family:"KakaoNews","Noto Sans KR",sans-serif}
+.rich-editor [data-font="default"]{font-family:"Noto Sans KR",sans-serif}
 .editor-font-select{min-width:155px;max-width:200px}
 .editor-size-box{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
 .editor-size-box label{font-size:12px;color:#6e6057}
 .editor-size-box input{height:33px;width:73px;border:1px solid #dfd9d2;border-radius:3px;padding:5px 6px;font-size:13px;background:white;color:#42352c}
 .editor-size-box button{min-height:33px}
+
+.rich-editor{font-family:"Noto Sans KR",sans-serif}
+.editor-font-select{min-width:175px;max-width:225px}
+.editor-color-box{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.editor-color-box label{font-size:12px;color:#6e6057}
+.editor-color-box input[type=color]{width:38px;height:33px;border:1px solid #dfd9d2;border-radius:3px;padding:2px;background:#fff;cursor:pointer}
+.editor-color-box input[type=text]{width:83px;height:33px;border:1px solid #dfd9d2;border-radius:3px;padding:5px;font-size:12px;background:#fff;color:#42352c}
+#localFontsButton{font-size:12px}
 </style>
 </head>
 <body>
@@ -156,15 +184,42 @@ tbody tr:last-child td{border-bottom:0}
           <select id="formatBlock" aria-label="문단 서식" class="editor-select"><option value="p">본문</option><option value="h2">큰 제목</option><option value="h3">작은 제목</option></select>
 
           <span class="toolbar-divider"></span>
-          <select id="fontFamily" aria-label="선택한 글자의 글꼴" class="editor-select editor-font-select">
-            <option value="">글꼴 선택</option>
-            <option value="default">기본 글꼴</option>
-            <option value="kakao">카카오체</option>
-            <option value="noto-sans">Noto Sans KR</option>
-            <option value="noto-serif">Noto Serif KR</option>
-            <option value="malgun">맑은 고딕</option>
-          </select>
+          <select id="fontFamily" aria-label="선택한 글자의 글꼴" class="editor-select editor-font-select"><option value="">글꼴 선택</option>
+<option value="default" data-family="Noto Sans KR" data-label="기본 글꼴">기본 글꼴 (Noto Sans KR)</option>
+<optgroup label="고딕">
+<option value="noto-sans" data-aliases="Noto Sans KR" data-label="Noto Sans KR">Noto Sans KR</option>
+<option value="kakao" data-aliases="Kakao|KakaoRegular|카카오" data-label="카카오체">카카오체</option>
+<option value="ibm-plex" data-aliases="IBM Plex Sans KR" data-label="IBM Plex Sans KR">IBM Plex Sans KR</option>
+<option value="gothic-a1" data-aliases="Gothic A1" data-label="Gothic A1">Gothic A1</option>
+<option value="nanum-gothic" data-aliases="Nanum Gothic|나눔고딕" data-label="나눔고딕">나눔고딕</option>
+<option value="gowun-dodum" data-aliases="Gowun Dodum|고운돋움" data-label="고운돋움">고운돋움</option>
+<option value="black-han" data-aliases="Black Han Sans|검은고딕" data-label="검은고딕">검은고딕</option>
+<option value="do-hyeon" data-aliases="Do Hyeon|도현" data-label="도현">도현</option>
+<option value="jua" data-aliases="Jua|주아" data-label="주아">주아</option>
+<option value="sunflower" data-aliases="Sunflower|해바라기" data-label="해바라기">해바라기</option>
+</optgroup>
+<optgroup label="명조">
+<option value="noto-serif" data-aliases="Noto Serif KR" data-label="Noto Serif KR">Noto Serif KR</option>
+<option value="nanum-myeongjo" data-aliases="Nanum Myeongjo|나눔명조" data-label="나눔명조">나눔명조</option>
+<option value="gowun-batang" data-aliases="Gowun Batang|고운바탕" data-label="고운바탕">고운바탕</option>
+<option value="hahmlet" data-aliases="Hahmlet|함렛" data-label="함렛">함렛</option>
+<option value="song-myung" data-aliases="Song Myung|송명" data-label="송명">송명</option>
+</optgroup>
+<optgroup label="손글씨">
+<option value="gaegu" data-aliases="Gaegu|개구쟁이" data-label="개구쟁이">개구쟁이</option>
+<option value="gamja-flower" data-aliases="Gamja Flower|감자꽃마을" data-label="감자꽃마을">감자꽃마을</option>
+<option value="single-day" data-aliases="Single Day" data-label="싱글데이">싱글데이</option>
+<option value="yeon-sung" data-aliases="Yeon Sung|연성" data-label="연성">연성</option>
+<option value="nanum-pen" data-aliases="Nanum Pen Script|나눔손글씨 펜" data-label="나눔손글씨 펜">나눔손글씨 펜</option>
+<option value="nanum-brush" data-aliases="Nanum Brush Script|나눔손글씨 붓" data-label="나눔손글씨 붓">나눔손글씨 붓</option>
+<option value="poor-story" data-aliases="Poor Story|서툰이야기" data-label="서툰이야기">서툰이야기</option>
+<option value="hi-melody" data-aliases="Hi Melody|하이멜로디" data-label="하이멜로디">하이멜로디</option>
+<option value="cute-font" data-aliases="Cute Font|귀여운 폰트" data-label="귀여운 폰트">귀여운 폰트</option>
+</optgroup></select>
+          <button type="button" class="format-btn" id="localFontsButton" title="내 PC와 공통으로 사용할 수 있는 웹폰트 확인">내 PC 폰트 확인</button>
           <span class="editor-size-box"><label for="fontSize">크기(px)</label><input id="fontSize" type="number" min="10" max="72" step="1" value="16" inputmode="numeric" aria-label="선택한 글자의 크기(px)"></span>
+          <span class="toolbar-divider"></span>
+          <span class="editor-color-box"><label for="fontColor">글자색</label><input id="fontColor" type="color" value="#35302c" aria-label="글자 색상 선택"><input id="fontColorHex" type="text" value="#35302c" maxlength="7" spellcheck="false" aria-label="글자색 HEX" title="#A52A2A"></span>
           <button type="button" class="format-btn" data-command="bold" aria-label="굵게"><strong>B</strong></button>
           <button type="button" class="format-btn" data-command="italic" aria-label="기울임"><em>I</em></button>
           <button type="button" class="format-btn" data-command="underline" aria-label="밑줄"><u>U</u></button>
@@ -179,7 +234,7 @@ tbody tr:last-child td{border-bottom:0}
           <button type="button" class="format-btn" data-command="removeFormat">서식 지우기</button>
         </div>
         <div id="content" class="rich-editor" contenteditable="true" role="textbox" aria-label="운영 소식 본문" aria-multiline="true" data-placeholder="운영 소식의 상세 내용을 입력하세요."></div>
-        <p class="note" id="editorFormatHint" aria-live="polite">글자를 선택한 뒤 글꼴이나 크기를 바꾸면 바로 적용됩니다. 저장 후에도 유지됩니다.</p>
+        <p class="note" id="editorFormatHint" aria-live="polite">글자를 선택한 뒤 글꼴·크기·색상을 바꾸면 즉시 적용됩니다. 저장 후 상세페이지에서도 유지됩니다.</p>
       </div>
       <div class="form-grid">
         <div class="form-row"><label class="label" for="status">게시 상태</label><select class="field" id="status"><option value="ongoing">진행중 · 메인과 지난 소식에 표시</option><option value="ended">종료 · 지난 소식에만 표시</option></select></div>
@@ -319,7 +374,7 @@ tbody tr:last-child td{border-bottom:0}
     $('editForm').reset();
     $('content').innerHTML='';
     selectedRange=null;
-    $('editorFormatHint').textContent='글자를 선택한 뒤 글꼴이나 크기를 바꾸면 바로 적용됩니다. 저장 후에도 유지됩니다.';
+    $('editorFormatHint').textContent='글자를 선택한 뒤 글꼴·크기·색상을 바꾸면 즉시 적용됩니다. 저장 후 상세페이지에서도 유지됩니다.';
     $('postId').value = '';
     $('sort').value = 0;
     $('status').value='ongoing';
@@ -423,9 +478,10 @@ tbody tr:last-child td{border-bottom:0}
   editor.addEventListener('input',()=>captureEditorRange(true));
   document.addEventListener('selectionchange',()=>captureEditorRange(false));
   function markInline(kind,rawValue){
-    const fontIds=['default','kakao','noto-sans','noto-serif','malgun'];
+    const fontIds=["noto-sans","kakao","ibm-plex","gothic-a1","nanum-gothic","gowun-dodum","black-han","do-hyeon","jua","sunflower","noto-serif","nanum-myeongjo","gowun-batang","hahmlet","song-myung","gaegu","gamja-flower","single-day","yeon-sung","nanum-pen","nanum-brush","poor-story","hi-melody","cute-font","default","malgun"];
     const size=Number(rawValue);
     if(kind==='font'&&!fontIds.includes(rawValue))return false;
+    if(kind==='color'&&!/^#[0-9a-fA-F]{6}$/.test(String(rawValue)))return false;
     if(kind==='size'&&(!/^\d{1,3}$/.test(String(rawValue))||!Number.isInteger(size)||size<10||size>72))
       return false;
     const active=currentEditorRange();
@@ -464,7 +520,8 @@ tbody tr:last-child td{border-bottom:0}
         span.appendChild(textNode);
       }
       if(kind==='font')span.dataset.font=rawValue;
-      else span.style.fontSize=size+'px';
+      else if(kind==='size')span.style.fontSize=size+'px';
+      else span.style.color=rawValue.toLowerCase();
       styled.push(textNode);
     }
     // Keep focus on the font-size input for repeated +/- adjustments.
@@ -493,6 +550,44 @@ tbody tr:last-child td{border-bottom:0}
     if(e.key==='Enter'){e.preventDefault();applySize();}
   });
 
+
+  const colorInput=$('fontColor'),hexInput=$('fontColorHex');
+  function applyTextColor(raw){
+    if(!/^#[0-9a-fA-F]{6}$/.test(raw))return;
+    colorInput.value=raw;
+    hexInput.value=raw.toUpperCase();
+    markInline('color',raw);
+  }
+  colorInput.addEventListener('input',()=>applyTextColor(colorInput.value));
+  colorInput.addEventListener('change',()=>applyTextColor(colorInput.value));
+  hexInput.addEventListener('input',()=>{
+    const value=hexInput.value.trim();
+    if(/^#[0-9a-fA-F]{6}$/.test(value))applyTextColor(value);
+  });
+  hexInput.addEventListener('keydown',e=>{
+    if(e.key==='Enter'){e.preventDefault();applyTextColor(hexInput.value.trim());}
+  });
+  // Only show local fonts that can also be delivered to every visitor as a webfont.
+  $('localFontsButton').addEventListener('click',async()=>{
+    if(typeof window.queryLocalFonts!=='function'){
+      $('editorFormatHint').textContent='이 브라우저에서는 PC 폰트 확인을 지원하지 않습니다. 위 웹폰트는 계속 사용 가능합니다.';
+      return;
+    }
+    try{
+      const local=await window.queryLocalFonts();
+      const norm=s=>String(s||'').normalize('NFKC').toLowerCase().replace(/[\s_-]/g,'');
+      const installed=new Set(local.flatMap(f=>[f.family,f.fullName]).map(norm));
+      let count=0;
+      for(const opt of $('fontFamily').querySelectorAll('option[data-aliases]')){
+        const matched=opt.dataset.aliases.split('|').some(f=>installed.has(norm(f)));
+        if(matched)count++;
+        opt.textContent=(matched?'✓ ':'')+opt.dataset.label+(matched?' (내 PC)':'');
+      }
+      $('editorFormatHint').textContent='PC에 설치된 웹 호환 폰트 '+count+'개를 ✓로 표시했습니다. 나머지 목록도 웹폰트로 제공됩니다.';
+    }catch{
+      $('editorFormatHint').textContent='PC 글꼴 접근 권한을 확인할 수 없습니다. 웹폰트 선택과 색상 기능은 정상 사용 가능합니다.';
+    }
+  });
   $('addLink').addEventListener('mousedown',e=>e.preventDefault());
   $('addLink').addEventListener('click',()=>{
     const href=window.prompt('링크 주소를 입력하세요 (https://...)');if(!href)return;
