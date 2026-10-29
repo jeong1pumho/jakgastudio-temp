@@ -655,7 +655,108 @@ strong,b{font-weight:700}
 @media(prefers-reduced-motion:reduce){
   #kv-hero.video-keyvisual .kv-video{display:none}
 }
-</style></head><body class="variant-a">
+</style>
+<style id="brand-final-layout-20261029">
+/* TEST SITE ONLY: wide BRAND art, real author photo, independent HTML brand copy.
+   Matched to NEWS width; the photograph remains the existing, authentic author source. */
+#brand-story .brand-container{
+  max-width:var(--content);
+  width:calc(100% - 112px);
+  padding-top:38px;
+}
+#brand-story .brand-section-heading{margin-bottom:34px}
+#brand-story .brand-art{
+  display:block;position:relative;
+  width:100%;min-height:0;aspect-ratio:1.94;
+  overflow:hidden;isolation:isolate;
+  background:#fbfaf7;
+}
+#brand-story .intro-photo{
+  position:absolute;inset:0;width:100%;height:100%;
+  z-index:-1;opacity:1;
+  background-image:url('/assets/brand-author.webp');
+  background-repeat:no-repeat;background-size:cover;
+  background-position:center 63%;
+}
+#brand-story .intro-photo::before{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(90deg,
+    rgba(255,255,255,.81) 0%,
+    rgba(255,255,255,.76) 43%,
+    rgba(255,255,255,.72) 100%);
+}
+#brand-story .brand-art .intro-inner{
+  position:relative;display:flex;flex-direction:column;justify-content:center;
+  box-sizing:border-box;
+  width:100%;height:100%;max-width:none;margin:0;
+  padding:clamp(32px,4vw,60px) clamp(36px,7.8vw,100px);
+}
+#brand-story .intro-ci{
+  display:block;
+  width:clamp(242px,22vw,313px);
+  max-width:100%;height:auto;
+  margin:0 0 31px;
+  filter:none;
+}
+#brand-story .intro-primary{max-width:68%}
+#brand-story .intro-list{
+  margin:0 0 19px;
+  padding-left:1.3em;
+  font-size:clamp(16px,1.17vw,19px);
+  line-height:1.69;letter-spacing:-.042em;word-break:keep-all;
+}
+#brand-story .intro-list li{padding-left:.17em}
+#brand-story .intro-divider{
+  display:block;width:72px;height:1px;background:#a79b90;
+}
+#brand-story .intro-divider-top{margin:0 0 23px}
+#brand-story .intro-byline,
+#brand-story .intro-lower{
+  font-size:clamp(16px,1.17vw,19px);
+  font-weight:400;
+  line-height:1.7;letter-spacing:-.042em;word-break:keep-all;
+}
+#brand-story .intro-byline{margin:0}
+#brand-story .intro-lower{max-width:68%;margin-top:23px}
+#brand-story .intro-lower p{margin:21px 0 0}
+@media (min-width:701px) and (max-width:1050px){
+  #brand-story .brand-container{width:calc(100% - 70px)}
+  #brand-story .brand-art{aspect-ratio:auto;min-height:590px}
+  #brand-story .intro-primary,#brand-story .intro-lower{max-width:78%}
+  #brand-story .brand-art .intro-inner{padding:43px 7%}
+}
+@media (max-width:700px){
+  #brand-story .brand-container{width:calc(100% - 42px);padding-top:29px}
+  #brand-story .brand-section-heading{margin-bottom:23px}
+  #brand-story .brand-art{aspect-ratio:auto;min-height:0}
+  #brand-story .intro-photo{background-size:cover;background-position:64% 58%}
+  #brand-story .intro-photo::before{
+    background:linear-gradient(90deg,
+      rgba(255,255,255,.88),rgba(255,255,255,.80));
+  }
+  #brand-story .brand-art .intro-inner{
+    display:block;width:100%;height:auto;
+    padding:43px 8% 47px;
+  }
+  #brand-story .intro-ci{width:min(235px,75vw);margin-bottom:27px}
+  #brand-story .intro-primary,#brand-story .intro-lower{max-width:none}
+  #brand-story .intro-list{
+    font-size:clamp(14px,3.6vw,16px);
+    line-height:1.8;letter-spacing:-.045em;
+    padding-left:1.5em;margin-bottom:21px;
+  }
+  #brand-story .intro-divider-top{margin-bottom:22px}
+  #brand-story .intro-byline,#brand-story .intro-lower{
+    font-size:clamp(14px,3.6vw,16px);line-height:1.85;
+  }
+  #brand-story .intro-lower{margin-top:26px}
+  #brand-story .intro-lower p{margin-top:19px}
+}
+@media (max-width:390px){
+  #brand-story .brand-container{width:calc(100% - 34px)}
+}
+</style>
+</head><body class="variant-a">
 <main id="top">
 <section aria-label="작가작업실 JEJU 영상 소개" class="hero video-keyvisual" id="kv-hero">
   <video class="kv-video" autoplay muted loop playsinline preload="metadata" poster="/assets/keyvisual-poster.jpg" aria-hidden="true" tabindex="-1">
@@ -695,6 +796,7 @@ strong,b{font-weight:700}
 <li>때로는 혼자 조용히 책을 읽고 글을 쓰며</li>
 <li>독서모임과 북토크를 위한 공간 대관을 위해</li>
 </ol>
+<span class="intro-divider intro-divider-top" aria-hidden="true"></span>
 <p class="intro-byline">작가 유미경이<br/>제주 이호테우 앞 조용한 공간에<br/>글과 책에 관한 모든 것을 담아낸 공간입니다.</p>
 </div>
 <div class="intro-lower">
