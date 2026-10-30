@@ -869,13 +869,141 @@ strong,b{font-weight:700}
   #hours .hours-card p{font-size:clamp(20px,5.3vw,24px)}
 }
 </style>
+<style id="hero-six-carousel-20261030">
+/* TEST ONLY — six authentic original photographs. Keep CI/copy/navigation above moving track. */
+#kv-hero.carousel-keyvisual {
+  position:relative;isolation:isolate;overflow:hidden;background:#40372e;
+  height:100svh;min-height:580px;max-height:none;
+}
+#kv-hero .kv-carousel-viewport {
+  position:absolute;inset:9svh 0 auto;height:80svh;z-index:1;
+  overflow:hidden;touch-action:pan-y;
+}
+#kv-hero .kv-carousel-track {
+  display:flex;align-items:stretch;gap:22px;height:100%;width:max-content;
+  transform:translate3d(calc(-70vw - 22px),0,0);
+  transition:transform 1200ms cubic-bezier(.22,1,.36,1);will-change:transform;
+}
+#kv-hero .kv-slide {
+  flex:0 0 80vw;width:80vw;height:100%;overflow:hidden;
+  border-radius:9px;position:relative;user-select:none;
+  background:#4a4238;
+}
+#kv-hero .kv-slide img {
+  width:100%;height:100%;display:block;object-fit:cover;object-position:center center;
+  pointer-events:none;user-select:none;-webkit-user-drag:none;
+}
+#kv-hero .kv-carousel-scrim {
+  position:absolute;left:10vw;top:9svh;width:80vw;height:80svh;z-index:2;
+  pointer-events:none;border-radius:9px;
+  background:linear-gradient(90deg,rgba(16,17,17,.65),rgba(16,17,17,.37) 35%,rgba(16,17,17,.08) 60%,transparent 74%);
+}
+#kv-hero .kv-video-nav {
+  z-index:6;background:linear-gradient(180deg,rgba(24,22,19,.55),rgba(24,22,19,.12));
+}
+#kv-hero .kv-text {
+  z-index:4;position:absolute;top:22svh;bottom:auto;
+  left:clamp(50px,13.1vw,275px);right:auto;
+  width:min(32vw,565px);max-width:calc(80vw - 48px);
+  color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.36);
+  pointer-events:none;
+}
+#kv-hero .kv-text img{
+  display:block;width:min(26vw,450px);max-width:100%;height:auto;
+  filter:brightness(0) invert(1) drop-shadow(0 2px 4px rgba(0,0,0,.18));
+}
+#kv-hero .kv-description-divider{
+  display:block;width:54px;height:2px;background:rgba(255,255,255,.97);
+  margin:clamp(28px,3.5svh,42px) 0 clamp(28px,3svh,39px);
+}
+#kv-hero .kv-description{
+  padding:0;margin:0;font-family:'KakaoSite','Malgun Gothic',sans-serif;
+  font-size:clamp(16px,1.45vw,24px);font-weight:400;
+  line-height:1.67;letter-spacing:-.043em;word-break:keep-all;color:#fff;
+}
+#kv-hero .kv-arrow{
+  position:absolute;z-index:7;top:49svh;transform:translateY(-50%);
+  display:flex;justify-content:center;align-items:center;
+  width:54px;height:54px;border:1.5px solid rgba(255,255,255,.95);
+  border-radius:50%;background:rgba(16,14,12,.18);color:#fff;
+  cursor:pointer;transition:background-color .2s ease,box-shadow .2s ease;
+  font:400 39px/1 sans-serif;padding:0 0 5px;
+}
+#kv-hero .kv-arrow:hover,#kv-hero .kv-arrow:focus-visible{
+  background:rgba(17,16,13,.65);box-shadow:0 0 0 3px rgba(255,255,255,.14);
+}
+#kv-hero .kv-arrow-prev{left:5vw}
+#kv-hero .kv-arrow-next{right:5vw}
+#kv-hero .kv-carousel-dots{
+  position:absolute;left:50%;bottom:3svh;transform:translateX(-50%);
+  z-index:5;display:flex;gap:15px;align-items:center;justify-content:center;
+}
+#kv-hero .kv-dot {
+  width:12px;height:12px;border-radius:50%;border:0;
+  padding:0;background:rgba(255,255,255,.35);cursor:pointer;
+  transition:background-color .2s,transform .2s;
+}
+#kv-hero .kv-dot[aria-current="true"]{background:#fff;transform:scale(1.1)}
+#kv-hero .kv-dot:focus-visible{outline:2px solid #fff;outline-offset:5px}
+@media(max-width:700px){
+  #kv-hero.carousel-keyvisual{min-height:570px}
+  #kv-hero .kv-carousel-viewport{top:12svh;height:74svh}
+  #kv-hero .kv-carousel-track{gap:12px;transform:translate3d(calc(-88vw - 12px),0,0)}
+  #kv-hero .kv-slide{width:92vw;flex-basis:92vw;border-radius:6px}
+  #kv-hero .kv-carousel-scrim{
+    top:12svh;left:4vw;width:92vw;height:74svh;border-radius:6px;
+    background:linear-gradient(90deg,rgba(10,11,11,.68),rgba(10,11,11,.29) 68%,transparent);
+  }
+  #kv-hero .kv-text{
+    left:8vw;top:24svh;bottom:auto;width:80vw;max-width:80vw;
+  }
+  #kv-hero .kv-text img{width:min(75vw,330px)}
+  #kv-hero .kv-description-divider{width:42px;margin:26px 0 25px}
+  #kv-hero .kv-description{font-size:clamp(14px,3.7vw,17px);line-height:1.74;max-width:83vw}
+  #kv-hero .kv-desktop-break{display:none}
+  #kv-hero .kv-arrow{top:57svh;width:42px;height:42px;font-size:30px;padding-bottom:4px}
+  #kv-hero .kv-arrow-prev{left:1.4vw}
+  #kv-hero .kv-arrow-next{right:1.4vw}
+  #kv-hero .kv-carousel-dots{bottom:5.6svh;gap:11px}
+  #kv-hero .kv-dot{width:10px;height:10px}
+}
+@media(prefers-reduced-motion:reduce){
+  #kv-hero .kv-carousel-track{transition:none!important}
+  #kv-hero .kv-arrow{transition:none!important}
+}
+</style>
 </head><body class="variant-a">
 <main id="top">
-<section aria-label="작가작업실 JEJU 영상 소개" class="hero video-keyvisual" id="kv-hero">
-  <video class="kv-video" autoplay muted loop playsinline preload="metadata" poster="/assets/keyvisual-poster.jpg" aria-hidden="true" tabindex="-1">
-    <source src="/assets/keyvisual-qhd.mp4" type="video/mp4"/>
-  </video>
-  <div class="kv-video-shade" aria-hidden="true"></div>
+<section aria-label="작가작업실 JEJU 사진 소개" class="hero video-keyvisual carousel-keyvisual" id="kv-hero">
+  <div class="kv-carousel-viewport" id="kv-carousel" role="region" aria-roledescription="캐러셀" aria-label="작가작업실 JEJU의 여섯 장 사진">
+    <div class="kv-carousel-track" id="kv-carousel-track">
+      <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="6 / 6" aria-hidden="true">
+        <img src="/assets/hero-06.jpg" alt="" draggable="false" loading="lazy" decoding="async"/>
+      </div>
+      <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="1 / 6" >
+        <img src="/assets/hero-01.jpg" alt="" draggable="false" fetchpriority="high" loading="eager" decoding="async"/>
+      </div>
+      <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="2 / 6" >
+        <img src="/assets/hero-02.jpg" alt="" draggable="false" loading="lazy" decoding="async"/>
+      </div>
+      <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="3 / 6" >
+        <img src="/assets/hero-03.jpg" alt="" draggable="false" loading="lazy" decoding="async"/>
+      </div>
+      <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="4 / 6" >
+        <img src="/assets/hero-04.jpg" alt="" draggable="false" loading="lazy" decoding="async"/>
+      </div>
+      <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="5 / 6" >
+        <img src="/assets/hero-05.jpg" alt="" draggable="false" loading="lazy" decoding="async"/>
+      </div>
+      <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="6 / 6" >
+        <img src="/assets/hero-06.jpg" alt="" draggable="false" loading="lazy" decoding="async"/>
+      </div>
+      <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="1 / 6" aria-hidden="true">
+        <img src="/assets/hero-01.jpg" alt="" draggable="false" loading="lazy" decoding="async"/>
+      </div>
+    </div>
+  </div>
+  <div class="kv-carousel-scrim" aria-hidden="true"></div>
   <nav class="kv-video-nav" aria-label="홈페이지 섹션 바로가기">
     <a href="#brand-story">브랜드</a>
     <a href="#news">소식</a>
@@ -886,9 +1014,79 @@ strong,b{font-weight:700}
   </nav>
   <div class="kv-text">
     <h1 class="sr-only">작가작업실 JEJU | 책방 그리고 글쓰기와 독서모임</h1>
-    <img src="/assets/ci-two-line.svg" alt="" width="299" height="90" fetchpriority="high"/>
+    <img src="/assets/hero-original-CI.svg" alt="" width="299" height="90" fetchpriority="high"/>
+    <span class="kv-description-divider" aria-hidden="true"></span>
+    <p class="kv-description">누구나 편하게 책을 읽고, 글을 쓸 수 있도록<br class="kv-desktop-break"/>제주 이호테우에 마련한 공간입니다.</p>
   </div>
+  <button type="button" class="kv-arrow kv-arrow-prev" id="kv-prev" aria-label="이전 사진"><span aria-hidden="true">‹</span></button>
+  <button type="button" class="kv-arrow kv-arrow-next" id="kv-next" aria-label="다음 사진"><span aria-hidden="true">›</span></button>
+  <div class="kv-carousel-dots" role="group" aria-label="사진 선택">
+    <button type="button" class="kv-dot" data-slide="1" aria-label="1번 사진 보기" aria-current="true"></button>
+    <button type="button" class="kv-dot" data-slide="2" aria-label="2번 사진 보기" aria-current="false"></button>
+    <button type="button" class="kv-dot" data-slide="3" aria-label="3번 사진 보기" aria-current="false"></button>
+    <button type="button" class="kv-dot" data-slide="4" aria-label="4번 사진 보기" aria-current="false"></button>
+    <button type="button" class="kv-dot" data-slide="5" aria-label="5번 사진 보기" aria-current="false"></button>
+    <button type="button" class="kv-dot" data-slide="6" aria-label="6번 사진 보기" aria-current="false"></button>
+  </div>
+  <span class="sr-only" id="kv-carousel-status" aria-live="polite">사진 1 / 6</span>
 </section>
+<script id="hero-six-carousel-behavior">
+(()=>{
+  const hero=document.getElementById('kv-hero');
+  const viewport=document.getElementById('kv-carousel');
+  const track=document.getElementById('kv-carousel-track');
+  if(!hero||!viewport||!track)return;
+  const buttons=[...hero.querySelectorAll('.kv-dot')];
+  const status=hero.querySelector('#kv-carousel-status');
+  const reduced=window.matchMedia('(prefers-reduced-motion: reduce)');
+  let index=1,locked=false,startX=null;
+  function translate(animate=true){
+    const slide=track.querySelector('.kv-slide');
+    const width=slide.getBoundingClientRect().width;
+    const gap=parseFloat(getComputedStyle(track).gap)||0;
+    const offset=(viewport.clientWidth-width)/2-index*(width+gap);
+    track.style.transitionDuration=(!animate||reduced.matches)?'0ms':'1200ms';
+    track.style.transform='translate3d('+offset+'px,0,0)';
+    const logical=(index+5)%6;
+    buttons.forEach((b,i)=>b.setAttribute('aria-current',i===logical?'true':'false'));
+    status.textContent='사진 '+(logical+1)+' / 6';
+  }
+  function go(next){
+    if(locked||next===index)return;
+    index=next;locked=true;translate(true);
+    if(reduced.matches){finish();}
+  }
+  function finish(){
+    if(index===0)index=6;
+    if(index===7)index=1;
+    translate(false);locked=false;
+  }
+  track.addEventListener('transitionend',e=>{
+    if(e.target===track&&e.propertyName==='transform')finish();
+  });
+  hero.querySelector('#kv-prev').addEventListener('click',()=>go(index-1));
+  hero.querySelector('#kv-next').addEventListener('click',()=>go(index+1));
+  buttons.forEach(b=>b.addEventListener('click',()=>{
+    if(locked)return;
+    go(Number(b.dataset.slide));
+  }));
+  viewport.addEventListener('pointerdown',e=>{if(e.pointerType!=='mouse'||e.button===0)startX=e.clientX;});
+  viewport.addEventListener('pointerup',e=>{
+    if(startX===null)return;
+    const delta=e.clientX-startX;startX=null;
+    if(Math.abs(delta)>55&&!locked)go(index+(delta<0?1:-1));
+  });
+  viewport.addEventListener('pointercancel',()=>{startX=null;});
+  hero.addEventListener('keydown',e=>{
+    if(e.target.tagName==='A')return;
+    if(e.key==='ArrowLeft'){e.preventDefault();go(index-1);}
+    if(e.key==='ArrowRight'){e.preventDefault();go(index+1);}
+  });
+  window.addEventListener('resize',()=>translate(false));
+  if('ResizeObserver'in window)new ResizeObserver(()=>translate(false)).observe(viewport);
+  translate(false);
+})();
+</script>
 <!-- Approved introduction: brand image only; all copy is searchable HTML -->
 <div class="page-with-header">
 <header aria-label="상단 고정 브랜드" class="sticky-brand-header">
