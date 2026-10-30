@@ -165,6 +165,31 @@ figure{margin:0}
 .lightbox img{max-height:calc(100svh - 130px);max-width:min(95vw,1200px);width:auto;height:auto;object-fit:contain}
 .lightbox-caption{font-size:13px;color:#e7e2dc;margin-top:10px}
 .lightbox-close{position:absolute;right:24px;top:11px;border:0;color:white;background:transparent;font-size:42px;line-height:1;cursor:pointer}
+/* SPACE lightbox: previous/next photos, without changing gallery layout. */
+.lightbox .space-lightbox-arrow{
+  position:absolute;top:50%;transform:translateY(-50%);z-index:2;
+  display:flex;align-items:center;justify-content:center;
+  width:50px;height:50px;padding:0;
+  border:1px solid rgba(255,255,255,.83);border-radius:50%;
+  background:rgba(23,21,20,.48);color:#fff;
+  font:400 32px/1 sans-serif;cursor:pointer;
+  transition:background-color .2s ease;
+}
+.lightbox .space-lightbox-arrow:hover,.lightbox .space-lightbox-arrow:focus-visible{
+  background:rgba(23,21,20,.87);outline-offset:3px;
+}
+.lightbox .space-lightbox-prev{left:clamp(12px,2.2vw,40px)}
+.lightbox .space-lightbox-next{right:clamp(12px,2.2vw,40px)}
+.lightbox img.space-lightbox-photo-in{animation:space-lightbox-photo-in .3s ease both}
+@keyframes space-lightbox-photo-in{from{opacity:.55}to{opacity:1}}
+@media(max-width:700px){
+  .lightbox .space-lightbox-arrow{width:42px;height:42px;font-size:27px}
+  .lightbox .space-lightbox-prev{left:8px}
+  .lightbox .space-lightbox-next{right:8px}
+}
+@media(prefers-reduced-motion:reduce){
+  .lightbox img.space-lightbox-photo-in{animation:none}
+}
 body.dialog-open{overflow:hidden}
 /* Alternative B: softer page-to-page editorial transitions; same content order and imagery. */
 body.variant-b {--paper:#f9f7f3;--soft:#f4efea;--line:#e2d7ca;--content:1160px;background:#f9f7f3}
@@ -1266,26 +1291,71 @@ strong,b{font-weight:700}
 </main>
 <div aria-label="사진 확대" aria-modal="true" class="lightbox" hidden="" id="lightbox" role="dialog">
 <button aria-label="닫기" class="lightbox-close" type="button">×</button>
+<button type="button" class="space-lightbox-arrow space-lightbox-prev" aria-label="이전 사진"><span aria-hidden="true">‹</span></button>
 <img alt=""/>
-<p class="lightbox-caption"></p>
+<button type="button" class="space-lightbox-arrow space-lightbox-next" aria-label="다음 사진"><span aria-hidden="true">›</span></button>
+<p class="lightbox-caption" aria-live="polite"></p>
 </div>
 <script>
 (function(){
  const modal=document.getElementById('lightbox');
  const close=modal.querySelector('.lightbox-close');
+ const prev=modal.querySelector('.space-lightbox-prev');
+ const next=modal.querySelector('.space-lightbox-next');
  const modalImg=modal.querySelector('img');
  const caption=modal.querySelector('.lightbox-caption');
- let last=null;
- function hide(){modal.hidden=true;document.body.classList.remove('dialog-open');if(last)last.focus();}
- document.querySelectorAll('.gallery-photo').forEach(btn=>{
-  btn.addEventListener('click',()=>{
-   last=btn;modalImg.src=btn.dataset.full;modalImg.alt=btn.dataset.alt;caption.textContent=btn.dataset.alt;
-   modal.hidden=false;document.body.classList.add('dialog-open');close.focus();
+ const photos=[...document.querySelectorAll('#space .space-gallery-item')];
+ let last=null,currentIndex=0,touchStart=null;
+ function showPhoto(index,animate){
+  if(!photos.length)return;
+  currentIndex=(index+photos.length)%photos.length;
+  const photo=photos[currentIndex];
+  modalImg.src=photo.dataset.full;
+  modalImg.alt=photo.dataset.alt||'공간소개 사진';
+  caption.textContent=photo.dataset.alt||'';
+  if(animate){
+   modalImg.classList.remove('space-lightbox-photo-in');
+   void modalImg.offsetWidth;
+   modalImg.classList.add('space-lightbox-photo-in');
+  }
+ }
+ function hide(){
+  modal.hidden=true;
+  modalImg.classList.remove('space-lightbox-photo-in');
+  document.body.classList.remove('dialog-open');
+  if(last)last.focus();
+ }
+ photos.forEach((photo,index)=>{
+  photo.addEventListener('click',()=>{
+   last=photo;
+   showPhoto(index,false);
+   modal.hidden=false;
+   document.body.classList.add('dialog-open');
+   close.focus();
   });
  });
+ prev.addEventListener('click',()=>showPhoto(currentIndex-1,true));
+ next.addEventListener('click',()=>showPhoto(currentIndex+1,true));
  close.addEventListener('click',hide);
  modal.addEventListener('click',e=>{if(e.target===modal)hide()});
- document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.hidden)hide()});
+ document.addEventListener('keydown',e=>{
+  if(modal.hidden)return;
+  if(e.key==='Escape'){e.preventDefault();hide();}
+  else if(e.key==='ArrowLeft'){e.preventDefault();showPhoto(currentIndex-1,true);}
+  else if(e.key==='ArrowRight'){e.preventDefault();showPhoto(currentIndex+1,true);}
+ });
+ modalImg.addEventListener('touchstart',e=>{
+  if(e.touches.length===1)touchStart={x:e.touches[0].clientX,y:e.touches[0].clientY};
+  else touchStart=null;
+ },{passive:true});
+ modalImg.addEventListener('touchend',e=>{
+  if(!touchStart||e.changedTouches.length!==1){touchStart=null;return;}
+  const dx=e.changedTouches[0].clientX-touchStart.x;
+  const dy=e.changedTouches[0].clientY-touchStart.y;
+  touchStart=null;
+  if(Math.abs(dx)>45&&Math.abs(dx)>Math.abs(dy)*1.2)showPhoto(currentIndex+(dx<0?1:-1),true);
+ },{passive:true});
+ modalImg.addEventListener('touchcancel',()=>{touchStart=null;},{passive:true});
 })();
 </script>
 <script>
