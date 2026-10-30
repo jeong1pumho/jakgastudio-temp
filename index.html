@@ -975,30 +975,27 @@ strong,b{font-weight:700}
 </head><body class="variant-a">
 <main id="top">
 <section aria-label="작가작업실 JEJU 사진 소개" class="hero video-keyvisual carousel-keyvisual" id="kv-hero">
-  <div class="kv-carousel-viewport" id="kv-carousel" role="region" aria-roledescription="캐러셀" aria-label="작가작업실 JEJU의 여섯 장 사진">
+  <div class="kv-carousel-viewport" id="kv-carousel" role="region" aria-roledescription="캐러셀" aria-label="작가작업실 JEJU의 다섯 장 사진">
     <div class="kv-carousel-track" id="kv-carousel-track">
-      <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="6 / 6" aria-hidden="true">
+      <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="5 / 5" aria-hidden="true">
         <img src="/assets/hero-06.jpg" alt="" draggable="false" loading="lazy" decoding="async"/>
       </div>
-      <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="1 / 6" >
+      <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="1 / 5" >
         <img src="/assets/hero-01.jpg" alt="" draggable="false" fetchpriority="high" loading="eager" decoding="async"/>
       </div>
-      <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="2 / 6" >
+      <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="2 / 5" >
         <img src="/assets/hero-02.jpg" alt="" draggable="false" loading="lazy" decoding="async"/>
       </div>
-      <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="3 / 6" >
+      <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="3 / 5" >
         <img src="/assets/hero-03.jpg" alt="" draggable="false" loading="lazy" decoding="async"/>
       </div>
-      <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="4 / 6" >
+      <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="4 / 5" >
         <img src="/assets/hero-04.jpg" alt="" draggable="false" loading="lazy" decoding="async"/>
       </div>
-      <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="5 / 6" >
-        <img src="/assets/hero-05.jpg" alt="" draggable="false" loading="lazy" decoding="async"/>
-      </div>
-      <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="6 / 6" >
+      <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="5 / 5" >
         <img src="/assets/hero-06.jpg" alt="" draggable="false" loading="lazy" decoding="async"/>
       </div>
-      <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="1 / 6" aria-hidden="true">
+      <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="1 / 5" aria-hidden="true">
         <img src="/assets/hero-01.jpg" alt="" draggable="false" loading="lazy" decoding="async"/>
       </div>
     </div>
@@ -1026,9 +1023,8 @@ strong,b{font-weight:700}
     <button type="button" class="kv-dot" data-slide="3" aria-label="3번 사진 보기" aria-current="false"></button>
     <button type="button" class="kv-dot" data-slide="4" aria-label="4번 사진 보기" aria-current="false"></button>
     <button type="button" class="kv-dot" data-slide="5" aria-label="5번 사진 보기" aria-current="false"></button>
-    <button type="button" class="kv-dot" data-slide="6" aria-label="6번 사진 보기" aria-current="false"></button>
   </div>
-  <span class="sr-only" id="kv-carousel-status" aria-live="polite">사진 1 / 6</span>
+  <span class="sr-only" id="kv-carousel-status" aria-live="polite">사진 1 / 5</span>
 </section>
 <script id="hero-six-carousel-behavior">
 (()=>{
@@ -1047,9 +1043,9 @@ strong,b{font-weight:700}
     const offset=(viewport.clientWidth-width)/2-index*(width+gap);
     track.style.transitionDuration=(!animate||reduced.matches)?'0ms':'1200ms';
     track.style.transform='translate3d('+offset+'px,0,0)';
-    const logical=(index+5)%6;
+    const logical=(index+4)%5;
     buttons.forEach((b,i)=>b.setAttribute('aria-current',i===logical?'true':'false'));
-    status.textContent='사진 '+(logical+1)+' / 6';
+    status.textContent='사진 '+(logical+1)+' / 5';
   }
   function go(next){
     if(locked||next===index)return;
@@ -1057,8 +1053,8 @@ strong,b{font-weight:700}
     if(reduced.matches){finish();}
   }
   function finish(){
-    if(index===0)index=6;
-    if(index===7)index=1;
+    if(index===0)index=5;
+    if(index===6)index=1;
     translate(false);locked=false;
   }
   track.addEventListener('transitionend',e=>{
