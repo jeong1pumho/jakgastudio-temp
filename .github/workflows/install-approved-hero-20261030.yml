@@ -1,0 +1,42 @@
+name: Install six approved hero photos on temp
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/install-approved-hero-20261030.yml', 'assets/hero-approved-20261030.zip']
+permissions:
+  contents: write
+jobs:
+  install:
+    if: github.event.head_commit.message == 'Stage six approved hero photos on TEMP only'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: true
+          ref: main
+      - name: Verify every approved asset and extract into assets
+        shell: bash
+        env:
+          HASHES: '{"assets/hero-01.jpg":"6c5ceaf460b7ce7be6590f66b96395f0adb9f7932cc795aa1566209322f2d56e","assets/hero-02.jpg":"5476e623b1fc80ca0d7fe42e5d5cf9e902cfaf0a0b834e3dd2d91f9338f7988e","assets/hero-03.jpg":"78eb5a1f76162e5d4c3d40fc3bd8c7c5b74efd7615c3edbc98730ad7db1bb877","assets/hero-04.jpg":"6ccff0f0c5c3070772cd8909ffd5b31e8a5738d945d2f6c8907e5551d6da2961","assets/hero-05.jpg":"3924b0bf3cdbcb898bf509ab1bcd57ebf0a2a4436fc62714753d299a18e0ec58","assets/hero-06.jpg":"bdceca8a8a77fbca37f633c1e27cbd3fc22ab1f2d5948d2d7f7a4c0e81734466","assets/hero-original-CI.svg":"63b3918f92ca7a151b931b4680adee4381156e42d95284164ae09ce1ab6dde92"}'
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os,json,hashlib,zipfile,pathlib
+          expected=json.loads(os.environ['HASHES'])
+          path=pathlib.Path('assets/hero-approved-20261030.zip')
+          with zipfile.ZipFile(path) as z:
+              assert z.testzip() is None, 'ZIP corruption'
+              assert set(z.namelist())==set(expected), 'Unexpected asset list'
+              for name, sha in expected.items():
+                  data=z.read(name)
+                  assert hashlib.sha256(data).hexdigest()==sha, 'Wrong content: '+name
+                  dst=pathlib.Path(name)
+                  dst.parent.mkdir(parents=True,exist_ok=True)
+                  dst.write_bytes(data)
+          print('All seven original assets verified and extracted')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add assets/hero-01.jpg assets/hero-02.jpg assets/hero-03.jpg assets/hero-04.jpg assets/hero-05.jpg assets/hero-06.jpg assets/hero-original-CI.svg
+          git commit -m 'Install six supplied photos and original CI on TEMP'
+          git push origin HEAD:main
