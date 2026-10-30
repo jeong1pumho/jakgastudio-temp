@@ -782,6 +782,42 @@ strong,b{font-weight:700}
 }
 </style>
 
+<style id="brand-copy-update-20261030">
+/* BRAND copy and final service list only; retain photograph, CI and section geometry. */
+#brand-story .brand-description{
+  max-width:76%;
+  font-family:var(--serif);
+  font-size:clamp(16px,1.17vw,19px);
+  font-weight:400;line-height:1.7;letter-spacing:-.042em;
+  word-break:keep-all;
+}
+#brand-story .brand-description p{margin:0}
+#brand-story .brand-description p+p{margin-top:23px}
+#brand-story .intro-lower.brand-services{max-width:76%;margin-top:25px}
+#brand-story .brand-services .intro-divider{margin-bottom:21px}
+#brand-story .brand-service-list{
+  margin:0;padding-left:1.3em;list-style:disc;
+  font-family:var(--serif);
+  font-size:clamp(16px,1.17vw,19px);
+  font-weight:400;line-height:1.72;letter-spacing:-.042em;word-break:keep-all;
+}
+#brand-story .brand-service-list li{padding-left:.15em}
+@media(min-width:701px) and (max-height:800px){
+  #brand-story .brand-description p+p{margin-top:14px}
+  #brand-story .intro-lower.brand-services{margin-top:17px}
+  #brand-story .brand-services .intro-divider{margin-bottom:14px}
+}
+@media(max-width:700px){
+  #brand-story .brand-description,#brand-story .intro-lower.brand-services{max-width:100%}
+  #brand-story .brand-description,#brand-story .brand-service-list{
+    font-size:clamp(14px,3.6vw,16px);line-height:1.85;
+  }
+  #brand-story .brand-description p+p{margin-top:23px}
+  #brand-story .intro-lower.brand-services{margin-top:26px}
+  #brand-story .brand-services .intro-divider{margin-bottom:18px}
+}
+</style>
+
 <style id="space-gallery-layout-20261029">
 /* Test-only responsive SPACE collage, extensible by appending .gallery-photo. */
 #space .space-grid.approved-grid.space-gallery-20261029{
@@ -1122,19 +1158,18 @@ strong,b{font-weight:700}
 <div class="intro-inner">
 <h2 class="sr-only" id="intro-title">작가작업실 JEJU 소개</h2>
 <img alt="작가작업실 JEJU" class="intro-ci" height="53" loading="eager" src="/assets/ci-one-line.svg" width="305"/>
-<div class="intro-primary">
-<ol class="intro-list">
-<li>작가가 추천하는 베스트셀러를 만나고</li>
-<li>함께 글쓰기를 시작하고</li>
-<li>때로는 혼자 조용히 책을 읽고 글을 쓰며</li>
-<li>독서모임과 북토크를 위한 공간 대관을 위해</li>
-</ol>
-<span class="intro-divider intro-divider-top" aria-hidden="true"></span>
-<p class="intro-byline">작가 유미경이<br/>제주 이호테우 앞 조용한 공간에<br/>글과 책에 관한 모든 것을 담아낸 공간입니다.</p>
+<div class="intro-primary brand-description">
+<p>제주 이호테우에 자리한 동네서점이자 책방입니다.<br/>작가 유미경이 추천하는 책들로 채워두었습니다.</p>
+<p>그리고 작가와 함께<br/>독서모임과 에세이 글쓰기를 시작할 수도 있습니다.</p>
+<p>사람들과 함께 이야기 나누고<br/>책과 글쓰기를 좋아하신다면<br/>작가작업실 JEJU는 언제나 기다립니다.</p>
 </div>
-<div class="intro-lower">
+<div class="intro-lower brand-services">
 <span aria-hidden="true" class="intro-divider"></span>
-<p>사람들과 함께 나누는 이야기<br/>그리고 글쓰기와 책을 좋아하신다면<br/>작가작업실 JEJU는 언제나 기다립니다.</p>
+<ul class="brand-service-list">
+<li>이호테우 동네서점</li>
+<li>독서와 에세이 글쓰기 모임</li>
+<li>모임공간 대관</li>
+</ul>
 </div>
 </div></div></div>
 </section>
