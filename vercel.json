@@ -2,6 +2,14 @@
   "version": 2,
   "rewrites": [
     {
+      "source": "/robots.txt",
+      "destination": "/api/robots"
+    },
+    {
+      "source": "/sitemap.xml",
+      "destination": "/api/sitemap"
+    },
+    {
       "source": "/news",
       "destination": "/api/news-page"
     },
