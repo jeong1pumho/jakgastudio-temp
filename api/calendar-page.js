@@ -40,8 +40,8 @@ function output(req,res,status,title,description,body,meta={}){
  res.setHeader('Content-Type','text/html; charset=utf-8');
  res.setHeader('Cache-Control','public, max-age=0, s-maxage=180');
  // Retain test-domain deindexing; Vercel blanket header also applies.
- if(!isProduction(req))res.setHeader('X-Robots-Tag','noindex, nofollow');
- const robots=isProduction(req)?'index,follow':'noindex,nofollow';
+ if(!isProduction(req)||status!==200)res.setHeader('X-Robots-Tag','noindex, nofollow');
+ const robots=isProduction(req)&&status===200?'index,follow':'noindex,nofollow';
  res.end('<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="'+robots+'">'+seo+'<style>'+css+'</style></head><body><header class="bar"><div class="bar-inner"><a class="brand" href="/">작가작업실 JEJU</a><a class="back" href="/#schedule">월간 캘린더로 돌아가기</a></div></header><main class="container">'+body+'</main></body></html>');
 }
 function monthSpan(){
