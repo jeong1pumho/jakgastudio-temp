@@ -13,12 +13,26 @@ module.exports=async(req,res)=>{
       posts.push(...rows);
       if(rows.length<500)break;
     }
-    const urls=[{path:'/'},{path:'/news'}];
+    const urls=[{path:'/'},{path:'/news'},{path:'/calendar'}];
     const seen=new Set();
     for(const p of posts){
       if(!['ongoing','ended'].includes(p.status)||!p.published_at||!SLUG.test(String(p.slug||''))||seen.has(p.slug))continue;
       seen.add(p.slug);
       urls.push({path:'/news/'+encodeURIComponent(p.slug),lastmod:isoDate(p.updated_at||p.published_at)});
+    }
+    // Only genuinely listed, public-facing meetings and special events get
+    // individual SEO URLs; private rentals, closures and auto free slots do not.
+    const todayParts=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Seoul',year:'numeric',month:'numeric',day:'numeric'}).formatToParts(new Date());
+    const todayValue=k=>Number(todayParts.find(p=>p.type===k)?.value||0);
+    const y=todayValue('year'),m=todayValue('month'),d=todayValue('day');
+    const today=y+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    const future=new Date(Date.UTC(y,m+3,1)).toISOString().slice(0,10);
+    const events=await query('/rest/v1/schedule_events?select=id,event_date,category,updated_at'+
+      '&event_date=gte.'+today+'&event_date=lt.'+future+
+      '&category=in.(meeting,custom)&order=event_date.asc,start_time.asc&limit=300');
+    for(const event of events){
+      if(!/^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(String(event.id||'')))continue;
+      urls.push({path:'/calendar/events/'+event.id,lastmod:isoDate(event.updated_at)});
     }
     const xml='<?xml version="1.0" encoding="UTF-8"?>\n'+
       '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+
