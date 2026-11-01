@@ -3,7 +3,7 @@
  if(!host)return;
  const $=id=>host.querySelector('#'+id);
  const weekdays=['일','월','화','수','목','금','토'];
- const names={meeting:'모임',rental:'대관',free:'자유방문'};
+ const names={meeting:'모임',rental:'대관',free:'자유방문',closure:'임시 휴무'};
  const now=new Date();
  // Calendar date is interpreted in Korea, independently of the client's local timezone.
 
@@ -19,9 +19,11 @@
  const text=(tag,className,value)=>{const e=document.createElement(tag);if(className)e.className=className;if(value!==undefined)e.textContent=value;return e;};
  const titleFor=e=>e.category==='custom'?e.category_label||'기타':names[e.category]||'기타';
  const classFor=e=>Object.prototype.hasOwnProperty.call(names,e.category)?e.category:'custom';
- const rangeFor=e=>e.start_time.slice(0,5)+'–'+e.end_time.slice(0,5);
+ const rangeFor=e=>e.category==='closure'?'종일 휴무':e.start_time.slice(0,5)+'–'+e.end_time.slice(0,5);
  function getDay(y,m,d){
   const day=keyFor(y,m,d),events=(records.get(day)||[]).slice().sort((a,b)=>a.start_time.localeCompare(b.start_time));
+  const temporaryClosure=events.find(e=>e.category==='closure');
+  if(temporaryClosure)return {closed:true,temporaryClosed:true,events:[temporaryClosure]};
   if(isClosed(y,m,d))return {closed:events.length===0,events};
   const free=[],begin=600,finish=1020;let pointer=begin;
   for(const e of events){
@@ -73,6 +75,15 @@
   $('sc-month').hidden=true;$('sc-detail-view').hidden=false;
   $('sc-detail-date').textContent=y+'년 '+m+'월 '+d+'일 ('+weekdays[dow]+')';
   const list=$('sc-detail-events');list.replaceChildren();
+  if(data.temporaryClosed){
+    const event=data.events[0],card=text('article','sc-detail closure');
+    card.append(
+      text('div','sc-detail-kind','임시 휴무'),
+      text('div','sc-detail-title',event.title),
+      text('div','sc-detail-clock','종일 휴무')
+    );
+    list.appendChild(card);return;
+  }
   if(data.closed){list.appendChild(text('div','sc-closed-detail','정기휴무 · 일요일과 월요일은 쉽니다.'));return;}
   for(const e of data.events){
     const card=text('article','sc-detail '+classFor(e));
