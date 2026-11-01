@@ -511,8 +511,127 @@ tbody tr:last-child td{border-bottom:0}
     } finally { $('loginBtn').disabled=false; }
   });
 
-  // Native contenteditable is intentionally self-contained; server sanitizes accepted markup.
+  // Rich text editor: safe clipboard conversion keeps pasted text editable.
   const editor=$('content');
+  // Convert Word, Google Docs, web pages and plain-text clipboard content into
+  // the limited safe HTML supported by both the editor and server sanitizer.
+  // Notepad has no text styling to preserve, but its paragraphs remain fully editable.
+  const escapePaste=s=>String(s??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  const pasteFontNames=[
+   [/맑은\s*고딕|malgun\s*gothic/i,'malgun'],
+   [/나눔\s*고딕|nanum\s*gothic/i,'nanum-gothic'],
+   [/나눔\s*명조|nanum\s*myeongjo/i,'nanum-myeongjo'],
+   [/본고딕|noto\s*sans/i,'noto-sans'],
+   [/본명조|noto\s*serif/i,'noto-serif'],
+   [/카카오|kakao/i,'kakao'],
+   [/gowun\s*dodum/i,'gowun-dodum'],
+   [/gowun\s*batang/i,'gowun-batang'],
+   [/ibm\s*plex/i,'ibm-plex'],
+   [/gothic\s*a1/i,'gothic-a1']
+  ];
+  function pasteColor(input){
+   const s=String(input||'').trim();
+   if(/^#[0-9a-f]{6}$/i.test(s))return s.toLowerCase();
+   if(/^#[0-9a-f]{3}$/i.test(s))return '#'+[...s.slice(1)].map(x=>x+x).join('').toLowerCase();
+   const rgb=s.match(/^rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})(?:\s*,\s*[\d.]+)?\s*\)$/i);
+   if(rgb&&rgb.slice(1,4).every(n=>Number(n)<=255))
+    return '#'+rgb.slice(1,4).map(n=>Number(n).toString(16).padStart(2,'0')).join('');
+   return '';
+  }
+  function pasteSize(value){
+   const v=String(value||'').trim().match(/^(\d+(?:\.\d+)?)\s*(px|pt)$/i);
+   if(!v)return '';
+   const n=Math.round(Number(v[1])*(v[2].toLowerCase()==='pt'?4/3:1));
+   return n>=10&&n<=72?String(n):'';
+  }
+  function pastedHtmlToEditor(html){
+   const body=new DOMParser().parseFromString(String(html),'text/html').body;
+   const omit=new Set(['script','style','head','meta','iframe','object','embed','svg','math','canvas','video','audio','img','form','input','button','select','textarea']);
+   const safeTags=new Set(['strong','b','em','i','u','s','ul','ol','li']);
+   const structural=new Set(['p','div','h1','h2','h3','h4','h5','h6','blockquote']);
+   function convert(node){
+    if(node.nodeType===Node.TEXT_NODE)return escapePaste(node.nodeValue);
+    if(node.nodeType!==Node.ELEMENT_NODE)return '';
+    const tag=node.tagName.toLowerCase();
+    if(omit.has(tag))return '';
+    if(tag==='br')return '<br>';
+    const children=[...node.childNodes].map(convert).join('');
+    if(tag==='a'){
+     const raw=node.getAttribute('href')||'';
+     try{
+      const url=new URL(raw);
+      if(['https:','http:','mailto:'].includes(url.protocol))
+       return '<a href="'+escapePaste(url.href)+'">'+children+'</a>';
+     }catch{}
+     return children;
+    }
+    let output=children;
+    if(safeTags.has(tag))output='<'+tag+'>'+output+'</'+tag+'>';
+    else if(structural.has(tag)){
+     const block=tag==='h1'?'h2':(['h2','h3'].includes(tag)?tag:'p');
+     const align=node.style.textAlign||node.getAttribute('align')||'';
+     const alignStyle=/^(left|center|right|justify)$/i.test(align)?' style="text-align:'+align.toLowerCase()+'"':'';
+     output='<'+block+alignStyle+'>'+(output||'<br>')+'</'+block+'>';
+    }else if(tag==='tr')output='<p>'+output+'</p>';
+    else if(tag==='td'||tag==='th')output=output+' ';
+    else if(tag==='hr')output='<br>';
+    // Convert inline formatting stored in CSS (common in Word/Google Docs).
+    const size=pasteSize(node.style.fontSize);
+    const color=pasteColor(node.style.color||node.getAttribute('color'));
+    const family=node.style.fontFamily||node.getAttribute('face')||'';
+    const font=pasteFontNames.find(([regex])=>regex.test(family))?.[1]||'';
+    const attrs=[];
+    if(font)attrs.push('data-font="'+font+'"');
+    const declarations=[];
+    if(size)declarations.push('font-size:'+size+'px');
+    if(color)declarations.push('color:'+color);
+    if(declarations.length)attrs.push('style="'+declarations.join(';')+'"');
+    if(attrs.length)output='<span '+attrs.join(' ')+'>'+output+'</span>';
+    const weight=node.style.fontWeight;
+    if(weight==='bold'||(Number(weight)>=600))output='<strong>'+output+'</strong>';
+    if(node.style.fontStyle==='italic'||node.style.fontStyle==='oblique')output='<em>'+output+'</em>';
+    if(node.style.textDecorationLine.includes('underline'))output='<u>'+output+'</u>';
+    return output;
+   }
+   return [...body.childNodes].map(convert).join('');
+  }
+  function plainTextToEditor(text){
+    return String(text||'').replace(/\r\n?/g,'\n').split('\n')
+      .map(line=>'<p>'+(line?escapePaste(line):'<br>')+'</p>').join('');
+  }
+  function insertSafePaste(markup){
+    const active=currentEditorRange();
+    editor.focus();
+    if(document.execCommand('insertHTML',false,markup))return;
+    // Fallback for browsers where execCommand returns false.
+    const sel=window.getSelection();
+    const range=active||document.createRange();
+    if(!active){range.selectNodeContents(editor);range.collapse(false);}
+    range.deleteContents();
+    const fragment=range.createContextualFragment(markup);
+    const last=fragment.lastChild;
+    range.insertNode(fragment);
+    if(last){
+      const caret=document.createRange();caret.setStartAfter(last);caret.collapse(true);
+      sel.removeAllRanges();sel.addRange(caret);
+    }
+  }
+  editor.addEventListener('paste',event=>{
+    const clipboard=event.clipboardData;
+    if(!clipboard)return;
+    const html=clipboard.getData('text/html');
+    const plain=clipboard.getData('text/plain');
+    if(!html&&!plain)return;
+    event.preventDefault();
+    let markup=html?pastedHtmlToEditor(html):'';
+    if(!markup||!markup.replace(/<[^>]*>/g,'').trim())markup=plainTextToEditor(plain);
+    if(!markup)return;
+    insertSafePaste(markup);
+    selectedRange=null;
+    $('editorFormatHint').textContent='붙여넣기 완료. 글자를 선택하면 서식 도구를 적용할 수 있습니다. 외부 문서의 지원되는 서식만 유지됩니다.';
+  });
+
+
   document.querySelectorAll('[data-command]').forEach(btn => {
     btn.addEventListener('mousedown',e=>e.preventDefault());
     btn.addEventListener('click',()=>{
