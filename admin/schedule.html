@@ -160,10 +160,6 @@ td.actions{white-space:nowrap}
   if(!custom)$('customLabel').value='';
   $('timeFields').hidden=closure;$('closureHelp').hidden=!closure;
   for(const id of ['eventStart','eventEnd']){$(id).disabled=closure;$(id).required=!closure;}
-  if(!closure){
-   if(!$('eventStart').value||$('eventStart').value==='00:00')$('eventStart').value='10:00';
-   if(!$('eventEnd').value||$('eventEnd').value==='24:00')$('eventEnd').value='12:00';
-  }
  }
  function editEvent(e){
   $('eventId').value=e.id;$('eventDate').value=e.event_date;
@@ -197,7 +193,11 @@ td.actions{white-space:nowrap}
   try{await api('/api/schedule-admin?id='+encodeURIComponent(e.id),{method:'DELETE'});await load();notice('일정을 삭제했습니다.');}
   catch(err){notice('삭제 실패: '+err.message,true);}
  }
- $('eventType').addEventListener('change',syncCustom);
+ $('eventType').addEventListener('change',()=>{
+  const leavingClosure=$('eventStart').disabled&&$('eventType').value!=='closure';
+  syncCustom();
+  if(leavingClosure){$('eventStart').value='10:00';$('eventEnd').value='12:00';}
+ });
  $('eventDate').addEventListener('input',syncWeekday);
  $('eventDate').addEventListener('change',syncWeekday);
  $('newBtn').addEventListener('click',newEvent);
