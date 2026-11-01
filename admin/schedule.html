@@ -11,10 +11,13 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:"Apple SD Gothic
 button,input,select{font:inherit}button{cursor:pointer}a{color:inherit;text-decoration:none}
 [hidden]{display:none!important}
 .container{max-width:1100px;padding:30px 20px 90px;margin:auto}
-header{display:flex;align-items:center;justify-content:space-between;gap:15px;border-bottom:1px solid var(--line);padding:0 0 24px;margin-bottom:32px}
+header{display:flex;align-items:center;justify-content:space-between;gap:15px;border-bottom:1px solid var(--line);padding:12px 16px;margin-bottom:32px;position:sticky;top:0;z-index:50;background:var(--bg);box-shadow:0 4px 14px rgba(40,32,25,.06)}
 .wordmark{font-size:19px;font-weight:650;letter-spacing:-.04em}
 .wordmark small{display:block;color:var(--muted);font-size:12px;font-weight:400;letter-spacing:0}
-.header-nav{display:flex;align-items:center;gap:13px;font-size:13px;flex-wrap:wrap}
+.header-nav{display:flex;align-items:center;gap:8px;font-size:13px;flex-wrap:wrap}
+.header-nav a{padding:8px 12px;border:1px solid transparent;border-radius:4px;white-space:nowrap}
+.header-nav a:hover{background:#eee7e0}
+.header-nav a.is-active{background:#f1e7dd;border-color:#c9b5a5;font-weight:700;color:#463427}
 .card{background:#fff;border:1px solid var(--line);border-radius:7px;padding:26px}
 .login{max-width:440px;margin:50px auto}
 h1{font-size:28px;font-weight:600;letter-spacing:-.04em;margin:0 0 7px}
@@ -60,7 +63,7 @@ td.actions{white-space:nowrap}
 
 .empty{padding:48px 12px;text-align:center;color:var(--muted)}
 .footer-help{margin:18px 0 0;font-size:12px;color:#85776c}
-@media(max-width:650px){.page-head{align-items:flex-start;flex-direction:column}.container{padding:20px 12px 60px}.card{padding:18px}.grid{grid-template-columns:1fr;gap:0}.wordmark{font-size:16px}.header-nav{gap:9px}.edit-actions{flex-wrap:wrap}.month-title{font-size:20px}}
+@media(max-width:650px){header{flex-direction:column;align-items:stretch;padding:12px 8px}.header-nav{justify-content:space-between}.header-nav a{padding:8px 7px}.page-head{align-items:flex-start;flex-direction:column}.container{padding:20px 12px 60px}.card{padding:18px}.grid{grid-template-columns:1fr;gap:0}.wordmark{font-size:16px}.header-nav{gap:9px}.edit-actions{flex-wrap:wrap}.month-title{font-size:20px}}
 /* Admin-only rich memo editor; public calendar never renders memo. */
 .memo-tools{display:flex;gap:5px;align-items:center;flex-wrap:wrap;background:#faf8f5;padding:9px 10px;border:1px solid #cbc2b9;border-bottom:0;border-radius:4px 4px 0 0}
 .memo-tools button{border:1px solid #e1d9d0;border-radius:4px;background:#fff;padding:5px 12px;font-size:13px;min-width:32px}
@@ -90,8 +93,8 @@ td.actions{white-space:nowrap}
 <body>
 <div class="container">
 <header>
- <a class="wordmark" href="/#schedule">작가작업실 JEJU <small>스케줄 관리자</small></a>
- <nav class="header-nav"><a href="/admin">운영 소식 관리</a><a href="/#schedule">캘린더 보기</a><button id="logout" type="button" class="btn secondary small" hidden>로그아웃</button></nav>
+ <a class="wordmark" href="/#schedule">작가작업실 JEJU <small>관리자</small></a>
+ <nav class="header-nav" aria-label="관리자 메뉴"><a href="/admin/">소식 관리</a><a href="/admin/schedule.html" class="is-active" aria-current="page">스케줄 관리</a><button id="logout" type="button" class="btn secondary small" hidden>로그아웃</button></nav>
 </header>
 <p id="status" class="status" role="status" aria-live="polite"></p>
 <section id="loginView" class="card login">
@@ -188,10 +191,12 @@ td.actions{white-space:nowrap}
 
 </section>
 </div>
+<script src="/assets/admin-session.js"></script>
 <script>
 (()=>{'use strict';
  const $=id=>document.getElementById(id);
  let token='',items=[],busy=false,requestSeq=0,selectedDate=null;
+ const sharedSession=window.JAKAdminSession;
  const fmt=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Seoul',year:'numeric',month:'numeric',day:'numeric'});
  const todayParts=fmt.formatToParts(new Date()),part=k=>Number(todayParts.find(p=>p.type===k)?.value||0);
  let year=part('year'),month=part('month');
@@ -216,7 +221,7 @@ td.actions{white-space:nowrap}
   try{response=await fetch(url,{...opts,headers,cache:'no-store'});}
   catch{throw Error('서버 연결에 실패했습니다. 네트워크를 확인해 주세요.');}
   const body=await response.json().catch(()=>({}));
-  if(!response.ok)throw Error(body.error||'요청에 실패했습니다. (HTTP '+response.status+')');
+  if(!response.ok){const err=Error(body.error||'요청에 실패했습니다. (HTTP '+response.status+')');err.status=response.status;throw err;}
   return body;
  }
  function newEvent(preferredDate){
@@ -398,11 +403,31 @@ td.actions{white-space:nowrap}
   e.preventDefault();$('loginBtn').disabled=true;notice('로그인 확인 중…');
   try{
    const data=await api('/api/admin',{method:'POST',body:JSON.stringify({action:'login',email:$('email').value.trim(),password:$('password').value})});
-   token=data.token;$('password').value='';$('loginView').hidden=true;$('adminView').hidden=false;$('logout').hidden=false;await load();
+   token=data.token;sharedSession?.save(data.token,data.expires_in);$('password').value='';$('loginView').hidden=true;$('adminView').hidden=false;$('logout').hidden=false;await load();
   }catch(err){notice('로그인 실패: '+err.message,true);}
   finally{$('loginBtn').disabled=false;}
  });
- $('logout').addEventListener('click',()=>{token='';items=[];requestSeq++;selectedDate=null;$('memoEditor').innerHTML='';$('adminView').hidden=true;$('loginView').hidden=false;$('logout').hidden=true;$('eventForm').reset();notice('로그아웃했습니다.');});
+ $('logout').addEventListener('click',()=>{token='';sharedSession?.clear();items=[];requestSeq++;selectedDate=null;$('memoEditor').innerHTML='';$('adminView').hidden=true;$('loginView').hidden=false;$('logout').hidden=true;$('eventForm').reset();notice('로그아웃했습니다.');});
+ async function restoreAdminSession(){
+  const cached=sharedSession?.read();
+  if(!cached)return;
+  token=cached;
+  $('loginView').hidden=true;$('adminView').hidden=false;$('logout').hidden=false;
+  try{
+   const payload=await api('/api/schedule-admin?month='+monthKey());
+   items=Array.isArray(payload.items)?payload.items:[];
+   render();notice('');
+  }catch(err){
+   if(err.status===401||err.status===403){
+    token='';sharedSession?.clear();
+    $('loginView').hidden=false;$('adminView').hidden=true;$('logout').hidden=true;
+    notice('로그인이 만료되었습니다. 다시 로그인해 주세요.',true);
+   }else{
+    notice('로그인은 유지됐지만 스케줄을 조회하지 못했습니다: '+err.message,true);
+   }
+  }
+ }
+ restoreAdminSession();
 })();
 </script>
 </body></html>
