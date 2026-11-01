@@ -5,7 +5,7 @@
  * Do not query schedule_event_memos or publish private notes.
  */
 const {query,ready,esc}=require('../lib/core');
-const {origin,jsonLd}=require('../lib/seo');
+const {origin,isProduction,jsonLd}=require('../lib/seo');
 const idPattern=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const COLS='id,event_date,category,category_label,title,start_time,end_time,updated_at';
 const visibleCategories='meeting,custom';
@@ -40,8 +40,9 @@ function output(req,res,status,title,description,body,meta={}){
  res.setHeader('Content-Type','text/html; charset=utf-8');
  res.setHeader('Cache-Control','public, max-age=0, s-maxage=180');
  // Retain test-domain deindexing; Vercel blanket header also applies.
- res.setHeader('X-Robots-Tag','noindex, nofollow');
- res.end('<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow">'+seo+'<style>'+css+'</style></head><body><header class="bar"><div class="bar-inner"><a class="brand" href="/">작가작업실 JEJU</a><a class="back" href="/#schedule">월간 캘린더로 돌아가기</a></div></header><main class="container">'+body+'</main></body></html>');
+ if(!isProduction(req))res.setHeader('X-Robots-Tag','noindex, nofollow');
+ const robots=isProduction(req)?'index,follow':'noindex,nofollow';
+ res.end('<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="'+robots+'">'+seo+'<style>'+css+'</style></head><body><header class="bar"><div class="bar-inner"><a class="brand" href="/">작가작업실 JEJU</a><a class="back" href="/#schedule">월간 캘린더로 돌아가기</a></div></header><main class="container">'+body+'</main></body></html>');
 }
 function monthSpan(){
  const now=dateNow(),first=now.year+'-'+pad(now.month)+'-01';
@@ -91,7 +92,7 @@ module.exports=async(req,res)=>{
    '&event_date=gte.'+first+'&event_date=lt.'+until+
    '&category=in.('+visibleCategories+')&order=event_date.asc,start_time.asc&limit=300';
   const rows=await query(url);
-  const visible=rows.filter(e=>onlyDate(e.event_date)>=today&&e.category!=='closure');
+  const visible=rows.filter(e=>onlyDate(e.event_date)>=today&&['meeting','custom'].includes(e.category));
   const description='제주 이호테우 작가작업실 JEJU에서 공개한 독서모임, 글쓰기 모임과 특별행사의 날짜·시간·장소를 확인하세요.';
   const cards=visible.map(e=>{
    const date=onlyDate(e.event_date),href='/calendar/events/'+encodeURIComponent(e.id);
