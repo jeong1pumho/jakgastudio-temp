@@ -1,6 +1,12 @@
 const {root,key,ready,query,send,admin,selected}=require('../lib/core');
 const {cleanHtml}=require('../lib/rich');
 const MAX_PHOTOS=20;
+// Calendar-only NEWS display dates. These fields are not linked to room schedules.
+function validCalendarDate(value){
+ if(typeof value!=='string'||!/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/.test(value))return false;
+ const d=new Date(value+'T00:00:00.000Z');
+ return Number.isFinite(d.getTime())&&d.toISOString().slice(0,10)===value;
+}
 module.exports=async(req,res)=>{try{
  if(req.method==='GET'&&req.query.action==='config')return send(res,200,{configured:ready(),url:root(),key:key(),maxPhotos:MAX_PHOTOS});
  if(req.method==='POST'&&req.body?.action==='login'){
@@ -26,8 +32,15 @@ module.exports=async(req,res)=>{try{
   if(!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug))return send(res,400,{error:'URL 주소 오류'});
   const status=String(b.status||'ongoing');
   if(!['ongoing','ended'].includes(status))return send(res,400,{error:'게시 상태 오류'});
+  const mode=String(b.date_mode||'none');
+  if(!['none','day','range'].includes(mode))return send(res,400,{error:'날짜 유형이 올바르지 않습니다.'});
+  const event_date_start=mode==='none'?null:b.event_date_start;
+  const event_date_end=mode==='range'?b.event_date_end:null;
+  if(mode!=='none'&&!validCalendarDate(event_date_start))return send(res,400,{error:'올바른 날짜를 입력해 주세요.'});
+  if(mode==='range'&&(!validCalendarDate(event_date_end)||event_date_end<event_date_start))
+    return send(res,400,{error:'종료일은 시작일 이후여야 합니다.'});
   const cover_index=images.length?Math.max(0,Math.min(images.length-1,Number(b.cover_index)||0)):0;
-  const post={slug,title,content,images,cover_index,status,sort_order:Number(b.sort_order)||0};
+  const post={slug,title,content,images,cover_index,status,sort_order:Number(b.sort_order)||0,event_date_start,event_date_end};
   if(req.method==='PATCH'){
    if(!/^[a-f0-9-]{36}$/i.test(b.id||''))return send(res,400,{error:'ID 오류'});
    const rows=await query('/rest/v1/news_posts?select=id,published_at&id=eq.'+encodeURIComponent(b.id),'GET',undefined,token);

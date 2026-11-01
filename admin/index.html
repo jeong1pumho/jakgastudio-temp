@@ -119,6 +119,15 @@ tbody tr:last-child td{border-bottom:0}
 .editor-color-box input[type=color]{width:38px;height:33px;border:1px solid #dfd9d2;border-radius:3px;padding:2px;background:#fff;cursor:pointer}
 .editor-color-box input[type=text]{width:83px;height:33px;border:1px solid #dfd9d2;border-radius:3px;padding:5px;font-size:12px;background:#fff;color:#42352c}
 #localFontsButton{font-size:12px}
+
+/* Optional event date / date-range editor (independent of scheduling). */
+.date-panel{border:1px solid var(--edge);border-radius:6px;background:#fbfaf8;padding:18px 20px}
+.date-panel .date-note{font-size:12px;color:var(--muted);margin:9px 0 0;line-height:1.6}
+.date-fields{margin-top:14px}
+.date-fields .form-row{margin-bottom:0}
+.date-clear{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:12px}
+.date-clear .note{margin:0}
+@media(max-width:800px){.date-panel{padding:16px}.date-fields{gap:12px}}
 </style>
 </head>
 <body>
@@ -168,6 +177,28 @@ tbody tr:last-child td{border-bottom:0}
       <input id="postId" type="hidden">
       <div class="form-row"><label class="label" for="title">소식 제목</label><input class="field" id="title" required minlength="2" maxlength="150"></div>
       <div class="form-row"><label class="label" for="slug">상세페이지 주소 (영문, 선택사항)</label><input class="field" id="slug" placeholder="비워 두면 자동 생성" pattern="[a-z0-9]+(-[a-z0-9]+)*"><p class="note">기존 글을 수정할 때는 주소를 변경하지 않는 편이 좋습니다.</p></div>
+      <div class="form-row date-panel">
+        <label class="label" for="dateMode">게시물 날짜 (선택)</label>
+        <select class="field" id="dateMode">
+          <option value="none">날짜 표시 안 함</option>
+          <option value="day">하루 날짜 지정</option>
+          <option value="range">기간 지정 (시작일 ~ 종료일)</option>
+        </select>
+        <div class="form-grid date-fields" id="dateFields" hidden>
+          <div class="form-row">
+            <label class="label" for="eventDateStart">날짜 / 시작일</label>
+            <input class="field" type="date" id="eventDateStart">
+          </div>
+          <div class="form-row" id="dateEndWrap" hidden>
+            <label class="label" for="eventDateEnd">종료일</label>
+            <input class="field" type="date" id="eventDateEnd">
+          </div>
+        </div>
+        <div class="date-clear">
+          <p class="note">입력한 날짜만 NEWS 목록·상세페이지에 표시됩니다. 스케줄과는 연동되지 않습니다.</p>
+          <button type="button" class="btn secondary small" id="clearEventDate">날짜 삭제</button>
+        </div>
+      </div>
       <div class="form-row">
         <label class="label" for="files">사진 등록 · 최대 20장</label>
         <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="사진을 드래그하거나 클릭해서 추가">
@@ -292,6 +323,27 @@ tbody tr:last-child td{border-bottom:0}
     if(!Number.isFinite(d.getTime())) return '-';
     return new Intl.DateTimeFormat('ko-KR', {year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).format(d);
   }
+
+  function displayEventDate(p) {
+    if(!p.event_date_start)return '';
+    const fmt=v=>String(v).replace(/-/g,'.');
+    return fmt(p.event_date_start)+(p.event_date_end?' ~ '+fmt(p.event_date_end):'');
+  }
+  function syncDateFields() {
+    const mode=$('dateMode').value;
+    $('dateFields').hidden=mode==='none';
+    $('dateEndWrap').hidden=mode!=='range';
+    $('eventDateStart').required=mode!=='none';
+    $('eventDateEnd').required=mode==='range';
+  }
+  $('dateMode').addEventListener('change',syncDateFields);
+  $('clearEventDate').addEventListener('click',()=>{
+    $('dateMode').value='none';
+    $('eventDateStart').value='';
+    $('eventDateEnd').value='';
+    syncDateFields();
+    message('날짜 표시가 해제되었습니다. 저장하면 게시물에서도 삭제됩니다.');
+  });
   function filterList() {
     const term = $('search').value.trim().toLocaleLowerCase('ko');
     const state = $('filter').value;
@@ -318,6 +370,7 @@ tbody tr:last-child td{border-bottom:0}
         } else info.appendChild(el('div','cover empty','사진 없음'));
         const desc = el('div');
         desc.appendChild(el('div','post-title',p.title));
+        if(displayEventDate(p))desc.appendChild(el('div','post-sub','날짜: '+displayEventDate(p)));
         desc.appendChild(el('div','post-sub','사진 ' + (p.images?.length || 0) + '장'));
         info.appendChild(desc); td0.appendChild(info); tr.appendChild(td0);
         const td1 = el('td');
@@ -378,6 +431,10 @@ tbody tr:last-child td{border-bottom:0}
     $('postId').value = '';
     $('sort').value = 0;
     $('status').value='ongoing';
+    $('dateMode').value='none';
+    $('eventDateStart').value='';
+    $('eventDateEnd').value='';
+    syncDateFields();
     imgs=[];cover=0;renderPhotos();
   }
   function newPost() {
@@ -396,6 +453,10 @@ tbody tr:last-child td{border-bottom:0}
     else $('content').textContent=p.content||'';
     $('status').value=p.status||'ongoing';
     $('sort').value=p.sort_order||0;
+    $('dateMode').value=p.event_date_start?(p.event_date_end?'range':'day'):'none';
+    $('eventDateStart').value=p.event_date_start||'';
+    $('eventDateEnd').value=p.event_date_end||'';
+    syncDateFields();
     imgs=Array.isArray(p.images)?p.images.slice(0,20):[];
     cover=Math.max(0,Math.min(Number(p.cover_index)||0,imgs.length-1));
     renderPhotos();
@@ -630,7 +691,12 @@ tbody tr:last-child td{border-bottom:0}
   $('editForm').addEventListener('submit', async e => {
     e.preventDefault();if(saving)return;
     const id=$('postId').value;
-    const payload={id,title:$('title').value.trim(),slug:$('slug').value.trim(),content:$('content').innerHTML,images:imgs.slice(),cover_index:cover,status:$('status').value,sort_order:Number($('sort').value)||0};
+    const mode=$('dateMode').value;
+    const start=mode==='none'?null:$('eventDateStart').value;
+    const end=mode==='range'?$('eventDateEnd').value:null;
+    if(mode!=='none'&&!start)return message('날짜를 선택해 주세요.',true);
+    if(mode==='range'&&(!end||end<start))return message('종료일은 시작일 이후로 설정해 주세요.',true);
+    const payload={id,title:$('title').value.trim(),slug:$('slug').value.trim(),content:$('content').innerHTML,images:imgs.slice(),cover_index:cover,status:$('status').value,sort_order:Number($('sort').value)||0,date_mode:mode,event_date_start:start,event_date_end:end};
     saving=true;$('saveBtn').disabled=true;message('게시물을 저장하는 중…');
     try {
       await api('/api/admin',{method:id?'PATCH':'POST',body:JSON.stringify(payload)});
