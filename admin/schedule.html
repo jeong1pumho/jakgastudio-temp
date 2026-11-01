@@ -259,13 +259,20 @@ td.actions{white-space:nowrap}
   if(closure)return{closed:true,temporaryClosed:true,events:[closure]};
   if([0,1].includes(dayOf(y,m,d)))return{closed:busy.length===0,events:busy};
   const free=[];let cursor=600;
+  // Auto free-visiting windows: 10:00–12:00 and 13:00–17:00.
+  const addFree=(start,end)=>{
+   for(const [windowStart,windowEnd] of [[600,720],[780,1020]]){
+    const a=Math.max(start,windowStart),b=Math.min(end,windowEnd);
+    if(a<b)free.push({category:'free',title:'자유롭게 책 읽고 글쓰기',start_time:fmtClock(a),end_time:fmtClock(b)});
+   }
+  };
   for(const e of busy){
    const start=Math.max(600,minutes(e.start_time)),end=Math.min(1020,minutes(e.end_time));
    if(start>=end)continue;
-   if(cursor<start)free.push({category:'free',title:'자유롭게 책 읽고 글쓰기',start_time:fmtClock(cursor),end_time:fmtClock(start)});
+   if(cursor<start)addFree(cursor,start);
    cursor=Math.max(cursor,end);
   }
-  if(cursor<1020)free.push({category:'free',title:'자유롭게 책 읽고 글쓰기',start_time:fmtClock(cursor),end_time:'17:00'});
+  if(cursor<1020)addFree(cursor,1020);
   return{closed:false,events:[...busy,...free].sort((a,b)=>a.start_time.localeCompare(b.start_time))};
  }
  function render(){
