@@ -566,13 +566,12 @@ tbody tr:last-child td{border-bottom:0}
      return children;
     }
     let output=children;
-    if(safeTags.has(tag))output='<'+tag+'>'+output+'</'+tag+'>';
-    else if(structural.has(tag)){
-     const block=tag==='h1'?'h2':(['h2','h3'].includes(tag)?tag:'p');
-     const align=node.style.textAlign||node.getAttribute('align')||'';
-     const alignStyle=/^(left|center|right|justify)$/i.test(align)?' style="text-align:'+align.toLowerCase()+'"':'';
-     output='<'+block+alignStyle+'>'+(output||'<br>')+'</'+block+'>';
-    }else if(tag==='tr')output='<p>'+output+'</p>';
+    // Apply inline styles inside block/list elements so pasted Word markup
+    // remains valid HTML; block tags cannot be children of a span/strong.
+    const block=structural.has(tag)?(tag==='h1'?'h2':(['h2','h3'].includes(tag)?tag:'p')):'';
+    const align=node.style.textAlign||node.getAttribute('align')||'';
+    const alignStyle=/^(left|center|right|justify)$/i.test(align)?' style="text-align:'+align.toLowerCase()+'"':'';
+    if(safeTags.has(tag)&&!['ul','ol','li'].includes(tag))output='<'+tag+'>'+output+'</'+tag+'>';
     else if(tag==='td'||tag==='th')output=output+' ';
     else if(tag==='hr')output='<br>';
     // Convert inline formatting stored in CSS (common in Word/Google Docs).
@@ -591,6 +590,9 @@ tbody tr:last-child td{border-bottom:0}
     if(weight==='bold'||(Number(weight)>=600))output='<strong>'+output+'</strong>';
     if(node.style.fontStyle==='italic'||node.style.fontStyle==='oblique')output='<em>'+output+'</em>';
     if(node.style.textDecorationLine.includes('underline'))output='<u>'+output+'</u>';
+    if(block)output='<'+block+alignStyle+'>'+(output||'<br>')+'</'+block+'>';
+    else if(['ul','ol','li'].includes(tag))output='<'+tag+'>'+output+'</'+tag+'>';
+    else if(tag==='tr')output='<p>'+output+'</p>';
     return output;
    }
    return [...body.childNodes].map(convert).join('');
