@@ -36,16 +36,19 @@ module.exports=async(req,res)=>{
   if(req.method!=='POST'&&req.method!=='PATCH')return send(res,405,{error:'허용되지 않은 요청입니다.'});
   const b=req.body||{};
   if(!validDate(b.event_date))return send(res,400,{error:'올바른 일정 날짜를 선택해 주세요.'});
-  if(!['meeting','rental','custom'].includes(b.category))return send(res,400,{error:'일정 구분을 선택해 주세요. 자유방문은 자동 계산됩니다.'});
+  if(!['meeting','rental','custom','closure'].includes(b.category))return send(res,400,{error:'일정 구분을 선택해 주세요. 자유방문은 자동 계산됩니다.'});
   const title=String(b.title||'').trim();
   if(title.length<1||title.length>150)return send(res,400,{error:'일정 제목은 1~150자로 입력해 주세요.'});
   const category_label=b.category==='custom'?String(b.category_label||'').trim():null;
   if(b.category==='custom'&&(category_label.length<1||category_label.length>50))
    return send(res,400,{error:'추가 구분 이름은 1~50자로 입력해 주세요.'});
-  if(!validTime(b.start_time)||!validTime(b.end_time)||b.end_time<=b.start_time)
-   return send(res,400,{error:'시간을 확인해 주세요. 종료시간은 시작시간보다 늦어야 합니다.'});
+  const isClosure=b.category==='closure';
+  if(!isClosure&&(!validTime(b.start_time)||!validTime(b.end_time)||b.end_time<=b.start_time))
+   return send(res,400,{error:'시간을 24시간 형식(HH:MM)으로 입력해 주세요. 종료시간은 시작시간보다 늦어야 합니다.'});
+  // A closure always occupies the complete date and blocks all other events.
   const post={event_date:b.event_date,category:b.category,category_label,title,
-    start_time:b.start_time+':00',end_time:b.end_time+':00',updated_at:new Date().toISOString()};
+    start_time:isClosure?'00:00:00':b.start_time+':00',
+    end_time:isClosure?'24:00:00':b.end_time+':00',updated_at:new Date().toISOString()};
   if(req.method==='PATCH'){
    if(!validId(b.id))return send(res,400,{error:'잘못된 일정 ID입니다.'});
    const rows=await query('/rest/v1/schedule_events?select=id&id=eq.'+b.id,'GET',undefined,token);
