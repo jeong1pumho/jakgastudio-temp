@@ -13,7 +13,11 @@ button,input,select,textarea{font:inherit}
 button{cursor:pointer}
 [hidden]{display:none!important}
 .container{max-width:1130px;margin:0 auto;padding:32px 22px 80px}
-.site-header{display:flex;justify-content:space-between;align-items:center;gap:14px;border-bottom:1px solid var(--edge);padding:6px 0 26px;margin-bottom:32px}
+.site-header{display:flex;justify-content:space-between;align-items:center;gap:14px;border-bottom:1px solid var(--edge);padding:14px 12px;margin-bottom:32px;position:sticky;top:0;z-index:50;background:var(--paper,#f7f5f1);box-shadow:0 4px 14px rgba(40,32,25,.06)}
+.admin-global-nav{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+.admin-nav-link{padding:9px 12px;border-radius:4px;text-decoration:none;font-size:13px;white-space:nowrap;color:var(--muted,#817970);border:1px solid transparent}
+.admin-nav-link:hover{background:#eee7e0;color:#38322e}
+.admin-nav-link.is-active{border-color:#c9b5a5;background:#f1e7dd;color:#463427;font-weight:700}
 .wordmark{font-size:20px;font-weight:600;letter-spacing:-.04em}.wordmark small{font-size:11px;color:var(--muted);font-weight:400;letter-spacing:0;margin-left:12px}
 a{color:inherit}.site-header a{text-decoration:none}
 .panel{background:white;border:1px solid var(--edge);border-radius:7px;padding:32px}
@@ -61,7 +65,7 @@ tbody tr:last-child td{border-bottom:0}
 .login-box{max-width:420px;margin:65px auto 0}.login-box h1{margin-bottom:10px}.login-box button{width:100%;margin-top:6px}
 .list-head-actions{display:flex;gap:8px;align-items:center}
 @media(max-width:800px){.container{padding:18px 14px 55px}.panel{padding:22px 16px}.wordmark small{display:none}.page-heading{align-items:flex-start;gap:12px}h1{font-size:23px}.form-grid{grid-template-columns:1fr}.photos{grid-template-columns:repeat(2,minmax(0,1fr))}table{min-width:670px}.toolbar .filter{width:100%}}
-@media(max-width:470px){.page-heading{flex-direction:column;align-items:stretch}.list-head-actions{justify-content:space-between}.page-heading .btn{align-self:stretch}.photos{grid-template-columns:1fr}.site-header{gap:8px}.wordmark{font-size:18px}}
+@media(max-width:470px){.site-header{flex-direction:column;align-items:stretch;padding:12px 7px}.admin-global-nav{justify-content:space-between}.admin-nav-link{padding:8px 9px}.page-heading{flex-direction:column;align-items:stretch}.list-head-actions{justify-content:space-between}.page-heading .btn{align-self:stretch}.photos{grid-template-columns:1fr}.site-header{gap:8px}.wordmark{font-size:18px}}
 
 /* Rich editor and drag-and-drop image upload */
 .visually-hidden{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
@@ -133,8 +137,12 @@ tbody tr:last-child td{border-bottom:0}
 <body>
 <div class="container">
 <header class="site-header">
-  <a class="wordmark" href="/#news">작가작업실 JEJU <small>운영 소식 관리자</small></a>
-  <button type="button" class="btn ghost small" id="logout" hidden>로그아웃</button>
+  <a class="wordmark" href="/#news">작가작업실 JEJU <small>관리자</small></a>
+  <nav class="admin-global-nav" aria-label="관리자 메뉴">
+    <a href="/admin/" class="admin-nav-link is-active" aria-current="page">소식 관리</a>
+    <a href="/admin/schedule.html" class="admin-nav-link">스케줄 관리</a>
+    <button type="button" class="btn ghost small" id="logout" hidden>로그아웃</button>
+  </nav>
 </header>
 <p id="message" class="status" role="status" aria-live="polite"></p>
 
@@ -280,11 +288,13 @@ tbody tr:last-child td{border-bottom:0}
 </section>
 </div>
 
+<script defer src="/assets/admin-session.js"></script>
 <script>
 (function () {
   'use strict';
   const $ = id => document.getElementById(id);
   let token = '';
+  const sharedSession=window.JAKAdminSession;
   let posts = [];
   let imgs = [];
   let cover = 0;
@@ -308,7 +318,7 @@ tbody tr:last-child td{border-bottom:0}
     try { r = await fetch(path, { ...o, headers }); }
     catch { throw Error('서버에 연결할 수 없습니다. 인터넷 연결을 확인해 주세요.'); }
     const body = await r.json().catch(() => ({}));
-    if(!r.ok) throw Error(body.error || '요청 실패 (HTTP ' + r.status + ')');
+    if(!r.ok){const err=Error(body.error || '요청 실패 (HTTP ' + r.status + ')');err.status=r.status;throw err;}
     return body;
   }
   const el = (tag, cls, txt) => {
@@ -480,7 +490,7 @@ tbody tr:last-child td{border-bottom:0}
   $('backBtn').addEventListener('click',() => {message('');show('listView');});
   $('cancelBtn').addEventListener('click',() => {message('');show('listView');});
   $('logout').addEventListener('click',() => {
-    token='';posts=[];imgs=[];cover=0;
+    token='';sharedSession?.clear();posts=[];imgs=[];cover=0;
     $('password').value='';$('listArea').replaceChildren();
     message('로그아웃했습니다.');show('loginView');
   });
@@ -491,6 +501,7 @@ tbody tr:last-child td{border-bottom:0}
     try {
       const r = await api('/api/admin',{method:'POST',body:JSON.stringify({action:'login',email:$('email').value.trim(),password:$('password').value})});
       token = r.token;
+      sharedSession?.save(r.token,r.expires_in);
       $('password').value='';
       show('listView');message('');
       await loadPosts();
@@ -705,7 +716,24 @@ tbody tr:last-child td{border-bottom:0}
     } catch(err) {message('저장 실패: '+err.message,true);}
     finally {saving=false;$('saveBtn').disabled=false;}
   });
-  show('loginView');
+  async function restoreAdminSession(){
+    show('loginView');
+    const saved=sharedSession?.read();
+    if(!saved)return;
+    token=saved;
+    try{
+      await loadPosts(); // GET /api/admin rechecks token and role.
+      show('listView');message('');
+    }catch(err){
+      if(err.status===401||err.status===403){
+        token='';sharedSession?.clear();
+        message('로그인이 만료되었습니다. 다시 로그인해 주세요.',true);
+      }else{
+        show('listView');message('기존 로그인은 유지됐지만 소식을 불러오지 못했습니다: '+err.message,true);
+      }
+    }
+  }
+  restoreAdminSession();
 }());
 </script>
 </body>
