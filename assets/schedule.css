@@ -36,6 +36,8 @@
 #schedule .sc-entry.custom{background:#f0eaf3;color:#795682}
 #schedule .sc-kind{display:block;max-width:100%;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;font-size:12px;font-weight:700}
 #schedule .sc-clock{display:block;font-size:11px;white-space:nowrap;font-variant-numeric:tabular-nums}
+#schedule .sc-lunch{display:block;font-size:10px;white-space:normal;overflow-wrap:anywhere;word-break:keep-all;line-height:1.4}
+#schedule .sc-detail-lunch{font-size:13px;color:#50795c;margin-top:5px;line-height:1.5}
 #schedule .sc-closed-label{font-size:12px;color:#9a938c;text-align:center;margin:auto}
 #schedule .sc-more{font-size:11px;color:#8a7768;margin-top:2px;text-align:center}
 #schedule .sc-info{font-size:12px;color:#7e756f;margin:16px 0 0}
