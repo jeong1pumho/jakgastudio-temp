@@ -72,7 +72,6 @@
   const dow=new Date(Date.UTC(y,m-1,d)).getUTCDay(),data=getDay(y,m,d);
   $('sc-month').hidden=true;$('sc-detail-view').hidden=false;
   $('sc-detail-date').textContent=y+'년 '+m+'월 '+d+'일 ('+weekdays[dow]+')';
-  $('sc-detail-note').textContent=data.closed?'정기휴무일':isClosed(y,m,d)?'특별 일정 운영 · 등록된 시간에만 이용 가능':'운영시간 10:00–17:00 · 등록 일정 중 자유방문 불가';
   const list=$('sc-detail-events');list.replaceChildren();
   if(data.closed){list.appendChild(text('div','sc-closed-detail','정기휴무 · 일요일과 월요일은 쉽니다.'));return;}
   for(const e of data.events){
@@ -97,7 +96,7 @@
     if(!records.has(item.event_date))records.set(item.event_date,[]);
     records.get(item.event_date).push(item);
    }
-   drawMonth();setState('날짜를 선택하면 일정을 자세히 볼 수 있습니다. 모바일에서는 캘린더를 좌우로 움직여 확인하세요.');
+   drawMonth();setState('모바일에서는 캘린더를 좌우로 움직여 확인하세요.');
   }catch(e){
    if(id!==currentRequest)return;
    $('sc-days').replaceChildren();setState('일정 조회 오류: '+e.message,true);
