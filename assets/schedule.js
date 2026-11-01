@@ -58,7 +58,7 @@
    if(key===koreanNow)button.classList.add('is-today');
    button.setAttribute('aria-label',month+'월 '+d+'일 '+weekdays[dow]+'요일 일정 보기');
    button.appendChild(text('span','sc-date-num',String(d)));
-   if(data.closed)button.appendChild(text('span','sc-closed-label','휴무'));
+   if(data.closed)button.appendChild(text('span','sc-closed-label',data.temporaryClosed?'임시휴무':'휴무'));
    else {
     for(const e of data.events.slice(0,4)){
      const chip=text('span','sc-entry '+classFor(e));
