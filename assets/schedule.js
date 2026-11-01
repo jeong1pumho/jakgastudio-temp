@@ -40,7 +40,12 @@
     pointer=Math.max(pointer,b);
   }
   if(pointer<finish)addFree(pointer,finish);
-  return {closed:false,events:[...events,...free].sort((a,b)=>a.start_time.localeCompare(b.start_time))};
+  // Presentation-only merge: two valid free segments become one informative card.
+  const wholeDay=free.length===2 &&
+   free[0].start_time==='10:00'&&free[0].end_time==='12:00'&&
+   free[1].start_time==='13:00'&&free[1].end_time==='17:00';
+  const displayFree=wholeDay?[{category:'free',title:'자유롭게 책 읽고 글쓰기',start_time:'10:00',end_time:'17:00',lunch_excluded:true}]:free;
+  return {closed:false,events:[...events,...displayFree].sort((a,b)=>a.start_time.localeCompare(b.start_time))};
  }
  function setState(message,isError=false){
   $('sc-state').textContent=message||'';
@@ -70,7 +75,9 @@
     for(const e of data.events.slice(0,4)){
      const chip=text('span','sc-entry '+classFor(e));
      const name=text('strong','sc-kind',titleFor(e));name.title=titleFor(e);
-     chip.append(name,text('span','sc-clock',rangeFor(e)));button.appendChild(chip);
+     chip.append(name,text('span','sc-clock',rangeFor(e)));
+     if(e.lunch_excluded)chip.appendChild(text('span','sc-lunch','(점심시간 12:00–13:00 제외)'));
+     button.appendChild(chip);
     }
     if(data.events.length>4)button.appendChild(text('span','sc-more','+'+(data.events.length-4)+'개 더보기'));
    }
@@ -95,6 +102,7 @@
   for(const e of data.events){
     const card=text('article','sc-detail '+classFor(e));
     card.append(text('div','sc-detail-kind',titleFor(e)),text('div','sc-detail-title',e.title),text('div','sc-detail-clock',rangeFor(e)));
+    if(e.lunch_excluded)card.appendChild(text('div','sc-detail-lunch','(점심시간 12:00–13:00 제외)'));
     list.appendChild(card);
   }
  }
