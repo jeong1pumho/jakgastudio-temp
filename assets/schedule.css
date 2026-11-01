@@ -1,0 +1,73 @@
+/* Test-only SCHEDULE calendar, independent from NEWS dates. */
+#schedule{background:#fffdfa}
+#schedule .sc-intro{font-size:14px;color:#756b63;margin:-22px 0 30px}
+#schedule .sc-frame{border:1px solid #e1d9d0;background:#fff;border-radius:7px;overflow:hidden}
+#schedule .sc-top{display:flex;align-items:center;justify-content:space-between;gap:18px;background:#302d2a;color:#fff;padding:23px 28px}
+#schedule .sc-top strong{display:block;font-size:19px;letter-spacing:-.035em;font-weight:500}
+#schedule .sc-top small{display:block;font-size:12px;color:#d8cbc0}
+#schedule .sc-legend{display:flex;gap:12px 20px;flex-wrap:wrap;align-items:center;padding:18px 26px;border-bottom:1px solid #eee7df}
+#schedule .sc-legend-item{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:#625950}
+#schedule .sc-dot{height:10px;width:10px;border-radius:2px;display:inline-block;background:#b6b2ae}
+#schedule .sc-dot.meeting{background:#ad705b}#schedule .sc-dot.rental{background:#5e8395}#schedule .sc-dot.free{background:#6e9778}#schedule .sc-dot.custom{background:#8e6d93}
+#schedule .sc-main{padding:25px}
+#schedule .sc-toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px}
+#schedule .sc-month-label{font-size:26px;letter-spacing:-.05em;font-weight:500}
+#schedule .sc-actions{display:flex;align-items:center;gap:7px}
+#schedule button{font-family:inherit;cursor:pointer}
+#schedule .sc-control{background:#fff;color:#413831;border:1px solid #ded6ce;border-radius:4px;min-width:36px;height:36px;line-height:1;padding:0 9px;font-size:18px}
+#schedule .sc-today{font-size:12px;min-width:53px}
+#schedule button:focus-visible{outline:2px solid #a58068;outline-offset:2px}
+#schedule .sc-month-scroll{overflow-x:auto}
+#schedule .sc-weekdays,#schedule .sc-days{min-width:770px;display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
+#schedule .sc-weekdays{background:#faf8f5;border:1px solid #e5ded6;border-bottom:0}
+#schedule .sc-weekdays span{text-align:center;font-size:13px;padding:10px 0;color:#85766b}
+#schedule .sc-days{border-top:1px solid #e5ded6;border-left:1px solid #e5ded6}
+#schedule .sc-day{border:0;border-right:1px solid #e5ded6;border-bottom:1px solid #e5ded6;border-radius:0;background:#fff;min-width:0;min-height:146px;padding:9px 7px 10px;text-align:left;display:flex;flex-direction:column;gap:5px;color:#3a3430}
+#schedule .sc-day:hover{background:#faf7f3}
+#schedule .sc-day.is-closed{background:#f8f7f5}
+#schedule .sc-day.is-other{background:#faf9f8;cursor:default}
+#schedule .sc-date-num{font-size:13px;font-weight:600;margin-bottom:5px}
+#schedule .sc-day.is-sunday .sc-date-num{color:#ad705b}
+#schedule .sc-day.is-today .sc-date-num{display:inline-flex;align-items:center;justify-content:center;border-radius:50%;width:26px;height:26px;background:#302d2a;color:#fff;margin-top:-3px;margin-left:-3px}
+#schedule .sc-entry{border-radius:3px;padding:6px 5px;line-height:1.3;min-width:0;display:flex;flex-direction:column;gap:3px}
+#schedule .sc-entry.meeting{background:#f3e7e1;color:#955b48}
+#schedule .sc-entry.rental{background:#e5eff3;color:#456e81}
+#schedule .sc-entry.free{background:#e9f2e9;color:#50795c}
+#schedule .sc-entry.custom{background:#f0eaf3;color:#795682}
+#schedule .sc-kind{display:block;max-width:100%;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;font-size:12px;font-weight:700}
+#schedule .sc-clock{display:block;font-size:11px;white-space:nowrap;font-variant-numeric:tabular-nums}
+#schedule .sc-closed-label{font-size:12px;color:#9a938c;text-align:center;margin:auto}
+#schedule .sc-more{font-size:11px;color:#8a7768;margin-top:2px;text-align:center}
+#schedule .sc-info{font-size:12px;color:#7e756f;margin:16px 0 0}
+#schedule .sc-notice{color:#77675b;font-size:13px;margin:0 0 17px}
+#schedule .sc-back{border:1px solid #c7b4a5;background:#fff;padding:8px 13px;color:#5e4e43;font-size:13px;border-radius:4px}
+#schedule .sc-selected-date{font-size:25px;font-weight:500;letter-spacing:-.04em;margin:22px 0 5px}
+#schedule .sc-selected-note{color:#867a71;font-size:13px;margin:0 0 22px}
+#schedule .sc-event-list{display:flex;flex-direction:column;gap:12px}
+#schedule .sc-detail{border:1px solid #e4ddd5;background:#fff;border-radius:5px;padding:18px 21px;border-left:4px solid #b9b5af}
+#schedule .sc-detail.meeting{border-left-color:#ad705b}
+#schedule .sc-detail.rental{border-left-color:#5e8395}
+#schedule .sc-detail.free{border-left-color:#6e9778}
+#schedule .sc-detail.custom{border-left-color:#8e6d93}
+#schedule .sc-detail-kind{font-size:13px;font-weight:700;margin:0 0 8px;color:#73665e}
+#schedule .sc-detail.meeting .sc-detail-kind{color:#955b48}
+#schedule .sc-detail.rental .sc-detail-kind{color:#456e81}
+#schedule .sc-detail.free .sc-detail-kind{color:#50795c}
+#schedule .sc-detail.custom .sc-detail-kind{color:#795682}
+#schedule .sc-detail-title{font-size:19px;line-height:1.5;font-weight:500;margin:0 0 10px;overflow-wrap:anywhere}
+#schedule .sc-detail-clock{font-size:15px;letter-spacing:-.01em;color:#746b63;font-variant-numeric:tabular-nums}
+#schedule .sc-closed-detail{border:1px solid #e5ded6;background:#faf8f5;text-align:center;padding:48px 10px;color:#887e76;font-size:15px}
+#schedule .sc-error{border:1px solid #efc3ba;color:#a13f31;background:#fff6f3;padding:16px;font-size:14px}
+#schedule [hidden]{display:none!important}
+@media(max-width:700px){
+ #schedule .sc-top{padding:17px}#schedule .sc-top strong{font-size:16px}
+ #schedule .sc-legend{padding:13px;gap:10px 12px}
+ #schedule .sc-main{padding:14px}
+ #schedule .sc-month-label{font-size:21px}
+ #schedule .sc-intro{margin-top:-14px}
+ #schedule .sc-weekdays,#schedule .sc-days{min-width:720px}
+ #schedule .sc-day{min-height:134px}
+ #schedule .sc-kind{font-size:11px}
+ #schedule .sc-selected-date{font-size:21px}
+ #schedule .sc-detail{padding:15px}
+}
