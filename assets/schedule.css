@@ -49,11 +49,13 @@
 #schedule .sc-detail.rental{border-left-color:#5e8395}
 #schedule .sc-detail.free{border-left-color:#6e9778}
 #schedule .sc-detail.custom{border-left-color:#8e6d93}
+#schedule .sc-detail.closure{border-left-color:#b9b5af;background:#faf9f7}
 #schedule .sc-detail-kind{font-size:13px;font-weight:700;margin:0 0 8px;color:#73665e}
 #schedule .sc-detail.meeting .sc-detail-kind{color:#955b48}
 #schedule .sc-detail.rental .sc-detail-kind{color:#456e81}
 #schedule .sc-detail.free .sc-detail-kind{color:#50795c}
 #schedule .sc-detail.custom .sc-detail-kind{color:#795682}
+#schedule .sc-detail.closure .sc-detail-kind{color:#746f68}
 #schedule .sc-detail-title{font-size:19px;line-height:1.5;font-weight:500;margin:0 0 10px;overflow-wrap:anywhere}
 #schedule .sc-detail-clock{font-size:15px;letter-spacing:-.01em;color:#746b63;font-variant-numeric:tabular-nums}
 #schedule .sc-closed-detail{border:1px solid #e5ded6;background:#faf8f5;text-align:center;padding:48px 10px;color:#887e76;font-size:15px}
