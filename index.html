@@ -508,7 +508,8 @@ strong,b{font-weight:700}
 .news-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:42px 25px;margin-top:42px}
 .news-card{display:block;color:inherit;text-decoration:none}
 .news-card img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;background:#f4f1eb}
-.news-card h3{font-size:20px;line-height:1.4;text-align:center;font-weight:500;margin-top:18px}
+.news-card h3{font-size:20px;line-height:1.4;text-align:center;font-weight:500;margin-top:18px;margin-bottom:0}
+.news-card .news-date{margin:7px 0 0;text-align:center;color:#857f78;font-size:14px;font-weight:400;line-height:1.5;overflow-wrap:anywhere}
 .news-all{text-align:right;margin-top:30px}.news-all a{color:#534336;text-decoration:underline}
 @media(max-width:740px){.news-section{padding:60px 0}.news-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 12px}.news-card h3{font-size:14px}.kv-text{left:7%;top:42%;width:78vw}}
 @media(prefers-reduced-motion:reduce){.kv-img{transition:none}}
@@ -1445,7 +1446,7 @@ strong,b{font-weight:700}
 (()=>{
 const video=document.querySelector('#kv-hero .kv-video');
 if(video&&window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches){video.pause();video.removeAttribute('autoplay');}
-const grid=document.getElementById('news-cards');const safe=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));fetch('/api/news').then(r=>r.ok?r.json():Promise.reject()).then(d=>{const items=(d.items||[]).slice(0,6);grid.innerHTML=items.length?items.map(x=>'<a class="news-card" href="/news/'+encodeURIComponent(x.slug)+'">'+(x.cover?'<img loading="lazy" src="'+safe(x.cover)+'" alt="'+safe(x.title)+'">':'<div style="aspect-ratio:1;background:#f4f1eb"></div>')+'<h3>'+safe(x.title)+'</h3></a>').join(''):'<p>현재 등록된 운영 소식이 없습니다.</p>'}).catch(()=>grid.innerHTML='<p>운영 소식을 불러오지 못했습니다.</p>');
+const grid=document.getElementById('news-cards');const safe=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const fmtEventDate=value=>{const v=String(value||'');return /^\d{4}-\d{2}-\d{2}$/.test(v)?v.replace(/-/g,'.'):''};const newsDate=item=>{const start=fmtEventDate(item.event_date_start);if(!start)return '';const end=fmtEventDate(item.event_date_end);return '<div class="news-date">'+start+(end?' ~ '+end:'')+'</div>';};fetch('/api/news').then(r=>r.ok?r.json():Promise.reject()).then(d=>{const items=(d.items||[]).slice(0,6);grid.innerHTML=items.length?items.map(x=>'<a class="news-card" href="/news/'+encodeURIComponent(x.slug)+'">'+(x.cover?'<img loading="lazy" src="'+safe(x.cover)+'" alt="'+safe(x.title)+'">':'<div style="aspect-ratio:1;background:#f4f1eb"></div>')+'<h3>'+safe(x.title)+'</h3>'+newsDate(x)+'</a>').join(''):'<p>현재 등록된 운영 소식이 없습니다.</p>'}).catch(()=>grid.innerHTML='<p>운영 소식을 불러오지 못했습니다.</p>');
 })();
 </script></body>
 </html>
