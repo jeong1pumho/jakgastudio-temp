@@ -76,7 +76,7 @@
      const chip=text('span','sc-entry '+classFor(e));
      const name=text('strong','sc-kind',titleFor(e));name.title=titleFor(e);
      chip.append(name,text('span','sc-clock',rangeFor(e)));
-     if(e.lunch_excluded)chip.appendChild(text('span','sc-lunch','(점심시간 12:00–13:00 제외)'));
+     if(e.lunch_excluded)chip.appendChild(text('span','sc-lunch','(점심시간 12-13시)'));
      button.appendChild(chip);
     }
     if(data.events.length>4)button.appendChild(text('span','sc-more','+'+(data.events.length-4)+'개 더보기'));
@@ -102,7 +102,7 @@
   for(const e of data.events){
     const card=text('article','sc-detail '+classFor(e));
     card.append(text('div','sc-detail-kind',titleFor(e)),text('div','sc-detail-title',e.title),text('div','sc-detail-clock',rangeFor(e)));
-    if(e.lunch_excluded)card.appendChild(text('div','sc-detail-lunch','(점심시간 12:00–13:00 제외)'));
+    if(e.lunch_excluded)card.appendChild(text('div','sc-detail-lunch','(점심시간 12-13시)'));
     list.appendChild(card);
   }
  }
