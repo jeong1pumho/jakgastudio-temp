@@ -72,7 +72,7 @@
   const dow=new Date(Date.UTC(y,m-1,d)).getUTCDay(),data=getDay(y,m,d);
   $('sc-month').hidden=true;$('sc-detail-view').hidden=false;
   $('sc-detail-date').textContent=y+'년 '+m+'월 '+d+'일 ('+weekdays[dow]+')';
-  $('sc-detail-note').textContent=isClosed(y,m,d)?'정기휴무일 · 등록된 일정만 운영':'운영시간 10:00–17:00 · 모임 및 대관 중 자유방문 불가';
+  $('sc-detail-note').textContent=data.closed?'정기휴무일':isClosed(y,m,d)?'특별 일정 운영 · 등록된 시간에만 이용 가능':'운영시간 10:00–17:00 · 등록 일정 중 자유방문 불가';
   const list=$('sc-detail-events');list.replaceChildren();
   if(data.closed){list.appendChild(text('div','sc-closed-detail','정기휴무 · 일요일과 월요일은 쉽니다.'));return;}
   for(const e of data.events){
