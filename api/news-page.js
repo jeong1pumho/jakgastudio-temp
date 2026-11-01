@@ -49,7 +49,7 @@ module.exports=async(req,res)=>{
     const dates=displayDateMarkup(p);
     body='<h2 class="post-title'+(dates?' with-date':'')+'">'+esc(p.title)+'</h2>'+
       (dates?'<div class="post-date"><span class="date-icon" aria-hidden="true">▦</span><span class="date-caption">'+(p.event_date_end?'기간':'일정')+'</span>'+dates+'</div>':'')+
-      '<div class="post-state"><span class="state +(p.status==='ongoing'?'ongoing':'ended')+'">'+label(p.status)+'</span></div>';
+      '<div class="post-state"><span class="state '+(p.status==='ongoing'?'ongoing':'ended')+'">'+label(p.status)+'</span></div>';
     body+='<div class="photos" id="photos">'+images.map((img,i)=>'<button type="button" class="photo-button" data-viewer="'+i+'" aria-label="'+(i+1)+'번째 사진 크게 보기">'+thumbnail(img,p.title+' 사진 '+(i+1))+'</button>').join('')+'</div>';
     body+='<article class="content">'+renderContent(p.content)+'</article>';
     if(images.length){
