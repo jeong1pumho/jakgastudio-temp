@@ -18,6 +18,14 @@
       "destination": "/api/news-page"
     },
     {
+      "source": "/calendar",
+      "destination": "/api/calendar-page"
+    },
+    {
+      "source": "/calendar/events/:id",
+      "destination": "/api/calendar-page?event_id=:id"
+    },
+    {
       "source": "/admin",
       "destination": "/admin/index.html"
     }
