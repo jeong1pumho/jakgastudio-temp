@@ -6,9 +6,10 @@
  const names={meeting:'모임',rental:'대관',free:'자유방문'};
  const now=new Date();
  // Calendar date is interpreted in Korea, independently of the client's local timezone.
- const koreanNow=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(now);
+
  const parts=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Seoul',year:'numeric',month:'numeric',day:'numeric'}).formatToParts(now);
  const readPart=name=>Number(parts.find(p=>p.type===name)?.value||0);
+ const koreanNow=String(readPart('year'))+'-'+String(readPart('month')).padStart(2,'0')+'-'+String(readPart('day')).padStart(2,'0');
  let year=readPart('year'),month=readPart('month'),records=new Map(),currentRequest=0;
  const pad=n=>String(n).padStart(2,'0');
  const keyFor=(y,m,d)=>y+'-'+pad(m)+'-'+pad(d);
@@ -96,7 +97,7 @@
     if(!records.has(item.event_date))records.set(item.event_date,[]);
     records.get(item.event_date).push(item);
    }
-   drawMonth();setState('요일을 선택하면 일정을 자세히 볼 수 있습니다. 모바일에서는 캘린더를 좌우로 움직여 확인하세요.');
+   drawMonth();setState('날짜를 선택하면 일정을 자세히 볼 수 있습니다. 모바일에서는 캘린더를 좌우로 움직여 확인하세요.');
   }catch(e){
    if(id!==currentRequest)return;
    $('sc-days').replaceChildren();setState('일정 조회 오류: '+e.message,true);
