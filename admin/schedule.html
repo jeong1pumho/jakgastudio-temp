@@ -61,7 +61,32 @@ td.actions{white-space:nowrap}
 .empty{padding:48px 12px;text-align:center;color:var(--muted)}
 .footer-help{margin:18px 0 0;font-size:12px;color:#85776c}
 @media(max-width:650px){.page-head{align-items:flex-start;flex-direction:column}.container{padding:20px 12px 60px}.card{padding:18px}.grid{grid-template-columns:1fr;gap:0}.wordmark{font-size:16px}.header-nav{gap:9px}.edit-actions{flex-wrap:wrap}.month-title{font-size:20px}}
-</style></head>
+/* Admin-only rich memo editor; public calendar never renders memo. */
+.memo-tools{display:flex;gap:5px;align-items:center;flex-wrap:wrap;background:#faf8f5;padding:9px 10px;border:1px solid #cbc2b9;border-bottom:0;border-radius:4px 4px 0 0}
+.memo-tools button{border:1px solid #e1d9d0;border-radius:4px;background:#fff;padding:5px 12px;font-size:13px;min-width:32px}
+.memo-tools button:hover{background:#eee8e1}
+.memo-editor{min-height:150px;padding:14px;border:1px solid #cbc2b9;border-radius:0 0 4px 4px;outline-offset:2px;background:#fff;line-height:1.7;font-size:14px;overflow-wrap:anywhere}
+.memo-editor:focus{outline:2px solid #ba987e;border-color:transparent}
+.memo-editor:empty:before{content:attr(data-placeholder);color:#9c948b;pointer-events:none}
+.memo-editor p{margin:7px 0}
+.memo-editor ul,.memo-editor ol{padding-left:23px}
+#schedule .sc-actions{gap:7px}
+#schedule .sc-admin-tools{margin:0 0 19px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+#schedule .sc-admin-event-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+#schedule .sc-admin-memo{border-top:1px solid #e9e3db;margin-top:14px;padding-top:14px;line-height:1.75;font-size:14px;color:#4a4540;overflow-wrap:anywhere}
+#schedule .sc-admin-memo p{margin:5px 0}
+#schedule .sc-admin-memo ul,#schedule .sc-admin-memo ol{padding-left:24px}
+#schedule .sc-admin-memo a{color:#84654e;text-decoration:underline}
+#schedule .sc-admin-memo-title{font-size:12px;font-weight:650;color:#8b7665;margin:0 0 8px}
+#schedule .sc-toolbar{margin-bottom:20px}
+#schedule .sc-info{padding:0}
+#schedule .sc-detail-notice{font-size:13px;color:#776b61;margin:11px 0}
+#schedule .sc-detail-title{word-break:break-word}
+#schedule .sc-day.is-selected{box-shadow:inset 0 0 0 2px #ac8b73}
+@media(max-width:700px){#schedule .sc-top{flex-wrap:wrap;gap:8px}#schedule .sc-frame{border-radius:4px}}
+</style>
+<link rel="stylesheet" href="/assets/schedule.css">
+</head>
 <body>
 <div class="container">
 <header>
@@ -95,11 +120,24 @@ td.actions{white-space:nowrap}
    </div>
    <div class="field-row" id="customRow" hidden><label for="customLabel">추가 구분 이름</label><input class="field" id="customLabel" maxlength="50" placeholder="예: 북토크, 촬영, 특별행사"><p class="form-help">월간 캘린더에서는 한 줄로만 표시되고 길면 …으로 생략됩니다.</p></div>
    <div class="field-row"><label for="eventTitle">모임·일정 타이틀</label><input class="field" id="eventTitle" maxlength="150" required placeholder="예: 에세이 글쓰기 모임"></div>
+   <div class="field-row">
+    <label for="memoEditor">메모 (선택 · 관리자 전용)</label>
+    <div class="memo-tools" aria-label="메모 서식">
+     <button type="button" data-memo-command="bold" title="굵게"><b>B</b></button>
+     <button type="button" data-memo-command="italic" title="기울임"><i>I</i></button>
+     <button type="button" data-memo-command="underline" title="밑줄"><u>U</u></button>
+     <button type="button" data-memo-command="insertUnorderedList" title="글머리 기호">• 목록</button>
+     <button type="button" data-memo-command="insertOrderedList" title="번호 목록">1. 목록</button>
+     <button type="button" id="memoClear" title="서식 제거">서식 제거</button>
+    </div>
+    <div id="memoEditor" class="memo-editor" contenteditable="true" role="textbox" aria-multiline="true" data-placeholder="대관 담당자, 준비물, 안내사항 등을 입력하세요."></div>
+    <p class="form-help">메모는 관리자 화면에만 표시되며 방문자용 캘린더에는 공개되지 않습니다. 기본 서식과 줄바꿈을 저장할 수 있습니다.</p>
+   </div>
    <div class="grid" id="timeFields">
     <div class="field-row"><label for="eventStart">시작시간 (24시간)</label><input id="eventStart" class="field" type="text" inputmode="numeric" autocomplete="off" maxlength="5" pattern="(?:[01][0-9]|2[0-3]):[0-5][0-9]" title="24시간 형식으로 입력해 주세요. 예: 10:00" placeholder="10:00" required value="10:00"></div>
     <div class="field-row"><label for="eventEnd">종료시간 (24시간)</label><input id="eventEnd" class="field" type="text" inputmode="numeric" autocomplete="off" maxlength="5" pattern="(?:[01][0-9]|2[0-3]):[0-5][0-9]" title="24시간 형식으로 입력해 주세요. 예: 17:00" placeholder="12:00" required value="12:00"></div>
    </div>
-   <p id="closureHelp" class="form-help" hidden>임시 휴무는 해당 날짜 전체에 적용됩니다. 기존 일정과 중복되면 등록할 수 없으며, 캘린더에는 회색 ‘휴무’로 표시됩니다.</p>
+   <p id="closureHelp" class="form-help" hidden>임시 휴무는 해당 날짜 전체에 적용됩니다. 기존 일정과 중복되면 등록할 수 없으며, 캘린더에는 회색 ‘임시휴무’로 표시됩니다.</p>
    <p class="form-help">기본 운영시간은 10:00~17:00입니다. 야간행사나 일·월 특별일정도 등록할 수 있습니다. 같은 시간대의 일정은 등록할 수 없습니다. 경계 시간이 맞닿는 일정은 등록할 수 있습니다.</p>
    <div class="edit-actions">
     <button id="cancelBtn" type="button" class="btn secondary">취소</button>
@@ -107,15 +145,47 @@ td.actions{white-space:nowrap}
    </div>
   </form>
  </section>
- <div class="card">
-  <div class="toolbar">
-   <div class="month-control"><button type="button" id="prevMonth" class="btn secondary" aria-label="이전 달">‹</button><strong id="monthTitle" class="month-title"></strong><button type="button" id="nextMonth" class="btn secondary" aria-label="다음 달">›</button></div>
-   <label style="margin:0;display:flex;align-items:center;gap:8px;color:var(--muted);font-weight:400">월 선택 <input type="month" id="monthPicker" class="field" style="width:auto"></label>
+ <div id="schedule" aria-label="관리자 월간 스케줄">
+  <div class="sc-frame">
+   <div class="sc-top">
+    <div><strong>작가작업실 JEJU · 월간 스케줄 관리</strong><small>날짜를 선택하면 상세 일정과 메모를 확인하고 수정·삭제할 수 있습니다.</small></div>
+    <div style="text-align:right"><strong style="font-size:16px">10:00 – 17:00</strong><small>일/월 정기휴무</small></div>
+   </div>
+   <div class="sc-legend" aria-label="스케줄 표시 구분">
+    <span class="sc-legend-item"><i class="sc-dot meeting"></i> 모임</span>
+    <span class="sc-legend-item"><i class="sc-dot rental"></i> 대관</span>
+    <span class="sc-legend-item"><i class="sc-dot free"></i> 자유방문</span>
+    <span class="sc-legend-item"><i class="sc-dot custom"></i> 특별일정</span>
+    <span class="sc-legend-item"><i class="sc-dot"></i> 휴무</span>
+   </div>
+   <div class="sc-main">
+    <section id="sc-month">
+     <div class="sc-toolbar">
+      <strong id="sc-month-title" class="sc-month-label"></strong>
+      <div class="sc-actions">
+       <button type="button" id="prevMonth" class="sc-control" aria-label="이전 달">‹</button>
+       <button type="button" id="currentMonth" class="sc-control sc-today">이번 달</button>
+       <button type="button" id="nextMonth" class="sc-control" aria-label="다음 달">›</button>
+      </div>
+     </div>
+     <div class="sc-month-scroll" aria-label="관리자 월간 캘린더">
+      <div class="sc-weekdays"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div>
+      <div id="sc-days" class="sc-days" aria-live="polite"></div>
+     </div>
+     <p class="sc-info">날짜를 클릭하면 일정 상세, 메모, 수정·삭제 기능을 이용할 수 있습니다. 모바일에서는 캘린더를 좌우로 이동해 확인해 주세요.</p>
+    </section>
+    <section id="sc-detail-view" hidden>
+     <div class="sc-admin-tools">
+      <button type="button" id="sc-back" class="sc-back">← 월간 캘린더로</button>
+      <button type="button" id="sc-new-day" class="btn small">+ 이 날짜에 일정 등록</button>
+     </div>
+     <h3 id="sc-detail-date" class="sc-selected-date"></h3>
+     <div id="sc-detail-events" class="sc-event-list"></div>
+    </section>
+   </div>
   </div>
-  <div class="table-wrap"><table><thead><tr><th>날짜</th><th>구분</th><th>타이틀</th><th>시간</th><th>관리</th></tr></thead><tbody id="eventRows"></tbody></table></div>
-  <p id="empty" class="empty" hidden>등록된 일정이 없습니다. 화~토에는 자유방문 시간이 자동으로 표시됩니다.</p>
-  <p class="footer-help">자유방문 시간은 캘린더에서 자동 계산되므로 별도의 등록·수정·삭제가 필요하지 않습니다.</p>
  </div>
+
 </section>
 </div>
 <script>
