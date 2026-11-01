@@ -137,7 +137,7 @@ td.actions{white-space:nowrap}
   return body;
  }
  function newEvent(){
-  $('eventForm').reset();$('eventId').value='';$('eventDate').value=todayKey();
+  $('eventForm').reset();$('eventId').value='';$('eventDate').value=todayKey().startsWith(monthKey())?todayKey():monthKey()+'-01';
   $('eventType').value='meeting';$('eventStart').value='10:00';$('eventEnd').value='12:00';
   $('formHeading').textContent='새 일정 등록';syncCustom();toggleForm(true);notice('');
  }
@@ -174,7 +174,7 @@ td.actions{white-space:nowrap}
  }
  async function deleteEvent(e){
   if(!confirm(e.event_date+' '+hhmm(e.start_time)+'–'+hhmm(e.end_time)+' '+e.title+' 일정을 삭제하시겠습니까?'))return;
-  try{await api('/api/schedule-admin?id='+encodeURIComponent(e.id),{method:'DELETE'});notice('일정을 삭제했습니다.');await load();}
+  try{await api('/api/schedule-admin?id='+encodeURIComponent(e.id),{method:'DELETE'});await load();notice('일정을 삭제했습니다.');}
   catch(err){notice('삭제 실패: '+err.message,true);}
  }
  $('eventType').addEventListener('change',syncCustom);
