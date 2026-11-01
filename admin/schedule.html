@@ -300,7 +300,7 @@ td.actions{white-space:nowrap}
      const chip=text('span','sc-entry '+shade(event));
      const label=text('strong','sc-kind',kind(event));label.title=kind(event);
      chip.append(label,text('span','sc-clock',interval(event)));
-     if(event.lunch_excluded)chip.appendChild(text('span','sc-lunch','(점심시간 12:00–13:00 제외)'));
+     if(event.lunch_excluded)chip.appendChild(text('span','sc-lunch','(점심시간 12-13시)'));
      button.appendChild(chip);
     }
     if(info.events.length>4)button.appendChild(text('span','sc-more','+'+(info.events.length-4)+'개 더보기'));
@@ -313,7 +313,7 @@ td.actions{white-space:nowrap}
   card.append(text('div','sc-detail-kind',kind(event)),
     text('div','sc-detail-title',event.title),
     text('div','sc-detail-clock',interval(event)));
-  if(event.lunch_excluded)card.appendChild(text('div','sc-detail-lunch','(점심시간 12:00–13:00 제외)'));
+  if(event.lunch_excluded)card.appendChild(text('div','sc-detail-lunch','(점심시간 12-13시)'));
   if(event.category!=='free'){
    if(event.memo){
     const memo=text('div','sc-admin-memo');
