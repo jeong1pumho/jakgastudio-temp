@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="ko"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>스케줄 관리 | 작가작업실 JEJU</title>
+<style>
+:root{--ink:#35302c;--muted:#817970;--line:#e7e1d8;--accent:#9d765e;--bg:#f7f5f1}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Apple SD Gothic Neo","Malgun Gothic",sans-serif;font-size:15px;line-height:1.65}
+button,input,select{font:inherit}button{cursor:pointer}a{color:inherit;text-decoration:none}
+[hidden]{display:none!important}
+.container{max-width:1100px;padding:30px 20px 90px;margin:auto}
+header{display:flex;align-items:center;justify-content:space-between;gap:15px;border-bottom:1px solid var(--line);padding:0 0 24px;margin-bottom:32px}
+.wordmark{font-size:19px;font-weight:650;letter-spacing:-.04em}
+.wordmark small{display:block;color:var(--muted);font-size:12px;font-weight:400;letter-spacing:0}
+.header-nav{display:flex;align-items:center;gap:13px;font-size:13px;flex-wrap:wrap}
+.card{background:#fff;border:1px solid var(--line);border-radius:7px;padding:26px}
+.login{max-width:440px;margin:50px auto}
+h1{font-size:28px;font-weight:600;letter-spacing:-.04em;margin:0 0 7px}
+h2{font-size:20px;font-weight:600;letter-spacing:-.035em;margin:0}
+.note{font-size:13px;color:var(--muted);line-height:1.65;margin:5px 0 22px}
+label{font-size:13px;font-weight:650;display:block;margin-bottom:7px}
+.field{border:1px solid #cbc2b9;background:white;border-radius:4px;width:100%;padding:11px 12px;color:var(--ink);min-width:0}
+.field:focus{outline:2px solid #ba987e;outline-offset:1px}
+.field-row{margin-bottom:19px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.btn{padding:10px 16px;background:#37312d;border:1px solid #37312d;color:white;border-radius:4px}
+.btn.secondary{background:#fff;border-color:#cfc7be;color:var(--ink)}
+.btn.danger{background:#fff;border-color:#d4a5a0;color:#a34339}
+.btn.small{font-size:12px;padding:6px 10px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.page-head{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:22px}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:18px;margin-bottom:20px;flex-wrap:wrap}
+.toolbar .month-control{display:flex;align-items:center;gap:9px}
+.month-title{font-size:23px;font-weight:600;min-width:140px;text-align:center}
+.month-control button{height:36px;min-width:36px;padding:0 8px;font-size:19px}
+.status{min-height:26px;font-size:13px;margin:0 0 18px;color:#3e6548}
+.status.error{color:#ac4034}
+form .form-help{font-size:12px;margin:7px 0 0;color:var(--muted)}
+#scheduleFormPanel{margin-bottom:26px;border-color:#b6a08f}
+.edit-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:26px}
+.edit-actions{border-top:1px solid var(--line);padding-top:20px;margin-top:22px;display:flex;justify-content:space-between;gap:12px}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;text-align:left}
+th,td{padding:13px 11px;border-bottom:1px solid var(--line)}
+th{background:#faf8f5;color:#81766e;font-size:12px;white-space:nowrap}
+td{font-size:14px;vertical-align:middle}
+td.title{font-weight:600;min-width:180px}
+td.time{white-space:nowrap;font-variant-numeric:tabular-nums}
+td.actions{white-space:nowrap}
+.tag{display:inline-block;font-size:12px;font-weight:650;padding:3px 8px;border-radius:3px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle}
+.tag.meeting{background:#f3e7e1;color:#955b48}.tag.rental{background:#e5eff3;color:#456e81}
+.tag.custom{background:#f0eaf3;color:#795682}
+.empty{padding:48px 12px;text-align:center;color:var(--muted)}
+.footer-help{margin:18px 0 0;font-size:12px;color:#85776c}
+@media(max-width:650px){.page-head{align-items:flex-start;flex-direction:column}.container{padding:20px 12px 60px}.card{padding:18px}.grid{grid-template-columns:1fr;gap:0}.wordmark{font-size:16px}.header-nav{gap:9px}.edit-actions{flex-wrap:wrap}.month-title{font-size:20px}}
+</style></head>
+<body>
+<div class="container">
+<header>
+ <a class="wordmark" href="/#schedule">작가작업실 JEJU <small>스케줄 관리자</small></a>
+ <nav class="header-nav"><a href="/admin">운영 소식 관리</a><a href="/#schedule">캘린더 보기</a><button id="logout" type="button" class="btn secondary small" hidden>로그아웃</button></nav>
+</header>
+<p id="status" class="status" role="status" aria-live="polite"></p>
+<section id="loginView" class="card login">
+ <h1>관리자 로그인</h1><p class="note">기존 운영 소식 관리자 계정으로 로그인할 수 있습니다.</p>
+ <form id="loginForm">
+  <div class="field-row"><label for="email">이메일</label><input id="email" class="field" type="email" required autocomplete="username"></div>
+  <div class="field-row"><label for="password">비밀번호</label><input id="password" class="field" type="password" required autocomplete="current-password"></div>
+  <button class="btn" type="submit" id="loginBtn">로그인</button>
+ </form>
+</section>
+<section id="adminView" hidden>
+ <div class="page-head"><div><h1>스케줄 관리</h1><p class="note">모임·대관·추가 구분을 등록합니다. 자유방문은 자동 계산됩니다.</p></div><button id="newBtn" class="btn" type="button">+ 일정 등록</button></div>
+ <section id="scheduleFormPanel" class="card" hidden>
+  <div class="edit-head"><h2 id="formHeading">일정 등록</h2><button type="button" id="cancelTop" class="btn secondary small">닫기</button></div>
+  <form id="eventForm">
+   <input type="hidden" id="eventId">
+   <div class="grid">
+    <div class="field-row"><label for="eventDate">날짜</label><input class="field" id="eventDate" type="date" required></div>
+    <div class="field-row"><label for="eventType">캘린더 구분</label>
+     <select class="field" id="eventType" required>
+      <option value="meeting">모임</option><option value="rental">대관</option>
+      <option value="free" disabled>자유방문 (자동 계산)</option>
+      <option value="custom">+ 구분 직접 입력</option>
+     </select>
+    </div>
+   </div>
+   <div class="field-row" id="customRow" hidden><label for="customLabel">추가 구분 이름</label><input class="field" id="customLabel" maxlength="50" placeholder="예: 북토크, 촬영, 특별행사"><p class="form-help">월간 캘린더에서는 한 줄로만 표시되고 길면 …으로 생략됩니다.</p></div>
+   <div class="field-row"><label for="eventTitle">모임·일정 타이틀</label><input class="field" id="eventTitle" maxlength="150" required placeholder="예: 에세이 글쓰기 모임"></div>
+   <div class="grid">
+    <div class="field-row"><label for="eventStart">시작시간</label><input id="eventStart" class="field" type="time" step="60" required value="10:00"></div>
+    <div class="field-row"><label for="eventEnd">종료시간</label><input id="eventEnd" class="field" type="time" step="60" required value="12:00"></div>
+   </div>
+   <p class="form-help">기본 운영시간은 10:00~17:00입니다. 야간행사나 일·월 특별일정도 등록할 수 있습니다. 같은 시간대의 일정은 등록할 수 없습니다. 경계 시간이 맞닿는 일정은 등록할 수 있습니다.</p>
+   <div class="edit-actions">
+    <button id="cancelBtn" type="button" class="btn secondary">취소</button>
+    <button id="saveBtn" type="submit" class="btn">일정 저장</button>
+   </div>
+  </form>
+ </section>
+ <div class="card">
+  <div class="toolbar">
+   <div class="month-control"><button type="button" id="prevMonth" class="btn secondary" aria-label="이전 달">‹</button><strong id="monthTitle" class="month-title"></strong><button type="button" id="nextMonth" class="btn secondary" aria-label="다음 달">›</button></div>
+   <label style="margin:0;display:flex;align-items:center;gap:8px;color:var(--muted);font-weight:400">월 선택 <input type="month" id="monthPicker" class="field" style="width:auto"></label>
+  </div>
+  <div class="table-wrap"><table><thead><tr><th>날짜</th><th>구분</th><th>타이틀</th><th>시간</th><th>관리</th></tr></thead><tbody id="eventRows"></tbody></table></div>
+  <p id="empty" class="empty" hidden>등록된 일정이 없습니다. 화~토에는 자유방문 시간이 자동으로 표시됩니다.</p>
+  <p class="footer-help">자유방문 시간은 캘린더에서 자동 계산되므로 별도의 등록·수정·삭제가 필요하지 않습니다.</p>
+ </div>
+</section>
+</div>
+<script>
+(()=>{'use strict';
+ const $=id=>document.getElementById(id);
+ let token='',items=[],busy=false;
+ const fmt=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Seoul',year:'numeric',month:'numeric',day:'numeric'});
+ const todayParts=fmt.formatToParts(new Date()),part=k=>Number(todayParts.find(p=>p.type===k)?.value||0);
+ let year=part('year'),month=part('month');
+ const pad=n=>String(n).padStart(2,'0');
+ const monthKey=()=>year+'-'+pad(month);
+ const todayKey=()=>part('year')+'-'+pad(part('month'))+'-'+pad(part('day'));
+ const label=x=>x.category==='meeting'?'모임':x.category==='rental'?'대관':x.category_label||'기타';
+ const hhmm=x=>String(x||'').slice(0,5);
+ function notice(s,error=false){$('status').textContent=s||'';$('status').className='status'+(error?' error':'');}
+ function toggleForm(visible){$('scheduleFormPanel').hidden=!visible;if(visible)$('scheduleFormPanel').scrollIntoView({behavior:'smooth',block:'start'});}
+ async function api(url,opts={}){
+  const headers={'Content-Type':'application/json'};
+  if(token)headers.Authorization='Bearer '+token;
+  let response;
+  try{response=await fetch(url,{...opts,headers,cache:'no-store'});}
+  catch{throw Error('서버 연결에 실패했습니다. 네트워크를 확인해 주세요.');}
+  const body=await response.json().catch(()=>({}));
+  if(!response.ok)throw Error(body.error||'요청에 실패했습니다. (HTTP '+response.status+')');
+  return body;
+ }
+ function newEvent(){
+  $('eventForm').reset();$('eventId').value='';$('eventDate').value=todayKey();
+  $('eventType').value='meeting';$('eventStart').value='10:00';$('eventEnd').value='12:00';
+  $('formHeading').textContent='새 일정 등록';syncCustom();toggleForm(true);notice('');
+ }
+ function syncCustom(){
+  const custom=$('eventType').value==='custom';$('customRow').hidden=!custom;$('customLabel').required=custom;
+  if(!custom)$('customLabel').value='';
+ }
+ function editEvent(e){
+  $('eventId').value=e.id;$('eventDate').value=e.event_date;
+  $('eventType').value=e.category;$('customLabel').value=e.category_label||'';
+  $('eventTitle').value=e.title;$('eventStart').value=hhmm(e.start_time);$('eventEnd').value=hhmm(e.end_time);
+  $('formHeading').textContent='일정 수정';syncCustom();if(e.category==='custom')$('customLabel').value=e.category_label||'';
+  notice('');toggleForm(true);
+ }
+ function text(tag,cls,value){const e=document.createElement(tag);if(cls)e.className=cls;if(value!==undefined)e.textContent=value;return e;}
+ function render(){
+  $('monthTitle').textContent=year+'년 '+month+'월';$('monthPicker').value=monthKey();
+  const tbody=$('eventRows');tbody.replaceChildren();$('empty').hidden=items.length!==0;
+  for(const e of items){
+    const tr=text('tr'),type=text('span','tag '+(e.category==='custom'?'custom':e.category),label(e));
+    type.title=label(e);
+    const date=text('td','',e.event_date),category=text('td');category.appendChild(type);
+    const title=text('td','title',e.title),time=text('td','time',hhmm(e.start_time)+'–'+hhmm(e.end_time));
+    const actions=text('td','actions'),edit=text('button','btn secondary small','수정'),remove=text('button','btn danger small','삭제');
+    edit.type='button';remove.type='button';edit.addEventListener('click',()=>editEvent(e));remove.addEventListener('click',()=>deleteEvent(e));
+    actions.append(edit,document.createTextNode(' '),remove);
+    tr.append(date,category,title,time,actions);tbody.appendChild(tr);
+  }
+ }
+ async function load(){
+  notice('일정을 조회하는 중입니다.');
+  try{const data=await api('/api/schedule-admin?month='+monthKey());items=data.items||[];render();notice('');}
+  catch(e){items=[];render();notice('조회 실패: '+e.message,true);}
+ }
+ async function deleteEvent(e){
+  if(!confirm(e.event_date+' '+hhmm(e.start_time)+'–'+hhmm(e.end_time)+' '+e.title+' 일정을 삭제하시겠습니까?'))return;
+  try{await api('/api/schedule-admin?id='+encodeURIComponent(e.id),{method:'DELETE'});notice('일정을 삭제했습니다.');await load();}
+  catch(err){notice('삭제 실패: '+err.message,true);}
+ }
+ $('eventType').addEventListener('change',syncCustom);
+ $('newBtn').addEventListener('click',newEvent);
+ for(const id of ['cancelBtn','cancelTop'])$(id).addEventListener('click',()=>toggleForm(false));
+ $('prevMonth').addEventListener('click',()=>changeMonth(-1));
+ $('nextMonth').addEventListener('click',()=>changeMonth(1));
+ function changeMonth(delta){const d=new Date(Date.UTC(year,month-1+delta,1));year=d.getUTCFullYear();month=d.getUTCMonth()+1;toggleForm(false);load();}
+ $('monthPicker').addEventListener('change',e=>{
+  if(!/^\d{4}-\d{2}$/.test(e.target.value))return;
+  const [y,m]=e.target.value.split('-').map(Number);year=y;month=m;toggleForm(false);load();
+ });
+ $('eventForm').addEventListener('submit',async e=>{
+  e.preventDefault();if(busy)return;
+  const id=$('eventId').value,date=$('eventDate').value,category=$('eventType').value;
+  const start=$('eventStart').value,end=$('eventEnd').value;
+  const title=$('eventTitle').value.trim(),categoryLabel=category==='custom'?$('customLabel').value.trim():null;
+  if(!date||!title)return notice('날짜와 제목을 입력해 주세요.',true);
+  if(category==='custom'&&!categoryLabel)return notice('추가 구분 이름을 입력해 주세요.',true);
+  if(!start||!end||end<=start)return notice('종료시간은 시작시간보다 늦어야 합니다.',true);
+  const overlap=items.find(x=>x.id!==id&&x.event_date===date&&hhmm(x.start_time)<end&&start<hhmm(x.end_time));
+  if(overlap)return notice('등록 불가: '+overlap.title+' ('+hhmm(overlap.start_time)+'–'+hhmm(overlap.end_time)+') 일정과 시간이 겹칩니다.',true);
+  const body={id,event_date:date,category,category_label:categoryLabel,title,start_time:start,end_time:end};
+  busy=true;$('saveBtn').disabled=true;notice('일정을 저장하는 중입니다.');
+  try{
+   await api('/api/schedule-admin',{method:id?'PATCH':'POST',body:JSON.stringify(body)});
+   const [y,m]=date.slice(0,7).split('-').map(Number);year=y;month=m;
+   toggleForm(false);await load();notice(id?'일정을 수정했습니다.':'일정을 등록했습니다.');
+  }catch(err){notice('저장 실패: '+err.message,true);}
+  finally{busy=false;$('saveBtn').disabled=false;}
+ });
+ $('loginForm').addEventListener('submit',async e=>{
+  e.preventDefault();$('loginBtn').disabled=true;notice('로그인 확인 중…');
+  try{
+   const data=await api('/api/admin',{method:'POST',body:JSON.stringify({action:'login',email:$('email').value.trim(),password:$('password').value})});
+   token=data.token;$('password').value='';$('loginView').hidden=true;$('adminView').hidden=false;$('logout').hidden=false;await load();
+  }catch(err){notice('로그인 실패: '+err.message,true);}
+  finally{$('loginBtn').disabled=false;}
+ });
+ $('logout').addEventListener('click',()=>{token='';items=[];$('adminView').hidden=true;$('loginView').hidden=false;$('logout').hidden=true;$('eventForm').reset();notice('로그아웃했습니다.');});
+})();
+</script>
+</body></html>
