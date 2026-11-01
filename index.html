@@ -1043,6 +1043,7 @@ strong,b{font-weight:700}
 </style>
 <link rel="preload" href="/assets/hero-01-mobile.webp" as="image" type="image/webp" media="(max-width:700px)" fetchpriority="high"/>
 <style id="kv-mobile-picture-performance-20261030">#kv-hero .kv-mobile-picture{display:block;width:100%;height:100%}</style>
+<link rel="stylesheet" href="/assets/schedule.css">
 </head><body class="variant-a">
 <main id="top">
 <section aria-label="작가작업실 JEJU 사진 소개" class="hero video-keyvisual carousel-keyvisual" id="kv-hero">
@@ -1078,6 +1079,7 @@ strong,b{font-weight:700}
     <a href="#space">공간소개</a>
     <a href="#program">운영 프로그램</a>
     <a href="#hours">운영시간</a>
+     <a href="#schedule">스케줄</a>
     <a href="#location">오시는 길</a>
   </nav>
   <div class="kv-text">
@@ -1280,16 +1282,61 @@ strong,b{font-weight:700}
   </div></div>
 </div>
 <div class="hours-cards">
-<div class="hours-card"><small>01 / 오전</small><h3>모임 시간</h3><p>10:00–12:00</p></div>
-<div class="hours-card"><small>02 / 오후</small><h3>자유 방문 시간</h3><p>13:00–17:00</p></div>
+<div class="hours-card"><small>01 / 기본 운영시간</small><h3>화요일~토요일</h3><p>10:00–17:00</p></div>
+<div class="hours-card"><small>02 / 자유방문</small><h3>방문 가능 시간</h3><p><a href="#schedule" style="font-size:.62em;text-decoration:underline">스케줄에서 확인 ↗</a></p></div>
 </div>
 <div class="notice">
-<p>모임 시간에는 자유 방문이 제한될 수 있습니다.<br/>자유 방문 전,<br/>&lt;작가작업실 JEJU&gt; 네이버 플레이스에서<br/>운영시간을 꼭 확인해 주세요.</p>
-<a class="ghost-btn" href="https://map.naver.com/p/entry/place/2020396707?placePath=%2Fhome%3Fentry%3Dplt%26fromPanelNum%3D1%26additionalHeight%3D76%26timestamp%3D202610211426%26locale%3Dko%26svcName%3Dmap_pcv5&amp;searchType=place&amp;lng=126.4565909&amp;lat=33.5016394&amp;c=15.15,0,0,0,dh" rel="noopener noreferrer" target="_blank">작가작업실 JEJU 운영시간 확인 <span aria-hidden="true">↗</span></a>
+<p>모임·대관 시간에는 자유방문이 제한됩니다.<br/>아래 월간 스케줄에서 방문 가능한 시간을 확인해 주세요.</p>
+<a class="ghost-btn" href="#schedule">스케줄 확인 <span aria-hidden="true">↗</span></a>
 </div>
 </div>
 <figure class="hours-figure"><img alt="책상과 의자, 한지 조명이 있는 작가작업실 공간" class="" decoding="async" loading="lazy" src="https://www.jakgastudio.com/assets/final_reading.webp"/><figcaption>JAKGA STUDIO JEJU</figcaption></figure>
 </div>
+</div>
+</section>
+<section aria-labelledby="schedule-title" class="section schedule-section" id="schedule">
+<div class="content-width">
+ <div class="section-heading">
+  <p class="eyebrow">05-1 <span>SCHEDULE</span><i></i></p>
+  <div class="heading-line"><h2 id="schedule-title">스케줄</h2></div>
+ </div>
+ <p class="sc-intro">작가작업실 모임과 대관 일정을 확인해 주세요. 두 일정이 없는 운영시간에는 자유롭게 방문하실 수 있습니다.</p>
+ <div class="sc-frame">
+  <div class="sc-top"><div><strong>작가작업실 JEJU · 월간 스케줄</strong><small>날짜를 누르면 상세 일정을 확인할 수 있습니다.</small></div>
+   <div style="text-align:right"><strong style="font-size:16px">10:00 – 17:00</strong><small>기본 운영시간 · 일/월 정기휴무</small></div>
+  </div>
+  <div class="sc-legend" aria-label="스케줄 표시 구분">
+   <span class="sc-legend-item"><i class="sc-dot meeting"></i> 모임</span>
+   <span class="sc-legend-item"><i class="sc-dot rental"></i> 대관</span>
+   <span class="sc-legend-item"><i class="sc-dot free"></i> 자유방문</span>
+   <span class="sc-legend-item"><i class="sc-dot custom"></i> 특별일정</span>
+   <span class="sc-legend-item"><i class="sc-dot"></i> 휴무</span>
+  </div>
+  <div class="sc-main">
+   <div id="sc-month">
+    <div class="sc-toolbar">
+     <strong id="sc-month-title" class="sc-month-label"></strong>
+     <div class="sc-actions">
+      <button type="button" id="sc-prev" class="sc-control" aria-label="이전 달">‹</button>
+      <button type="button" id="sc-current" class="sc-control sc-today">이번 달</button>
+      <button type="button" id="sc-next" class="sc-control" aria-label="다음 달">›</button>
+     </div>
+    </div>
+    <div class="sc-month-scroll" aria-label="월간 일정 캘린더">
+     <div class="sc-weekdays"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div>
+     <div id="sc-days" class="sc-days" aria-live="polite"></div>
+    </div>
+   </div>
+   <div id="sc-detail-view" hidden>
+    <button type="button" id="sc-back" class="sc-back">← 월간 스케줄로 돌아가기</button>
+    <h3 id="sc-detail-date" class="sc-selected-date"></h3>
+    <p id="sc-detail-note" class="sc-selected-note"></p>
+    <div id="sc-detail-events" class="sc-event-list"></div>
+    <p class="sc-info">자유방문은 모임·대관 등 등록된 일정을 제외한 운영시간으로 자동 계산됩니다. 휴무일에는 등록된 특별 일정만 진행됩니다.</p>
+   </div>
+   <p id="sc-state" class="sc-info" role="status" aria-live="polite">일정을 불러오는 중입니다.</p>
+  </div>
+ </div>
 </div>
 </section>
 <section aria-labelledby="location-title" class="section location-section" id="location">
@@ -1448,5 +1495,6 @@ const video=document.querySelector('#kv-hero .kv-video');
 if(video&&window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches){video.pause();video.removeAttribute('autoplay');}
 const grid=document.getElementById('news-cards');const safe=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const fmtEventDate=value=>{const v=String(value||'');if(!/^\d{4}-\d{2}-\d{2}$/.test(v))return '';const weekday=['일','월','화','수','목','금','토'][new Date(v+'T00:00:00Z').getUTCDay()];return v.replace(/-/g,'.')+' ('+weekday+')';};const newsDate=item=>{const start=fmtEventDate(item.event_date_start);if(!start)return '';const end=fmtEventDate(item.event_date_end);return '<div class="news-date">'+start+(end?' ~ '+end:'')+'</div>';};fetch('/api/news').then(r=>r.ok?r.json():Promise.reject()).then(d=>{const items=(d.items||[]).slice(0,6);grid.innerHTML=items.length?items.map(x=>'<a class="news-card" href="/news/'+encodeURIComponent(x.slug)+'">'+(x.cover?'<img loading="lazy" src="'+safe(x.cover)+'" alt="'+safe(x.title)+'">':'<div style="aspect-ratio:1;background:#f4f1eb"></div>')+'<h3>'+safe(x.title)+'</h3>'+newsDate(x)+'</a>').join(''):'<p>현재 등록된 운영 소식이 없습니다.</p>'}).catch(()=>grid.innerHTML='<p>운영 소식을 불러오지 못했습니다.</p>');
 })();
-</script></body>
+</script><script defer src="/assets/schedule.js"></script>
+</body>
 </html>
