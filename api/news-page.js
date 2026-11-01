@@ -9,7 +9,8 @@ const lightboxJs="(()=>{const box=document.getElementById('viewer'),thumbs=[...d
 function displayDateMarkup(p){
  const start=String(p.event_date_start||''),end=String(p.event_date_end||'');
  if(!/^\d{4}-\d{2}-\d{2}$/.test(start))return '';
- const time=d=>'<time datetime="'+esc(d)+'">'+esc(d.replace(/-/g,'.'))+'</time>';
+ const weekday=d=>['일','월','화','수','목','금','토'][new Date(d+'T00:00:00Z').getUTCDay()];
+ const time=d=>'<time datetime="'+esc(d)+'">'+esc(d.replace(/-/g,'.'))+' ('+weekday(d)+')</time>';
  return time(start)+(end&&/^\d{4}-\d{2}-\d{2}$/.test(end)?' <span aria-hidden="true">~</span> '+time(end):'');
 }
 function label(status){return status==='ongoing'?'진행중':'종료';}
