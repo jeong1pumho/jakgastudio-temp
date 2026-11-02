@@ -26,6 +26,11 @@
 #schedule .sc-day:hover{background:#faf7f3}
 #schedule .sc-day.is-closed{background:#f8f7f5}
 #schedule .sc-day.is-other{background:#faf9f8;cursor:default}
+#schedule .sc-day.is-pre-open{background:#f8f7f5;color:#aaa19b;cursor:default;opacity:1}
+#schedule .sc-day.is-pre-open:hover{background:#f8f7f5}
+#schedule .sc-day.is-opening{background:#fff8ee;cursor:default;opacity:1}
+#schedule .sc-day.is-opening:hover{background:#fff8ee}
+#schedule .sc-control:disabled{cursor:not-allowed;background:#f4f1ee;color:#aaa29c;opacity:.55}
 #schedule .sc-date-num{font-size:13px;font-weight:600;margin-bottom:5px}
 #schedule .sc-day.is-sunday .sc-date-num{color:#ad705b}
 #schedule .sc-day.is-today .sc-date-num{display:inline-flex;align-items:center;justify-content:center;border-radius:50%;width:26px;height:26px;background:#302d2a;color:#fff;margin-top:-3px;margin-left:-3px}
@@ -34,6 +39,8 @@
 #schedule .sc-entry.rental{background:#e5eff3;color:#456e81}
 #schedule .sc-entry.free{background:#e9f2e9;color:#50795c}
 #schedule .sc-entry.custom{background:#f0eaf3;color:#795682}
+#schedule .sc-entry.opening{background:#f0e2cf;color:#725033;padding:9px 7px}
+#schedule .sc-entry.opening .sc-kind{white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:break-word;word-break:keep-all;font-size:12px;line-height:1.4}
 #schedule .sc-kind{display:block;max-width:100%;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;font-size:12px;font-weight:700}
 #schedule .sc-clock{display:block;font-size:11px;white-space:nowrap;font-variant-numeric:tabular-nums}
 #schedule .sc-lunch{display:block;font-size:10px;white-space:normal;overflow-wrap:anywhere;word-break:keep-all;line-height:1.4}
