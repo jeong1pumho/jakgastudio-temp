@@ -30,7 +30,7 @@ module.exports=async(req,res)=>{
   const slug=(typeof req.query?.slug==='string'?req.query.slug:'')|| (urlPath.includes('/news/')?decodeURIComponent(urlPath.split('/news/')[1]||''):'');
   const listing=!slug||slug==='news';
   if(!listing&&!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug))return res.status(404).send('소식을 찾을 수 없습니다.');
-  const q='/rest/v1/news_posts?select='+selected+(listing?'&order=sort_order.desc,published_at.desc.nullslast,created_at.desc':'&slug=eq.'+encodeURIComponent(slug)+'&limit=1');
+  const q='/rest/v1/news_posts?select='+selected+(listing?'&status=eq.ended&order=sort_order.desc,published_at.desc.nullslast,created_at.desc':'&slug=eq.'+encodeURIComponent(slug)+'&limit=1');
   let rows;
   if(listing){
     rows=[];
@@ -44,7 +44,7 @@ module.exports=async(req,res)=>{
   let body='',script='';
   if(listing){
     body='<div class="cards">'+rows.map(card).join('')+'</div>';
-    if(!rows.length)body='<p style="text-align:center;margin:70px 0;color:#857a72">등록된 소식이 없습니다.</p>';
+    if(!rows.length)body='<p style="text-align:center;margin:70px 0;color:#857a72">종료된 소식이 없습니다.</p>';
   } else {
     const p=rows[0],images=Array.isArray(p.images)?p.images.slice(0,20):[];
     const dates=displayDateMarkup(p);
