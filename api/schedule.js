@@ -4,9 +4,9 @@ const columns='id,event_date,category,category_label,title,start_time,end_time';
 function monthRange(value){
   if(typeof value!=='string'||!/^\d{4}-(0[1-9]|1[0-2])$/.test(value))return null;
   const [y,m]=value.split('-').map(Number);
-  if(y<2000||y>2100)return null;
+  if(y<2000||y>2100||value<'2026-10')return null;
   const next=new Date(Date.UTC(y,m,1)).toISOString().slice(0,10);
-  return {start:value+'-01',end:next};
+  return {start:value==='2026-10'?'2026-10-22':value+'-01',end:next};
 }
 module.exports=async(req,res)=>{
   try{
