@@ -3,7 +3,8 @@
  if(!host)return;
  const $=id=>host.querySelector('#'+id);
  const weekdays=['일','월','화','수','목','금','토'];
- const names={meeting:'모임',rental:'대관',free:'자유방문',closure:'임시 휴무'};
+ const names={meeting:'모임',rental:'대관',free:'자유방문',closure:'임시 휴무',opening:'OPEN'};
+ const OPEN_DATE='2026-10-22',OPEN_MONTH='2026-10';
  const now=new Date();
  // Calendar date is interpreted in Korea, independently of the client's local timezone.
 
@@ -21,7 +22,11 @@
  const classFor=e=>Object.prototype.hasOwnProperty.call(names,e.category)?e.category:'custom';
  const rangeFor=e=>e.category==='closure'?'종일 휴무':e.start_time.slice(0,5)+'–'+e.end_time.slice(0,5);
  function getDay(y,m,d){
-  const day=keyFor(y,m,d),events=(records.get(day)||[]).slice().sort((a,b)=>a.start_time.localeCompare(b.start_time));
+  const day=keyFor(y,m,d);
+  if(day<OPEN_DATE)return {preOpen:true,closed:false,events:[]};
+  const events=(records.get(day)||[]).slice().sort((a,b)=>a.start_time.localeCompare(b.start_time));
+  const opening=events.find(e=>e.category==='opening');
+  if(opening)return {opening:true,closed:false,events:[opening]};
   const temporaryClosure=events.find(e=>e.category==='closure');
   if(temporaryClosure)return {closed:true,temporaryClosed:true,events:[temporaryClosure]};
   if(isClosed(y,m,d))return {closed:events.length===0,events};
@@ -54,6 +59,7 @@
  }
  function drawMonth(){
   $('sc-month-title').textContent=year+'년 '+month+'월';
+  $('sc-prev').disabled=keyFor(year,month,1).slice(0,7)<=OPEN_MONTH;
   const grid=$('sc-days');grid.replaceChildren();
   const first=new Date(Date.UTC(year,month-1,1)).getUTCDay();
   const max=new Date(Date.UTC(year,month,0)).getUTCDate();
@@ -67,24 +73,30 @@
    const button=text('button','sc-day');button.type='button';
    if(dow===0)button.classList.add('is-sunday');
    if(data.closed)button.classList.add('is-closed');
+   if(data.preOpen)button.classList.add('is-pre-open');
+   if(data.opening)button.classList.add('is-opening');
    if(key===koreanNow)button.classList.add('is-today');
-   button.setAttribute('aria-label',month+'월 '+d+'일 '+weekdays[dow]+'요일 일정 보기');
+   button.setAttribute('aria-label',data.opening?'10월 22일 작가작업실 JEJU OPEN':data.preOpen?month+'월 '+d+'일 오픈 전':month+'월 '+d+'일 '+weekdays[dow]+'요일 일정 보기');
    button.appendChild(text('span','sc-date-num',String(d)));
    if(data.closed)button.appendChild(text('span','sc-closed-label',data.temporaryClosed?'임시휴무':'휴무'));
    else {
     for(const e of data.events.slice(0,4)){
      const chip=text('span','sc-entry '+classFor(e));
-     const name=text('strong','sc-kind',titleFor(e));name.title=titleFor(e);
-     chip.append(name,text('span','sc-clock',rangeFor(e)));
+     const name=text('strong','sc-kind',e.category==='opening'?e.title:titleFor(e));name.title=e.category==='opening'?e.title:titleFor(e);
+     chip.appendChild(name);
+     if(e.category!=='opening')chip.appendChild(text('span','sc-clock',rangeFor(e)));
      if(e.lunch_excluded)chip.appendChild(text('span','sc-lunch','(점심시간 12-13시)'));
      button.appendChild(chip);
     }
     if(data.events.length>4)button.appendChild(text('span','sc-more','+'+(data.events.length-4)+'개 더보기'));
    }
-   button.addEventListener('click',()=>showDay(year,month,d));grid.appendChild(button);
+   if(data.preOpen||data.opening)button.disabled=true;
+   else button.addEventListener('click',()=>showDay(year,month,d));
+   grid.appendChild(button);
   }
  }
  function showDay(y,m,d){
+  if(keyFor(y,m,d)<=OPEN_DATE)return;
   const dow=new Date(Date.UTC(y,m-1,d)).getUTCDay(),data=getDay(y,m,d);
   $('sc-month').hidden=true;$('sc-detail-view').hidden=false;
   $('sc-detail-date').textContent=y+'년 '+m+'월 '+d+'일 ('+weekdays[dow]+')';
@@ -128,7 +140,7 @@
    $('sc-days').replaceChildren();setState('일정 조회 오류: '+e.message,true);
   }
  }
- function changeMonth(delta){const n=new Date(Date.UTC(year,month-1+delta,1));year=n.getUTCFullYear();month=n.getUTCMonth()+1;load();}
+ function changeMonth(delta){const n=new Date(Date.UTC(year,month-1+delta,1));const target=keyFor(n.getUTCFullYear(),n.getUTCMonth()+1,1).slice(0,7);if(target<OPEN_MONTH)return;year=n.getUTCFullYear();month=n.getUTCMonth()+1;load();}
  $('sc-prev').addEventListener('click',()=>changeMonth(-1));
  $('sc-next').addEventListener('click',()=>changeMonth(1));
  $('sc-current').addEventListener('click',()=>{year=readPart('year');month=readPart('month');load();});
