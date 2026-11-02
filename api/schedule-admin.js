@@ -14,8 +14,8 @@ function validTime(s){return typeof s==='string'&&/^([01]\d|2[0-3]):[0-5]\d$/.te
 function monthRange(value){
   if(typeof value!=='string'||!/^\d{4}-(0[1-9]|1[0-2])$/.test(value))return null;
   const [y,m]=value.split('-').map(Number);
-  if(y<2000||y>2100)return null;
-  return {start:value+'-01',end:new Date(Date.UTC(y,m,1)).toISOString().slice(0,10)};
+  if(y<2000||y>2100||value<'2026-10')return null;
+  return {start:value==='2026-10'?'2026-10-22':value+'-01',end:new Date(Date.UTC(y,m,1)).toISOString().slice(0,10)};
 }
 module.exports=async(req,res)=>{
  try{
@@ -31,14 +31,16 @@ module.exports=async(req,res)=>{
   if(req.method==='DELETE'){
    const id=req.query?.id;
    if(!validId(id))return send(res,400,{error:'잘못된 일정 ID입니다.'});
-   const rows=await query('/rest/v1/schedule_events?select=id&id=eq.'+id,'GET',undefined,token);
+   const rows=await query('/rest/v1/schedule_events?select=id,category&id=eq.'+id,'GET',undefined,token);
    if(!rows.length)return send(res,404,{error:'일정을 찾을 수 없습니다.'});
+   if(rows[0].category==='opening')return send(res,403,{error:'오픈일 기록은 삭제할 수 없습니다.'});
    await query('/rest/v1/schedule_events?id=eq.'+id,'DELETE',undefined,token);
    return send(res,200,{ok:true});
   }
   if(req.method!=='POST'&&req.method!=='PATCH')return send(res,405,{error:'허용되지 않은 요청입니다.'});
   const b=req.body||{};
   if(!validDate(b.event_date))return send(res,400,{error:'올바른 일정 날짜를 선택해 주세요.'});
+  if(b.event_date<'2026-10-22')return send(res,400,{error:'작가작업실 오픈일(2026-10-22) 이전에는 일정을 등록할 수 없습니다.'});
   if(!['meeting','rental','custom','closure'].includes(b.category))return send(res,400,{error:'일정 구분을 선택해 주세요. 자유방문은 자동 계산됩니다.'});
   const title=String(b.title||'').trim();
   if(title.length<1||title.length>150)return send(res,400,{error:'일정 제목은 1~150자로 입력해 주세요.'});
@@ -55,8 +57,9 @@ module.exports=async(req,res)=>{
   const id=req.method==='PATCH'?b.id:null;
   if(req.method==='PATCH'){
    if(!validId(id))return send(res,400,{error:'잘못된 일정 ID입니다.'});
-   const rows=await query('/rest/v1/schedule_events?select=id&id=eq.'+id,'GET',undefined,token);
+   const rows=await query('/rest/v1/schedule_events?select=id,category&id=eq.'+id,'GET',undefined,token);
    if(!rows.length)return send(res,404,{error:'수정할 일정을 찾을 수 없습니다.'});
+   if(rows[0].category==='opening')return send(res,403,{error:'오픈일 기록은 수정할 수 없습니다.'});
   }
   // Atomic insert/update of event + protected memo. DB exclusion guard remains active.
   const payload={
