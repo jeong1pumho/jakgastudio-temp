@@ -30,10 +30,10 @@
   const temporaryClosure=events.find(e=>e.category==='closure');
   if(temporaryClosure)return {closed:true,temporaryClosed:true,events:[temporaryClosure]};
   if(isClosed(y,m,d))return {closed:events.length===0,events};
-  const free=[],begin=600,finish=1020;let pointer=begin;
+  const free=[],begin=540,finish=1020;let pointer=begin;
   // Auto-calculated free visits must exclude 12:00–13:00.
   const addFree=(start,end)=>{
-    for(const [windowStart,windowEnd] of [[600,720],[780,1020]]){
+    for(const [windowStart,windowEnd] of [[540,720],[780,1020]]){
       const a=Math.max(start,windowStart),b=Math.min(end,windowEnd);
       if(a<b)free.push({category:'free',title:'자유롭게 책 읽고 글쓰기',start_time:toTime(a),end_time:toTime(b)});
     }
@@ -47,9 +47,9 @@
   if(pointer<finish)addFree(pointer,finish);
   // Presentation-only merge: two valid free segments become one informative card.
   const wholeDay=free.length===2 &&
-   free[0].start_time==='10:00'&&free[0].end_time==='12:00'&&
+   free[0].start_time==='09:00'&&free[0].end_time==='12:00'&&
    free[1].start_time==='13:00'&&free[1].end_time==='17:00';
-  const displayFree=wholeDay?[{category:'free',title:'자유롭게 책 읽고 글쓰기',start_time:'10:00',end_time:'17:00',lunch_excluded:true}]:free;
+  const displayFree=wholeDay?[{category:'free',title:'자유롭게 책 읽고 글쓰기',start_time:'09:00',end_time:'17:00',lunch_excluded:true}]:free;
   return {closed:false,events:[...events,...displayFree].sort((a,b)=>a.start_time.localeCompare(b.start_time))};
  }
  function setState(message,isError=false){
