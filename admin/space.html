@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>공간소개 사진 관리 | 작가작업실 JEJU</title>
+<style>
+:root{--paper:#f8f6f2;--ink:#3c312c;--muted:#80736a;--edge:#dfd8d0}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:"Noto Sans KR",system-ui,sans-serif;font-size:14px}
+button,input{font:inherit}button{cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}a{text-decoration:none;color:inherit}
+.container{max-width:1180px;margin:auto;padding:0 22px 80px}
+header{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;border-bottom:1px solid var(--edge);padding:15px 0;margin-bottom:34px}
+.wordmark{font-size:19px;font-weight:650;letter-spacing:-.04em}.wordmark small{display:block;font-size:12px;font-weight:400;color:var(--muted);letter-spacing:0}
+nav{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px}nav a{padding:9px 12px;border-radius:4px}
+nav a.active{background:#ece1d7;border:1px solid #c9af9e;font-weight:650}nav a:hover{background:#eee9e3}
+h1{font-size:29px;margin:0 0 8px;letter-spacing:-.04em}.note{color:var(--muted);line-height:1.7;font-size:13px;margin:8px 0 18px}
+.panel{background:#fff;border:1px solid var(--edge);border-radius:6px;padding:26px}.login{max-width:460px;margin:60px auto}
+label{display:block;font-weight:600;font-size:13px;margin:17px 0 7px}.field{border:1px solid #d1c7be;border-radius:4px;width:100%;padding:11px;background:#fff;color:var(--ink)}
+.btn{padding:10px 16px;border:1px solid #3c312c;background:#3c312c;color:white;border-radius:4px}
+.btn.secondary{background:white;border-color:#d4c8bc;color:var(--ink)}.btn.small{font-size:12px;padding:7px 11px}
+.actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.heading{display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:20px}
+.status{min-height:25px;margin:0 0 20px;color:#436a4c;white-space:pre-wrap}.status.error{color:#a53c31}
+.drop{border:2px dashed #ccbcb0;padding:28px 20px;text-align:center;border-radius:6px;background:#faf8f5;cursor:pointer}
+.drop:hover,.drop.over{background:#f0e8df}.drop.busy{opacity:.65;pointer-events:none}.drop strong{display:block;font-size:17px}
+.drop span{display:block;margin-top:8px;font-size:12px;color:var(--muted)}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:22px 0 18px}.count{font-weight:700}
+.gallery{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px}.item{border:1px solid var(--edge);background:#fff;border-radius:5px;overflow:hidden;min-width:0}
+.item.dragging{opacity:.4}.item.drag-over{outline:3px solid #ad8a73}.thumb{aspect-ratio:4/3;background:#ece8e1;display:block;width:100%;object-fit:cover}
+.number{position:absolute;top:8px;left:8px;background:rgba(40,34,28,.8);color:#fff;border-radius:3px;padding:3px 8px;font-size:12px}.image{position:relative}
+.item-body{padding:11px}.item-body label{margin:0 0 5px;font-weight:500}.item-body input{font-size:12px;padding:8px}
+.item-buttons{display:flex;gap:5px;justify-content:space-between;margin-top:11px}
+.item-buttons button{border:1px solid #d6c8bd;background:#fff;border-radius:3px;padding:6px 9px;font-size:12px}
+.item-buttons .remove{color:#a13f34;border-color:#dbb8b5}
+.footer{position:sticky;bottom:0;background:rgba(248,246,242,.96);border-top:1px solid var(--edge);padding:16px 0;margin-top:24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+[hidden]{display:none!important}
+@media(max-width:980px){.gallery{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:650px){.container{padding:0 14px 80px}.gallery{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.panel{padding:18px}.item-body{padding:8px}h1{font-size:25px}.drop{padding:22px 12px}}
+@media(max-width:390px){.gallery{grid-template-columns:1fr}}
+</style></head><body><div class="container">
+<header><a class="wordmark" href="/#space">작가작업실 JEJU <small>관리자</small></a>
+<nav aria-label="관리자 메뉴"><a href="/admin/">소식 관리</a><a href="/admin/schedule.html">스케줄 관리</a>
+<a href="/admin/space.html" class="active" aria-current="page">공간소개 관리</a><button class="btn secondary small" id="logout" hidden>로그아웃</button></nav></header>
+<p id="status" class="status" role="status" aria-live="polite"></p>
+<section id="loginView" class="panel login"><h1>관리자 로그인</h1><p class="note">기존 관리자 계정으로 로그인하세요.</p>
+<form id="loginForm"><label for="email">이메일</label><input class="field" id="email" type="email" autocomplete="username" required>
+<label for="password">비밀번호</label><input class="field" id="password" type="password" autocomplete="current-password" required>
+<p><button class="btn" id="loginBtn" type="submit">로그인</button></p></form></section>
+<section id="manageView" hidden>
+<div class="heading"><div><h1>공간소개 사진 관리</h1><p class="note">사진을 추가·삭제하고 순서를 바꾼 뒤, 저장 버튼으로 방문자 화면에 반영합니다.</p></div>
+<a href="/#space" class="btn secondary" target="_blank" rel="noopener">방문자 화면 확인 ↗</a></div>
+<div class="panel">
+<div id="drop" class="drop" role="button" tabindex="0" aria-label="공간 사진 업로드">
+<strong>+ 사진 선택 · 여러 장 동시 등록</strong><span>JPG · PNG · WEBP · AVIF / 사진 1장당 최대 10MB</span>
+<span>PC에서는 사진 파일을 이곳으로 끌어다 놓아도 됩니다.</span></div>
+<input id="files" type="file" accept="image/jpeg,image/png,image/webp,image/avif" multiple hidden>
+<p class="note">첫 번째 사진은 기존처럼 크게 표시됩니다. 드래그 또는 ↑ ↓ 버튼으로 순서를 바꾸세요. 모든 변경은 저장 후 홈페이지에 반영됩니다.</p>
+<div class="toolbar"><span id="count" class="count">사진 0장</span><div class="actions">
+<button id="reset" type="button" class="btn secondary">변경 취소</button><button id="saveTop" type="button" class="btn">변경사항 저장</button></div></div>
+<div id="gallery" class="gallery" aria-live="polite"></div></div>
+<div class="footer"><span id="dirtyLabel" class="note">저장된 사진 목록</span><button id="save" type="button" class="btn">변경사항 저장</button></div>
+</section></div>
+<script src="/assets/admin-session.js"></script>
+<script>
+(function(){
+'use strict';
+const $=id=>document.getElementById(id),session=window.JAKAdminSession;
+let token='',images=[],saved=[],version=0,config=null,busy=false,dragFrom=-1;
+const clone=arr=>arr.map(x=>({...x}));
+const changed=()=>JSON.stringify(images)!==JSON.stringify(saved);
+function notice(msg,error){$('status').textContent=msg||'';$('status').className='status'+(error?' error':'');}
+function mode(authenticated){$('loginView').hidden=authenticated;$('manageView').hidden=!authenticated;$('logout').hidden=!authenticated;}
+async function api(path,options={}){
+ const headers={'Content-Type':'application/json'};
+ if(token)headers.Authorization='Bearer '+token;
+ let resp;
+ try{resp=await fetch(path,{...options,headers,cache:'no-store'});}
+ catch{throw Error('서버 연결에 실패했습니다. 인터넷 연결을 확인해 주세요.');}
+ const result=await resp.json().catch(()=>({}));
+ if(!resp.ok){const e=Error(result.error||'요청 실패 ('+resp.status+')');e.status=resp.status;throw e;}
+ return result;
+}
+function updateDirty(){
+ const dirty=changed();$('dirtyLabel').textContent=dirty?'저장하지 않은 변경사항이 있습니다.':'저장된 사진 목록';
+ for(const id of ['save','saveTop','reset'])$(id).disabled=busy||!dirty;
+ $('count').textContent='사진 '+images.length+'장'+(config?' / 최대 '+config.maxPhotos+'장':'');
+}
+function move(from,to){
+ if(busy||from===to||from<0||to<0||from>=images.length||to>=images.length)return;
+ const [entry]=images.splice(from,1);images.splice(to,0,entry);render();
+}
+function render(){
+ const target=$('gallery');target.replaceChildren();
+ images.forEach((item,index)=>{
+  const card=document.createElement('article');card.className='item';card.draggable=!busy;
+  card.addEventListener('dragstart',e=>{dragFrom=index;card.classList.add('dragging');e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',String(index));});
+  card.addEventListener('dragend',()=>{dragFrom=-1;card.classList.remove('dragging');});
+  card.addEventListener('dragover',e=>{e.preventDefault();card.classList.add('drag-over');});
+  card.addEventListener('dragleave',()=>card.classList.remove('drag-over'));
+  card.addEventListener('drop',e=>{e.preventDefault();card.classList.remove('drag-over');move(dragFrom,index);dragFrom=-1;});
+  const image=document.createElement('div');image.className='image';
+  const img=document.createElement('img');img.className='thumb';img.src=item.src;img.alt=item.alt;img.loading='lazy';image.appendChild(img);
+  const num=document.createElement('span');num.className='number';num.textContent=String(index+1)+(index===0?' · 대표':'');image.appendChild(num);card.appendChild(image);
+  const body=document.createElement('div');body.className='item-body';
+  const label=document.createElement('label');label.textContent='사진 설명';label.htmlFor='alt-'+index;body.appendChild(label);
+  const alt=document.createElement('input');alt.className='field';alt.id='alt-'+index;alt.maxLength=160;alt.value=item.alt;alt.placeholder='공간 사진 설명';
+  alt.addEventListener('input',()=>{item.alt=alt.value;updateDirty();});body.appendChild(alt);
+  const actions=document.createElement('div');actions.className='item-buttons';
+  for(const [symbol,to,name] of [['↑',index-1,'앞으로 이동'],['↓',index+1,'뒤로 이동']]){
+   const b=document.createElement('button');b.type='button';b.textContent=symbol;b.title=name;b.setAttribute('aria-label',(index+1)+'번 사진 '+name);b.disabled=busy||to<0||to>=images.length;
+   b.addEventListener('click',()=>move(index,to));actions.appendChild(b);
+  }
+  const remove=document.createElement('button');remove.type='button';remove.className='remove';remove.textContent='삭제';remove.setAttribute('aria-label',(index+1)+'번 사진 삭제');
+  remove.addEventListener('click',()=>{if(busy)return;if(!confirm((index+1)+'번 사진을 목록에서 제거할까요? 저장하면 홈페이지에도 반영됩니다.'))return;images.splice(index,1);render();});
+  actions.appendChild(remove);body.appendChild(actions);card.appendChild(body);target.appendChild(card);
+ });
+ updateDirty();
+}
+async function load(){const data=await api('/api/space-admin');config=data.config;version=data.version;images=clone(data.images||[]);saved=clone(images);render();mode(true);}
+$('loginForm').addEventListener('submit',async e=>{
+ e.preventDefault();$('loginBtn').disabled=true;notice('로그인 중…');
+ try{
+  const a=await api('/api/admin',{method:'POST',body:JSON.stringify({action:'login',email:$('email').value.trim(),password:$('password').value})});
+  token=a.token;session?.save(token,a.expires_in);await load();notice('로그인했습니다.');
+ }catch(e){if(e.status===401||e.status===403){token='';session?.clear();mode(false);}notice('로그인 실패: '+e.message,true);}
+ finally{$('loginBtn').disabled=false;}
+});
+$('logout').addEventListener('click',()=>{if(changed()&&!confirm('저장하지 않은 변경사항이 있습니다. 로그아웃할까요?'))return;token='';session?.clear();mode(false);notice('로그아웃했습니다.');});
+async function upload(files){
+ if(!files.length)return;
+ if(busy)return notice('현재 작업이 끝난 뒤 추가해 주세요.',true);
+ if(!config)return notice('저장소 정보를 불러오지 못했습니다.',true);
+ if(images.length+files.length>config.maxPhotos)return notice('공간 사진은 최대 '+config.maxPhotos+'장입니다.',true);
+ const mime={'image/jpeg':'jpg','image/png':'png','image/webp':'webp','image/avif':'avif'};
+ if(files.some(f=>!mime[f.type]||f.size>10*1024*1024||f.size===0))return notice('JPG·PNG·WEBP·AVIF 파일만 장당 10MB 이내로 등록할 수 있습니다.',true);
+ busy=true;$('drop').classList.add('busy');updateDirty();let done=0;
+ try{
+  for(const file of files){
+   notice('사진 업로드 중… '+(done+1)+' / '+files.length);
+   const name='photos/'+crypto.randomUUID()+'.'+mime[file.type];
+   const response=await fetch(config.url+'/storage/v1/object/space-media/'+name,{method:'POST',headers:{apikey:config.key,Authorization:'Bearer '+token,'Content-Type':file.type,'x-upsert':'false'},body:file});
+   if(!response.ok){const data=await response.json().catch(()=>({}));throw Error(data.message||'Storage 업로드 오류 ('+response.status+')');}
+   images.push({src:config.url+'/storage/v1/object/public/space-media/'+name,alt:file.name.replace(/\.[^.]+$/,'').slice(0,160)||'작가작업실 JEJU 공간'});done++;
+  }
+  notice('사진 '+done+'장 업로드 완료. 변경사항 저장을 눌러 홈페이지에 반영하세요.');
+ }catch(e){notice(done+'장 업로드 후 중단: '+e.message,true);}
+ finally{busy=false;$('drop').classList.remove('busy');render();}
+}
+$('drop').addEventListener('click',()=>$('files').click());
+$('drop').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('files').click();}});
+$('files').addEventListener('change',e=>{const f=Array.from(e.target.files||[]);e.target.value='';upload(f);});
+['dragenter','dragover'].forEach(ev=>$('drop').addEventListener(ev,e=>{e.preventDefault();$('drop').classList.add('over');}));
+['dragleave','drop'].forEach(ev=>$('drop').addEventListener(ev,e=>{e.preventDefault();$('drop').classList.remove('over');}));
+$('drop').addEventListener('drop',e=>{upload([...e.dataTransfer.files]);});
+async function save(){
+ if(busy||!changed())return;busy=true;updateDirty();notice('공간 사진 목록 저장 중…');
+ const removed=saved.filter(x=>!images.some(y=>x.src===y.src)&&x.src.startsWith((config?.url||'')+'/storage/v1/object/public/space-media/')).map(x=>x.src);
+ try{
+  const data=await api('/api/space-admin',{method:'PATCH',body:JSON.stringify({version,images})});
+  version=data.version;images=clone(data.images);saved=clone(images);notice('공간 사진 변경사항을 저장했습니다. 방문자 화면을 새로고침하면 반영됩니다.');
+  if(removed.length){
+   try{await api('/api/space-admin',{method:'POST',body:JSON.stringify({action:'cleanup',urls:removed})});}
+   catch(e){notice('사진 목록은 저장됐지만 이전 업로드 파일 정리에 실패했습니다: '+e.message,true);}
+  }
+ }catch(e){notice('저장 실패: '+e.message,true);}
+ finally{busy=false;render();}
+}
+$('save').addEventListener('click',save);$('saveTop').addEventListener('click',save);
+$('reset').addEventListener('click',()=>{if(busy||!changed())return;if(!confirm('저장하지 않은 변경사항을 취소할까요?'))return;images=clone(saved);render();notice('변경사항을 취소했습니다.');});
+window.addEventListener('beforeunload',e=>{if(changed()){e.preventDefault();e.returnValue='';}});
+(async()=>{mode(false);const savedToken=session?.read();if(!savedToken)return;token=savedToken;try{await load();notice('');}catch(e){if(e.status===401||e.status===403){token='';session?.clear();}notice('관리자 화면을 불러오지 못했습니다: '+e.message,true);}})();
+})();
+</script></body></html>
