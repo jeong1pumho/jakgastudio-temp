@@ -1194,7 +1194,7 @@ strong,b{font-weight:700}
 <p class="eyebrow">03 <span>SPACE</span><i></i></p>
 <div class="heading-line"><h2 id="space-title">공간소개</h2></div>
 </div>
-<div class="space-grid approved-grid space-gallery-20261029">
+<div class="space-grid approved-grid space-gallery-20261029" id="space-gallery">
 <button type="button" class="gallery-photo space-gallery-item space-photo-primary" aria-label="밝은 창과 모임 테이블이 있는 작가작업실 내부 사진 확대" data-alt="밝은 창과 모임 테이블이 있는 작가작업실 내부" data-full="/assets/space-refresh-20261104-01.webp"><img src="/assets/space-refresh-20261104-01.webp" alt="밝은 창과 모임 테이블이 있는 작가작업실 내부" loading="lazy" decoding="async"/></button>
 <button type="button" class="gallery-photo space-gallery-item" aria-label="작가작업실 JEJU의 흰색 건물 정면 사진 확대" data-alt="작가작업실 JEJU의 흰색 건물 정면" data-full="/assets/space-refresh-20261104-02.webp"><img src="/assets/space-refresh-20261104-02.webp" alt="작가작업실 JEJU의 흰색 건물 정면" loading="lazy" decoding="async"/></button>
 <button type="button" class="gallery-photo space-gallery-item" aria-label="다양한 책이 정면으로 전시된 책장 사진 확대" data-alt="다양한 책이 정면으로 전시된 책장" data-full="/assets/space-refresh-20261104-03.webp"><img src="/assets/space-refresh-20261104-03.webp" alt="다양한 책이 정면으로 전시된 책장" loading="lazy" decoding="async"/></button>
@@ -1405,12 +1405,14 @@ strong,b{font-weight:700}
  const next=modal.querySelector('.space-lightbox-next');
  const modalImg=modal.querySelector('img');
  const caption=modal.querySelector('.lightbox-caption');
- const photos=[...document.querySelectorAll('#space .space-gallery-item')];
+ const grid=document.getElementById('space-gallery');
+ const photos=()=>[...grid.querySelectorAll('.space-gallery-item')];
  let last=null,currentIndex=0,touchStart=null;
  function showPhoto(index,animate){
-  if(!photos.length)return;
-  currentIndex=(index+photos.length)%photos.length;
-  const photo=photos[currentIndex];
+  const list=photos();
+   if(!list.length)return;
+   currentIndex=(index+list.length)%list.length;
+   const photo=list[currentIndex];
   modalImg.src=photo.dataset.full;
   modalImg.alt=photo.dataset.alt||'공간소개 사진';
   caption.textContent=photo.dataset.alt||'';
@@ -1424,17 +1426,17 @@ strong,b{font-weight:700}
   modal.hidden=true;
   modalImg.classList.remove('space-lightbox-photo-in');
   document.body.classList.remove('dialog-open');
-  if(last)last.focus();
+  if(last?.isConnected)last.focus();
  }
- photos.forEach((photo,index)=>{
-  photo.addEventListener('click',()=>{
+ grid.addEventListener('click',e=>{
+   const photo=e.target.closest('.space-gallery-item');
+   if(!photo||!grid.contains(photo))return;
    last=photo;
-   showPhoto(index,false);
+   showPhoto(photos().indexOf(photo),false);
    modal.hidden=false;
    document.body.classList.add('dialog-open');
    close.focus();
   });
- });
  prev.addEventListener('click',()=>showPhoto(currentIndex-1,true));
  next.addEventListener('click',()=>showPhoto(currentIndex+1,true));
  close.addEventListener('click',hide);
@@ -1459,6 +1461,7 @@ strong,b{font-weight:700}
  modalImg.addEventListener('touchcancel',()=>{touchStart=null;},{passive:true});
 })();
 </script>
+<script defer src="/assets/space-gallery.js"></script>
 <script>
 (function(){
  const vp=document.getElementById('map-viewport');
