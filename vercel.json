@@ -11,7 +11,7 @@
     },
     {
       "source": "/news",
-      "destination": "/api/news-page"
+      "destination": "/api/archive-page"
     },
     {
       "source": "/news/:slug",
