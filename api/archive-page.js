@@ -83,7 +83,7 @@ module.exports=async(req,res)=>{
    '<p class="count">총 '+total+'개 · 최신 게시순</p>'+
    (items.length?'<div class="cards">'+items.map(card).join('')+'</div>':'<p class="empty">등록된 지난 모임·행사가 없습니다.</p>')+
    pager(page,pages,rental)+
-   (rental?'<a class="return" href="/#prog-04">공간 대관 안내 보기 ↗</a>':'')+
+   (rental?'<a class="return" href="/#rental-program">공간 대관 안내 보기 ↗</a>':'')+
    '<a class="return" href="/#news">모임·행사로 돌아가기</a></main></body></html>';
   res.setHeader('Content-Type','text/html; charset=utf-8');
   res.setHeader('Cache-Control','no-store');

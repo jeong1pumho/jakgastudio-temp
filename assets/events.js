@@ -40,9 +40,11 @@
    list($('rental-case-grid'),rentals.slice(0,3),'',true);
    $('rental-case-showcase').hidden=false;
   }
+  window.dispatchEvent(new Event('jak:events-rendered'));
  }).catch(()=>{
   current.innerHTML='<p class="news-empty">진행 중인 모임·행사를 불러오지 못했습니다.</p>';
   ended.innerHTML='<p class="news-empty">지난 모임·행사를 불러오지 못했습니다.</p>';
+  window.dispatchEvent(new Event('jak:events-rendered'));
  });
  button.addEventListener('click',async()=>{
   if(expanded){

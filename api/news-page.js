@@ -60,7 +60,7 @@ module.exports=async(req,res)=>{
       p.operator_type==='studio'?'<p class="event-owner"><strong>운영</strong> 작가작업실 JEJU</p>':'');
     body+='<div class="photos" id="photos">'+images.map((img,i)=>'<button type="button" class="photo-button" data-viewer="'+i+'" aria-label="'+(i+1)+'번째 사진 크게 보기">'+thumbnail(img,p.title+' 사진 '+(i+1))+'</button>').join('')+'</div>';
     body+='<article class="content">'+renderContent(p.content)+'</article>';
-    if(p.operator_type==='rental')body+='<aside class="rental-link"><h3>이런 모임을 준비하고 계신가요?</h3><p>제주 이호테우 작가작업실 JEJU의 공간대관 안내를 확인해 보세요.</p><a href="/#prog-04">공간 대관 안내 보기 ↗</a></aside>';
+    if(p.operator_type==='rental')body+='<aside class="rental-link"><h3>이런 모임을 준비하고 계신가요?</h3><p>제주 이호테우 작가작업실 JEJU의 공간대관 안내를 확인해 보세요.</p><a href="/#rental-program">공간 대관 안내 보기 ↗</a></aside>';
     if(images.length){
       body+='<div class="viewer" id="viewer" role="dialog" aria-modal="true" aria-label="사진 크게 보기" hidden><button class="close" id="close" type="button" aria-label="사진 닫기">×</button><button class="prev" id="prev" type="button" aria-label="이전 사진">‹</button><img id="viewerImage" alt=""><button class="next" id="next" type="button" aria-label="다음 사진">›</button><span class="count" id="count"></span></div>';
       script='<script>'+lightboxJs+'</script>';

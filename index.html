@@ -347,6 +347,7 @@ body { background:#fdfbf8; }
 }
 .sticky-brand-home:focus-visible {outline:2px solid #e0cbbd;outline-offset:4px;border-radius:2px;}
 .section[id] { scroll-margin-top:80px }
+#rental-program{scroll-margin-top:88px}
 @media (max-width:1050px) {
   .intro-section{min-height:730px}
   .intro-inner{padding-top:87px;padding-bottom:85px}
@@ -368,6 +369,7 @@ body { background:#fdfbf8; }
   .sticky-brand-inner{height:57px}
   .sticky-brand-home img{width:min(89vw,360px);max-height:33px}
   .section[id]{scroll-margin-top:67px}
+  #rental-program{scroll-margin-top:75px}
 }
 @media (prefers-reduced-motion:reduce) {
  html{scroll-behavior:auto}
@@ -1286,7 +1288,7 @@ strong,b{font-weight:700}
 <div class="program-copy"><p>글쓰기를 시작해 보고 싶지만<br/>어디서부터 시작해야 할지 막막한 적 없으세요?</p><p>출간한 저 또한<br/>처음 시작할 때는 어렵게만 느껴졌었습니다.</p><p>제주 이호테우에서 진행하는 글쓰기 클래스는<br/>응원받으며 글쓰기를 시작할 수 있는 공간입니다.</p><p>작가작업실 JEJU는 언제나 기다릴께요.</p></div>
 <figure class="program-figure"><img alt="보라색 꽃병과 글쓰기에 좋은 흰 테이블" class="" decoding="async" loading="lazy" src="https://www.jakgastudio.com/assets/final_writing.webp"/></figure>
 </article>
-<article aria-labelledby="prog-04" class="program-row">
+<article id="rental-program" aria-labelledby="prog-04" class="program-row">
 <div class="program-heading"><div class="item-index">04<i></i></div><h3 id="prog-04">공간 대관</h3>
 <p class="program-meta">(독서모임, 글쓰기 모임, 북토크 등)</p>
 <a class="ghost-btn" href="tel:01050657776">전화 문의 <span aria-hidden="true">↗</span></a>
@@ -1541,6 +1543,33 @@ strong,b{font-weight:700}
 const video=document.querySelector('#kv-hero .kv-video');
 if(video&&window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches){video.pause();video.removeAttribute('autoplay');}
 
+})();
+</script>
+<script>
+/* Preserve the rental row's landing position even when async event cards
+   above PROGRAM expand after the browser initially resolves a fragment. */
+(()=>{
+ 'use strict';
+ const rentalHashes=new Set(['#rental-program','#prog-04']);
+ function alignRental(){
+   if(!rentalHashes.has(location.hash))return;
+   const target=document.getElementById('rental-program');
+   if(!target)return;
+   requestAnimationFrame(()=>{
+     if(!rentalHashes.has(location.hash))return;
+     const bar=document.querySelector('.sticky-brand-header');
+     const offset=(bar?bar.getBoundingClientRect().height:66)+18;
+     const y=Math.max(0,window.scrollY+target.getBoundingClientRect().top-offset);
+     window.scrollTo({top:y,behavior:'instant'});
+   });
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',alignRental);
+ else alignRental();
+ window.addEventListener('load',alignRental);
+ window.addEventListener('pageshow',alignRental);
+ window.addEventListener('hashchange',alignRental);
+ window.addEventListener('jak:events-rendered',alignRental);
+ if(document.fonts?.ready)document.fonts.ready.then(alignRental).catch(()=>{});
 })();
 </script><script defer src="/assets/events.js"></script><script defer src="/assets/schedule.js"></script>
 </body>
