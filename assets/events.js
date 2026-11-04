@@ -10,20 +10,21 @@
   const weekday=['일','월','화','수','목','금','토'][new Date(s+'T00:00:00Z').getUTCDay()];
   return s.replace(/-/g,'.')+' ('+weekday+')';
  };
- function card(p){
+ function card(p,compact=false){
   const date=formatDate(p.event_date_start),end=formatDate(p.event_date_end);
   const type=typeLabel[p.event_type],operator=opLabel[p.operator_type];
   const tags=(operator?'<span class="operator-label">'+esc(operator)+'</span>':'')+
    (type?'<span>'+esc(type)+'</span>':'');
-  return '<a class="news-card" href="/news/'+encodeURIComponent(p.slug||'')+'">'+
-   (p.cover?'<img loading="lazy" decoding="async" src="'+esc(p.cover)+'" alt="'+esc(p.title)+'">':'<div class="news-blank" style="aspect-ratio:1;background:#f4f1eb"></div>')+
-   (tags?'<div class="news-tagline">'+tags+'</div>':'')+
+  const image=p.cover?'<img loading="lazy" decoding="async" src="'+esc(p.cover)+'" alt="'+esc(p.title)+'">':
+   '<div class="news-blank" style="aspect-ratio:1;background:#f4f1eb"></div>';
+  const text=(tags?'<div class="news-tagline">'+tags+'</div>':'')+
    '<h3>'+esc(p.title)+'</h3>'+
-   (date?'<p class="news-date">'+esc(date)+(end?' ~ '+esc(end):'')+'</p>':'')+
-   '</a>';
+   (date?'<p class="news-date">'+esc(date)+(end?' ~ '+esc(end):'')+'</p>':'');
+  return '<a class="news-card" href="/news/'+encodeURIComponent(p.slug||'')+'">'+
+   image+(compact?'<div class="rental-card-copy">'+text+'</div>':text)+'</a>';
  }
- function list(node,items,empty){
-  node.innerHTML=items.length?items.map(card).join(''):'<p class="news-empty">'+esc(empty)+'</p>';
+ function list(node,items,empty,compact=false){
+  node.innerHTML=items.length?items.map(p=>card(p,compact)).join(''):'<p class="news-empty">'+esc(empty)+'</p>';
  }
  const current=$('news-cards'),ended=$('ended-cards'),button=$('news-more');
  if(!current||!ended||!button)return;
@@ -36,7 +37,7 @@
   button.hidden=!data.hasMoreOngoing;
   const rentals=Array.isArray(data.rentals)?data.rentals:[];
   if(rentals.length&&$('rental-case-showcase')&&$('rental-case-grid')){
-   list($('rental-case-grid'),rentals,'');
+   list($('rental-case-grid'),rentals.slice(0,3),'',true);
    $('rental-case-showcase').hidden=false;
   }
  }).catch(()=>{

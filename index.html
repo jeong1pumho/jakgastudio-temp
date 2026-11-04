@@ -520,14 +520,22 @@ strong,b{font-weight:700}
 .news-toggle,.news-archive-link{font:inherit;display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:12px 28px;color:#514236;border:1px solid #b9a99b;background:transparent;text-decoration:none;font-size:14px;cursor:pointer;min-height:44px}
 .news-toggle:hover,.news-archive-link:hover{background:#f7f2ee}.news-toggle[hidden],.news-archive-link[hidden],.rental-case-showcase[hidden]{display:none!important}
 .news-empty{font-size:14px;color:#82786e;padding:16px 0}
-.rental-case-showcase{padding:37px 0 53px;border-bottom:1px solid var(--line);grid-column:1/-1}
+/* Confirmed compact rental cases: 3 horizontal image/text tiles, no tall vertical cards. */
+.rental-case-showcase{padding:31px 0 35px;border-bottom:1px solid var(--line);grid-column:1/-1}
 .rental-case-showcase h4{font-size:24px;font-weight:500;line-height:1.5;margin:0;color:#41382f}
-.rental-case-showcase>p{font-size:14px;color:#746a61;margin:7px 0 23px;line-height:1.7}
-.rental-case-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
-.rental-case-grid .news-card img{aspect-ratio:4/3}
-.rental-case-grid .news-card h3{font-size:17px;margin-top:14px}
-.rental-more{text-align:center;margin-top:27px}
-@media(max-width:740px){.news-section-intro{font-size:13px}.news-subsection{margin-top:30px}.news-subsection+.news-subsection{margin-top:54px;padding-top:37px}.news-subtitle{font-size:19px}.news-section .news-grid{margin-top:23px}.news-tagline{font-size:11px}.rental-case-showcase{padding:28px 0}.rental-case-showcase h4{font-size:20px}.rental-case-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 12px}.rental-case-grid .news-card h3{font-size:14px}}
+.rental-case-showcase>p{font-size:14px;color:#746a61;margin:7px 0 21px;line-height:1.7}
+.rental-case-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.rental-case-grid .news-card{display:grid;grid-template-columns:minmax(0,46%) minmax(0,1fr);align-items:stretch;gap:14px;min-height:150px;padding:11px;border:1px solid #d9cec3;border-radius:5px;color:inherit;text-decoration:none}
+.rental-case-grid .news-card:hover{border-color:#ae9782;background:#fbf9f6}
+.rental-case-grid .news-card img,.rental-case-grid .news-card .news-blank{display:block;width:100%;height:137px;aspect-ratio:auto!important;object-fit:cover;border-radius:4px}
+.rental-card-copy{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;min-width:0;gap:4px}
+.rental-case-grid .news-tagline{justify-content:flex-start;margin:0 0 5px;gap:5px;font-size:11px;line-height:1.4}
+.rental-case-grid .news-tagline .operator-label{padding:3px 6px}
+.rental-case-grid .news-card h3{font-size:16px;line-height:1.45;font-weight:500;text-align:left;margin:0;overflow-wrap:anywhere}
+.rental-case-grid .news-card .news-date{font-size:13px;line-height:1.5;text-align:left;margin:5px 0 0;color:#857f78}
+.rental-more{text-align:center;margin-top:24px}
+@media(max-width:990px){.rental-case-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}}
+@media(max-width:640px){.rental-case-showcase{padding:26px 0 30px}.rental-case-showcase h4{font-size:20px}.rental-case-showcase>p{font-size:12px;margin-bottom:16px}.rental-case-grid{grid-template-columns:minmax(0,1fr);gap:10px}.rental-case-grid .news-card{grid-template-columns:minmax(0,39%) minmax(0,1fr);gap:12px;min-height:116px;padding:8px}.rental-case-grid .news-card img,.rental-case-grid .news-card .news-blank{height:105px}.rental-case-grid .news-card h3{font-size:14px}.rental-case-grid .news-card .news-date{font-size:12px}.rental-case-grid .news-tagline{font-size:10px}.rental-more{margin-top:19px}}
 
 @media(max-width:740px){.news-section{padding:60px 0}.news-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 12px}.news-card h3{font-size:14px}.kv-text{left:7%;top:42%;width:78vw}}
 @media(prefers-reduced-motion:reduce){.kv-img{transition:none}}
