@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<title>운영 소식 관리 | 작가작업실 JEJU</title>
+<title>모임·행사 관리 | 작가작업실 JEJU</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&amp;family=IBM+Plex+Sans+KR&amp;family=Gothic+A1&amp;family=Nanum+Gothic&amp;family=Gowun+Dodum&amp;family=Black+Han+Sans&amp;family=Do+Hyeon&amp;family=Jua&amp;family=Sunflower&amp;family=Noto+Serif+KR&amp;family=Nanum+Myeongjo&amp;family=Gowun+Batang&amp;family=Hahmlet&amp;family=Song+Myung&amp;family=Gaegu&amp;family=Gamja+Flower&amp;family=Single+Day&amp;family=Yeon+Sung&amp;family=Nanum+Pen+Script&amp;family=Nanum+Brush+Script&amp;family=Poor+Story&amp;family=Hi+Melody&amp;family=Cute+Font&amp;display=swap"><style>
 :root{--ink:#35302c;--muted:#817970;--light:#faf8f4;--edge:#e7e1d8;--accent:#9d765e;--button:#3c3530;--bg:#f7f5f1}
 *{box-sizing:border-box}
@@ -132,6 +132,15 @@ tbody tr:last-child td{border-bottom:0}
 .date-clear{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:12px}
 .date-clear .note{margin:0}
 @media(max-width:800px){.date-panel{padding:16px}.date-fields{gap:12px}}
+/* Added event taxonomy, provenance and confirmation dialogs. */
+.event-classes{display:flex;gap:7px;flex-wrap:wrap;align-items:center}.event-class{font-size:12px;background:#f3eee9;color:#655448;padding:4px 8px;border-radius:4px;white-space:nowrap}
+.event-class.rental{background:#eee4da;color:#634c3e}
+.dialog-confirm{border:1px solid #d2c5b8;border-radius:9px;box-shadow:0 18px 50px rgba(0,0,0,.24);max-width:min(500px,92vw);width:100%;padding:30px;background:white;color:#41392f}
+.dialog-confirm::backdrop{background:rgba(18,14,11,.6)}.dialog-confirm h2{font-size:22px;margin:0 0 12px}.dialog-confirm p{font-size:14px;color:#665b52;line-height:1.7}
+.dialog-confirm .dialog-item{background:#f8f5f1;padding:15px;border-radius:5px;margin:16px 0}.dialog-confirm .dialog-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:24px}
+.preview-seo{border:1px solid #d9cfc5;border-radius:5px;padding:15px;margin:0 0 20px;font-size:14px}.preview-seo .seo-link{font-size:12px;color:#807267}.preview-seo .seo-title{font-size:17px;color:#2c66a1;line-height:1.5;overflow-wrap:anywhere}.preview-seo .seo-desc{font-size:13px;color:#615d57;line-height:1.6}
+.editor-preview-body{padding:12px 0;line-height:1.9;overflow-wrap:anywhere}.editor-preview-body img{max-width:100%}
+@media(max-width:720px){.toolbar{flex-wrap:wrap}.toolbar .filter{max-width:100%!important}.dialog-confirm{padding:19px}}
 </style>
 </head>
 <body>
@@ -139,7 +148,7 @@ tbody tr:last-child td{border-bottom:0}
 <header class="site-header">
   <a class="wordmark" href="/#news">작가작업실 JEJU <small>관리자</small></a>
   <nav class="admin-global-nav" aria-label="관리자 메뉴">
-    <a href="/admin/" class="admin-nav-link is-active" aria-current="page">소식 관리</a>
+    <a href="/admin/" class="admin-nav-link is-active" aria-current="page">모임·행사 관리</a>
     <a href="/admin/schedule.html" class="admin-nav-link">스케줄 관리</a>
     <a href="/admin/space.html" class="admin-nav-link">공간소개 관리</a>
     <button type="button" class="btn ghost small" id="logout" hidden>로그아웃</button>
@@ -149,7 +158,7 @@ tbody tr:last-child td{border-bottom:0}
 
 <section id="loginView" class="panel login-box">
   <h1>관리자 로그인</h1>
-  <p class="subline">운영 소식을 등록하거나 수정할 수 있습니다.</p>
+  <p class="subline">모임·행사를 등록하고 운영 구분과 진행 상태를 관리합니다.</p>
   <form id="loginForm">
     <div class="form-row"><label class="label" for="email">이메일</label><input class="field" id="email" type="email" required autocomplete="username"></div>
     <div class="form-row"><label class="label" for="password">비밀번호</label><input class="field" id="password" type="password" required autocomplete="current-password"></div>
@@ -159,16 +168,27 @@ tbody tr:last-child td{border-bottom:0}
 
 <section id="listView" hidden>
   <div class="page-heading">
-    <div><h1>운영 소식 관리</h1><p class="subline">등록한 게시물을 검색하고 수정·삭제할 수 있습니다.</p></div>
-    <div class="list-head-actions"><a class="btn secondary" href="/admin/schedule.html">스케줄 관리</a><a class="btn secondary" href="/admin/space.html">공간소개 관리</a><button type="button" class="btn" id="newBtn">+ 새 소식 등록</button></div>
+    <div><h1>모임·행사 관리</h1><p class="subline">콘텐츠 유형, 운영 구분, 진행 상태별로 검색하고 수정·삭제할 수 있습니다.</p></div>
+    <div class="list-head-actions"><a class="btn secondary" href="/admin/schedule.html">스케줄 관리</a><a class="btn secondary" href="/admin/space.html">공간소개 관리</a><button type="button" class="btn" id="newBtn">+ 새 모임·행사 등록</button></div>
   </div>
   <div class="panel">
     <div class="toolbar">
-      <input class="field search" id="search" type="search" placeholder="소식 제목 검색" aria-label="소식 제목 검색">
+      <input class="field search" id="search" type="search" placeholder="모임·행사 제목 검색" aria-label="모임·행사 제목 검색">
       <select class="field filter" id="filter" aria-label="게시 상태 필터">
         <option value="all">전체 상태</option>
-        <option value="ongoing">진행중</option>
+        <option value="ongoing">진행 중</option>
         <option value="ended">종료</option>
+      </select>
+      <select class="field filter" id="filterType" aria-label="콘텐츠 유형 필터">
+        <option value="all">전체 유형</option>
+        <option value="reading">독서</option><option value="writing">글쓰기</option>
+        <option value="themed">주제모임</option><option value="special">특별행사</option>
+        <option value="legacy">미분류(기존 글)</option>
+      </select>
+      <select class="field filter" id="filterOperator" aria-label="운영 구분 필터">
+        <option value="all">전체 운영</option>
+        <option value="studio">작가작업실 JEJU 운영</option><option value="rental">대관 행사</option>
+        <option value="legacy">미분류(기존 글)</option>
       </select>
     </div>
     <div id="listArea" class="list-wrap"></div>
@@ -178,14 +198,31 @@ tbody tr:last-child td{border-bottom:0}
 
 <section id="editView" hidden>
   <div class="page-heading">
-    <div><h1 id="editHeading">새 소식 등록</h1><p class="subline" id="editSubline">제목과 내용을 입력하고 게시 상태를 선택하세요.</p></div>
+    <div><h1 id="editHeading">새 모임·행사 등록</h1><p class="subline" id="editSubline">제목과 내용을 입력하고 게시 상태를 선택하세요.</p></div>
     <button type="button" class="btn secondary" id="backBtn">← 목록으로</button>
   </div>
   <div class="panel">
     <form id="editForm">
       <input id="postId" type="hidden">
-      <div class="form-row"><label class="label" for="title">소식 제목</label><input class="field" id="title" required minlength="2" maxlength="150"></div>
+      <div class="form-row"><label class="label" for="title">행사 제목</label><input class="field" id="title" required minlength="2" maxlength="150"></div>
       <div class="form-row"><label class="label" for="slug">상세페이지 주소 (영문, 선택사항)</label><input class="field" id="slug" placeholder="비워 두면 자동 생성" pattern="[a-z0-9]+(-[a-z0-9]+)*"><p class="note">기존 글을 수정할 때는 주소를 변경하지 않는 편이 좋습니다.</p></div>
+      <div class="form-grid">
+        <div class="form-row"><label class="label" for="eventType">콘텐츠 유형</label>
+          <select class="field" id="eventType" required>
+            <option value="">유형 선택</option><option value="reading">독서</option><option value="writing">글쓰기</option>
+            <option value="themed">주제모임</option><option value="special">특별행사</option>
+          </select><p class="note">검색을 고려해 구체적인 활동명을 제목과 본문에도 적어 주세요.</p></div>
+        <div class="form-row"><label class="label" for="operatorType">운영 구분</label>
+          <select class="field" id="operatorType" required>
+            <option value="">운영 구분 선택</option><option value="studio">작가작업실 JEJU 운영</option>
+            <option value="rental">대관 행사</option>
+          </select><p class="note">대관 행사에서는 공간 제공과 실제 주최자를 구분합니다.</p></div>
+      </div>
+      <div class="form-row" id="organizerRow" hidden>
+        <label class="label" for="externalOrganizer">외부 주최자 · 대관 행사 필수</label>
+        <input class="field" id="externalOrganizer" maxlength="160" placeholder="주최 단체 또는 진행자 이름">
+        <p class="note">대관 행사 상세페이지에 행사 주최자로 표시됩니다.</p>
+      </div>
       <div class="form-row date-panel">
         <label class="label" for="dateMode">게시물 날짜 (선택)</label>
         <select class="field" id="dateMode">
@@ -204,7 +241,7 @@ tbody tr:last-child td{border-bottom:0}
           </div>
         </div>
         <div class="date-clear">
-          <p class="note">입력한 날짜만 NEWS 목록·상세페이지에 표시됩니다. 스케줄과는 연동되지 않습니다.</p>
+          <p class="note">입력한 날짜만 모임·행사 목록·상세페이지에 표시됩니다. 스케줄과는 연동되지 않습니다.</p>
           <button type="button" class="btn secondary small" id="clearEventDate">날짜 삭제</button>
         </div>
       </div>
@@ -273,15 +310,21 @@ tbody tr:last-child td{border-bottom:0}
           <button type="button" class="format-btn" id="addLink">링크</button>
           <button type="button" class="format-btn" data-command="removeFormat">서식 지우기</button>
         </div>
-        <div id="content" class="rich-editor" contenteditable="true" role="textbox" aria-label="운영 소식 본문" aria-multiline="true" data-placeholder="운영 소식의 상세 내용을 입력하세요."></div>
+        <div id="content" class="rich-editor" contenteditable="true" role="textbox" aria-label="모임·행사 본문" aria-multiline="true" data-placeholder="진행자, 모임 소개, 참가 대상, 일정·장소, 참가비, 신청 방법을 입력하세요."></div>
         <p class="note" id="editorFormatHint" aria-live="polite">글자를 선택한 뒤 글꼴·크기·색상을 바꾸면 즉시 적용됩니다. 저장 후 상세페이지에서도 유지됩니다.</p>
       </div>
       <div class="form-grid">
-        <div class="form-row"><label class="label" for="status">게시 상태</label><select class="field" id="status"><option value="ongoing">진행중 · 메인과 지난 소식에 표시</option><option value="ended">종료 · 지난 소식에만 표시</option></select></div>
+        <div class="form-row"><label class="label" for="status">게시 상태</label><select class="field" id="status"><option value="ongoing">진행 중 · 홈페이지 진행 중 목록에 표시</option><option value="ended">종료 · 홈페이지와 지난 모임·행사 목록에 표시</option></select></div>
         <div class="form-row"><label class="label" for="sort">게시 순서</label><input class="field" id="sort" type="number" step="1" value="0"><p class="note">값이 클수록 목록 상단에 표시됩니다.</p></div>
+      </div>
+      <div class="preview-seo" id="seoPreview" aria-live="polite">
+        <div class="seo-link">jakgastudio-temp.vercel.app › news › 행사주소</div>
+        <div class="seo-title" id="seoPreviewTitle">제주 독서모임·글쓰기 모임 | 작가작업실 JEJU</div>
+        <div class="seo-desc" id="seoPreviewDesc">모임·행사의 내용, 일정, 참가 방법을 안내합니다.</div>
       </div>
       <div class="edit-footer">
         <button type="button" class="btn secondary" id="cancelBtn">취소 · 목록으로</button>
+        <button type="button" class="btn secondary" id="previewBtn">미리보기</button>
         <button type="submit" class="btn" id="saveBtn">저장하기</button>
       </div>
     </form>
@@ -289,6 +332,20 @@ tbody tr:last-child td{border-bottom:0}
 </section>
 </div>
 
+<dialog class="dialog-confirm" id="deleteDialog" aria-labelledby="deleteHeading">
+  <h2 id="deleteHeading">모임·행사 삭제</h2>
+  <p>이 행사를 삭제하시겠습니까?</p>
+  <div class="dialog-item" id="deleteItemTitle"></div>
+  <p>삭제된 콘텐츠와 행사 상세 URL은 복구할 수 없습니다. 기록을 남기려면 삭제 대신 진행 상태를 '종료'로 변경하세요.</p>
+  <div class="dialog-actions"><button type="button" class="btn secondary" id="deleteCancel">취소</button><button type="button" class="btn danger" id="deleteConfirm">삭제</button></div>
+</dialog>
+<dialog class="dialog-confirm" id="previewDialog" aria-labelledby="previewHeading">
+  <h2 id="previewHeading">모임·행사 미리보기</h2>
+  <h3 id="previewTitle"></h3>
+  <p id="previewMeta"></p>
+  <div id="previewContent" class="editor-preview-body"></div>
+  <div class="dialog-actions"><button type="button" class="btn secondary" id="previewClose">닫기</button></div>
+</dialog>
 <script src="/assets/admin-session.js"></script>
 <script>
 (function () {
@@ -300,7 +357,31 @@ tbody tr:last-child td{border-bottom:0}
   let imgs = [];
   let cover = 0;
   let saving = false;
-  const statusNames = { ongoing:'진행중', ended:'종료' };
+  const statusNames = { ongoing:'진행 중', ended:'종료' };
+  const eventNames={reading:'독서',writing:'글쓰기',themed:'주제모임',special:'특별행사'};
+  const operatorNames={studio:'작가작업실 JEJU 운영',rental:'대관 행사'};
+  const operatorRow=$('organizerRow');
+  function syncOperator(){
+    const rental=$('operatorType').value==='rental';
+    operatorRow.hidden=!rental;
+    $('externalOrganizer').required=rental;
+    if(!rental)$('externalOrganizer').value='';
+  }
+  $('operatorType').addEventListener('change',syncOperator);
+  function updateSeoPreview(){
+    $('seoPreviewTitle').textContent=($('title').value.trim()||'제주 모임·행사')+' | 작가작업실 JEJU';
+    const text=$('content').textContent.trim().replace(/\\s+/g,' ');
+    $('seoPreviewDesc').textContent=text.slice(0,145)||'모임·행사의 진행 내용, 일정과 참가 방법을 안내합니다.';
+  }
+  $('title').addEventListener('input',updateSeoPreview);
+  $('content').addEventListener('input',updateSeoPreview);
+  $('previewBtn').addEventListener('click',()=>{
+    $('previewTitle').textContent=$('title').value||'행사 제목을 입력해 주세요.';
+    $('previewMeta').textContent=[$('eventType').selectedOptions[0]?.textContent,$('operatorType').selectedOptions[0]?.textContent,$('status').selectedOptions[0]?.textContent].filter(Boolean).join(' · ');
+    $('previewContent').innerHTML=$('content').innerHTML;
+    $('previewDialog').showModal();
+  });
+  $('previewClose').addEventListener('click',()=>$('previewDialog').close());
 
   function message(s, error) {
     $('message').textContent = s || '';
@@ -357,8 +438,12 @@ tbody tr:last-child td{border-bottom:0}
   });
   function filterList() {
     const term = $('search').value.trim().toLocaleLowerCase('ko');
-    const state = $('filter').value;
-    const rows = posts.filter(p => (state === 'all' || p.status === state) && String(p.title || '').toLocaleLowerCase('ko').includes(term));
+    const state=$('filter').value,kind=$('filterType').value,operator=$('filterOperator').value;
+    const rows=posts.filter(p=>
+      (state==='all'||p.status===state)&&
+      (kind==='all'||(kind==='legacy'?!p.event_type:p.event_type===kind))&&
+      (operator==='all'||(operator==='legacy'?!p.operator_type:p.operator_type===operator))&&
+      String(p.title||'').toLocaleLowerCase('ko').includes(term));
     const area = $('listArea');
     area.replaceChildren();
     if(!rows.length) {
@@ -367,7 +452,7 @@ tbody tr:last-child td{border-bottom:0}
       const table = el('table');
       const thead = el('thead');
       const tr = el('tr');
-      ['소식','상태','마지막 수정','관리'].forEach(s => tr.appendChild(el('th','',s)));
+      ['모임·행사','유형','운영 구분','상태','마지막 수정','관리'].forEach(s => tr.appendChild(el('th','',s)));
       thead.appendChild(tr); table.appendChild(thead);
       const tbody = el('tbody');
       rows.forEach(p => {
@@ -384,6 +469,8 @@ tbody tr:last-child td{border-bottom:0}
         if(displayEventDate(p))desc.appendChild(el('div','post-sub','날짜: '+displayEventDate(p)));
         desc.appendChild(el('div','post-sub','사진 ' + (p.images?.length || 0) + '장'));
         info.appendChild(desc); td0.appendChild(info); tr.appendChild(td0);
+        const tdType=el('td');tdType.appendChild(el('span','event-class',eventNames[p.event_type]||'미분류'));tr.appendChild(tdType);
+        const tdOperator=el('td');tdOperator.appendChild(el('span','event-class'+(p.operator_type==='rental'?' rental':''),operatorNames[p.operator_type]||'미분류'));tr.appendChild(tdOperator);
         const td1 = el('td');
         td1.appendChild(el('span','badge ' + (p.status === 'ongoing' ? 'public' : 'ended'), statusNames[p.status] || p.status));
         tr.appendChild(td1);
@@ -442,6 +529,10 @@ tbody tr:last-child td{border-bottom:0}
     $('postId').value = '';
     $('sort').value = 0;
     $('status').value='ongoing';
+    $('eventType').value='';
+    $('operatorType').value='';
+    $('externalOrganizer').value='';
+    syncOperator();updateSeoPreview();
     $('dateMode').value='none';
     $('eventDateStart').value='';
     $('eventDateEnd').value='';
@@ -450,7 +541,7 @@ tbody tr:last-child td{border-bottom:0}
   }
   function newPost() {
     message('');resetForm();
-    $('editHeading').textContent='새 소식 등록';
+    $('editHeading').textContent='새 모임·행사 등록';
     $('editSubline').textContent='내용을 입력하고 임시저장 또는 공개로 등록하세요.';
     $('saveBtn').textContent='등록하기';
     show('editView');
@@ -463,6 +554,10 @@ tbody tr:last-child td{border-bottom:0}
     if(/<\s*\/?\s*(p|div|h2|h3|b|strong|em|i|u|ul|ol|li|span|a|br)\b/i.test(p.content||''))$('content').innerHTML=p.content||'';
     else $('content').textContent=p.content||'';
     $('status').value=p.status||'ongoing';
+    $('eventType').value=p.event_type||'';
+    $('operatorType').value=p.operator_type||'';
+    $('externalOrganizer').value=p.external_organizer||'';
+    syncOperator();updateSeoPreview();
     $('sort').value=p.sort_order||0;
     $('dateMode').value=p.event_date_start?(p.event_date_end?'range':'day'):'none';
     $('eventDateStart').value=p.event_date_start||'';
@@ -471,22 +566,42 @@ tbody tr:last-child td{border-bottom:0}
     imgs=Array.isArray(p.images)?p.images.slice(0,20):[];
     cover=Math.max(0,Math.min(Number(p.cover_index)||0,imgs.length-1));
     renderPhotos();
-    $('editHeading').textContent='운영 소식 수정';
+    $('editHeading').textContent='모임·행사 수정';
     $('editSubline').textContent='기존 내용을 불러왔습니다. 변경 후 저장하기를 선택하세요.';
     $('saveBtn').textContent='수정 내용 저장';
     show('editView');
   }
+  function confirmDeletion(p){
+    return new Promise(resolve=>{
+      const dlg=$('deleteDialog');
+      $('deleteItemTitle').textContent=p.title;
+      let decided=false;
+      const finish=value=>{if(decided)return;decided=true;cleanup();dlg.close();resolve(value);};
+      const cancel=()=>finish(false),accept=()=>finish(true);
+      const dismiss=()=>{if(!decided){decided=true;cleanup();resolve(false);}};
+      const cleanup=()=>{
+       $('deleteCancel').removeEventListener('click',cancel);
+       $('deleteConfirm').removeEventListener('click',accept);
+       dlg.removeEventListener('close',dismiss);
+      };
+      $('deleteCancel').addEventListener('click',cancel);
+      $('deleteConfirm').addEventListener('click',accept);
+      dlg.addEventListener('close',dismiss);
+      dlg.showModal();
+    });
+  }
   async function deletePost(p) {
-    const ok = window.confirm('"' + p.title + '" 게시물을 삭제하시겠습니까?\n\n삭제한 게시물은 되돌릴 수 없습니다.\n(업로드 사진 파일은 서버에 남을 수 있습니다.)');
-    if(!ok) return;
-    try {
+    if(!await confirmDeletion(p))return;
+    try{
       await api('/api/admin?id='+encodeURIComponent(p.id),{method:'DELETE'});
-      message('게시물이 삭제되었습니다.');
+      message('모임·행사가 삭제되었습니다.');
       await loadPosts();
-    } catch(e) { message('삭제 실패: '+e.message,true); }
+    }catch(e){message('삭제 실패: '+e.message,true);}
   }
   $('search').addEventListener('input',filterList);
   $('filter').addEventListener('change',filterList);
+  $('filterType').addEventListener('change',filterList);
+  $('filterOperator').addEventListener('change',filterList);
   $('newBtn').addEventListener('click',newPost);
   $('backBtn').addEventListener('click',() => {message('');show('listView');});
   $('cancelBtn').addEventListener('click',() => {message('');show('listView');});
@@ -829,12 +944,14 @@ tbody tr:last-child td{border-bottom:0}
     const end=mode==='range'?$('eventDateEnd').value:null;
     if(mode!=='none'&&!start)return message('날짜를 선택해 주세요.',true);
     if(mode==='range'&&(!end||end<start))return message('종료일은 시작일 이후로 설정해 주세요.',true);
-    const payload={id,title:$('title').value.trim(),slug:$('slug').value.trim(),content:$('content').innerHTML,images:imgs.slice(),cover_index:cover,status:$('status').value,sort_order:Number($('sort').value)||0,date_mode:mode,event_date_start:start,event_date_end:end};
+    if(!$('eventType').value||!$('operatorType').value)return message('콘텐츠 유형과 운영 구분을 선택해 주세요.',true);
+    if($('operatorType').value==='rental'&&!$('externalOrganizer').value.trim())return message('대관 행사 주최자를 입력해 주세요.',true);
+    const payload={id,title:$('title').value.trim(),slug:$('slug').value.trim(),content:$('content').innerHTML,images:imgs.slice(),cover_index:cover,status:$('status').value,sort_order:Number($('sort').value)||0,date_mode:mode,event_date_start:start,event_date_end:end,event_type:$('eventType').value,operator_type:$('operatorType').value,external_organizer:$('externalOrganizer').value.trim()};
     saving=true;$('saveBtn').disabled=true;message('게시물을 저장하는 중…');
     try {
       await api('/api/admin',{method:id?'PATCH':'POST',body:JSON.stringify(payload)});
       resetForm();show('listView');await loadPosts();
-      message(id?'수정 내용을 저장했습니다.':'새 운영 소식을 등록했습니다.');
+      message(id?'수정 내용을 저장했습니다.':'새 모임·행사를 등록했습니다.');
     } catch(err) {message('저장 실패: '+err.message,true);}
     finally {saving=false;$('saveBtn').disabled=false;}
   });
