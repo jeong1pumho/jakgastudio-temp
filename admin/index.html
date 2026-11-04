@@ -447,7 +447,7 @@ tbody tr:last-child td{border-bottom:0}
     const area = $('listArea');
     area.replaceChildren();
     if(!rows.length) {
-      area.appendChild(el('div','empty-state', posts.length ? '검색 조건에 맞는 소식이 없습니다.' : '아직 등록된 운영 소식이 없습니다. 새 소식을 등록해 보세요.'));
+      area.appendChild(el('div','empty-state', posts.length ? '검색 조건에 맞는 모임·행사가 없습니다.' : '아직 등록된 모임·행사가 없습니다. 새 모임·행사를 등록해 보세요.'));
     } else {
       const table = el('table');
       const thead = el('thead');

@@ -32,6 +32,7 @@ module.exports=async(req,res)=>{
   const urlPath=(req.url||'').split('?')[0];
   const slug=(typeof req.query?.slug==='string'?req.query.slug:'')|| (urlPath.includes('/news/')?decodeURIComponent(urlPath.split('/news/')[1]||''):'');
   const listing=!slug||slug==='news';
+  if(listing){res.setHeader('Cache-Control','no-store');return res.redirect(308,'/news');}
   if(!listing&&!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug))return res.status(404).send('소식을 찾을 수 없습니다.');
   const q='/rest/v1/news_posts?select='+selected+(listing?'&status=eq.ended&order=sort_order.desc,published_at.desc.nullslast,created_at.desc':'&slug=eq.'+encodeURIComponent(slug)+'&limit=1');
   let rows;
@@ -74,7 +75,7 @@ module.exports=async(req,res)=>{
     ?(entry.title.includes('작가작업실')?entry.title:entry.title+' | 작가작업실 JEJU')
     :'소식 | 독서모임·글쓰기 클래스·북나이트 · 작가작업실 JEJU';
   const seoDescription=entry
-    ?(plainDescription(renderContent(entry.content),155)||'제주 이호테우 작가작업실 JEJU의 '+entry.title+' 관련 소식입니다.')
+    ?(plainDescription(renderContent(entry.content),155)||'제주 이호테우 작가작업실 JEJU의 '+entry.title+' 관련 모임·행사 안내입니다.')
     :'제주 이호테우의 작가작업실 JEJU에서 전하는 책방, 독서모임, 글쓰기 클래스, 북나이트와 북토크 운영 소식.';
   const images=entry&&Array.isArray(entry.images)?entry.images:[];
   const cover=entry?safeImage(images[entry.cover_index]||images[0]):'';
@@ -114,5 +115,5 @@ module.exports=async(req,res)=>{
   res.setHeader('Cache-Control','no-store');
   res.setHeader('X-Robots-Tag','noindex, nofollow');
   res.end('<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow">'+seoHead+'<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&amp;family=IBM+Plex+Sans+KR&amp;family=Gothic+A1&amp;family=Nanum+Gothic&amp;family=Gowun+Dodum&amp;family=Black+Han+Sans&amp;family=Do+Hyeon&amp;family=Jua&amp;family=Sunflower&amp;family=Noto+Serif+KR&amp;family=Nanum+Myeongjo&amp;family=Gowun+Batang&amp;family=Hahmlet&amp;family=Song+Myung&amp;family=Gaegu&amp;family=Gamja+Flower&amp;family=Single+Day&amp;family=Yeon+Sung&amp;family=Nanum+Pen+Script&amp;family=Nanum+Brush+Script&amp;family=Poor+Story&amp;family=Hi+Melody&amp;family=Cute+Font&amp;display=swap"><style>'+style+dateStyles+extraStyle+'</style></head><body><header class="top"><div class="top-inner"><a href="/#news">작가작업실 JEJU</a><a href="/news">지난 모임·행사</a></div></header><main class="wrap"><div class="section-title"><p class="eyebrow">02 <b>MEETINGS &amp; EVENTS</b></p><div class="heading"><h1>모임·행사</h1></div></div>'+body+'<a class="back" href="/#news">모임·행사로 돌아가기</a></main>'+script+'</body></html>');
- }catch(e){res.status(e.status||500).send('운영 소식을 불러오지 못했습니다.');}
+ }catch(e){res.status(e.status||500).send('모임·행사를 불러오지 못했습니다.');}
 };
