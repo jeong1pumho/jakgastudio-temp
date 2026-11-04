@@ -510,7 +510,25 @@ strong,b{font-weight:700}
 .news-card img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;background:#f4f1eb}
 .news-card h3{font-size:20px;line-height:1.4;text-align:center;font-weight:500;margin-top:18px;margin-bottom:0}
 .news-card .news-date{margin:7px 0 0;text-align:center;color:#857f78;font-size:14px;font-weight:400;line-height:1.5;overflow-wrap:anywhere}
-.news-all{text-align:right;margin-top:30px}.news-all a{color:#534336;text-decoration:underline}
+.news-section-intro{max-width:820px;margin:14px 0 0;color:#6d655d;font-size:15px;line-height:1.9}
+.news-subsection{margin-top:48px}.news-subsection+.news-subsection{margin-top:80px;padding-top:55px;border-top:1px solid var(--line)}
+.news-subtitle{font-size:25px;font-weight:500;line-height:1.4;color:#3b342f;letter-spacing:-.035em;margin:0}
+.news-section .news-grid{margin-top:30px}.news-section .news-card{text-align:center}
+.news-tagline{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:5px;margin:10px 0 0;color:#82776b;font-size:12px}
+.news-tagline .operator-label{background:#f1ece7;border-radius:2px;padding:3px 7px;color:#5b4b3c}
+.news-actions{text-align:center;margin-top:29px}
+.news-toggle,.news-archive-link{font:inherit;display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:12px 28px;color:#514236;border:1px solid #b9a99b;background:transparent;text-decoration:none;font-size:14px;cursor:pointer;min-height:44px}
+.news-toggle:hover,.news-archive-link:hover{background:#f7f2ee}.news-toggle[hidden],.news-archive-link[hidden],.rental-case-showcase[hidden]{display:none!important}
+.news-empty{font-size:14px;color:#82786e;padding:16px 0}
+.rental-case-showcase{padding:37px 0 53px;border-bottom:1px solid var(--line);grid-column:1/-1}
+.rental-case-showcase h4{font-size:24px;font-weight:500;line-height:1.5;margin:0;color:#41382f}
+.rental-case-showcase>p{font-size:14px;color:#746a61;margin:7px 0 23px;line-height:1.7}
+.rental-case-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+.rental-case-grid .news-card img{aspect-ratio:4/3}
+.rental-case-grid .news-card h3{font-size:17px;margin-top:14px}
+.rental-more{text-align:center;margin-top:27px}
+@media(max-width:740px){.news-section-intro{font-size:13px}.news-subsection{margin-top:30px}.news-subsection+.news-subsection{margin-top:54px;padding-top:37px}.news-subtitle{font-size:19px}.news-section .news-grid{margin-top:23px}.news-tagline{font-size:11px}.rental-case-showcase{padding:28px 0}.rental-case-showcase h4{font-size:20px}.rental-case-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 12px}.rental-case-grid .news-card h3{font-size:14px}}
+
 @media(max-width:740px){.news-section{padding:60px 0}.news-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 12px}.news-card h3{font-size:14px}.kv-text{left:7%;top:42%;width:78vw}}
 @media(prefers-reduced-motion:reduce){.kv-img{transition:none}}
 
@@ -1075,7 +1093,7 @@ strong,b{font-weight:700}
   <div class="kv-carousel-scrim" aria-hidden="true"></div>
   <nav class="kv-video-nav" aria-label="홈페이지 섹션 바로가기">
     <a href="#brand-story">브랜드</a>
-    <a href="#news">소식</a>
+    <a href="#news">모임·행사</a>
     <a href="#space">공간소개</a>
     <a href="#program">운영 프로그램</a>
     <a href="#hours">운영시간</a>
@@ -1186,8 +1204,19 @@ strong,b{font-weight:700}
 </div></div></div>
 </section>
 <section class="section news-section" id="news" aria-labelledby="news-title"><div class="content-width">
-<div class="section-heading"><p class="eyebrow">02 <span>NEWS</span><i></i></p><div class="heading-line"><h2 id="news-title">소식</h2></div></div>
-<div id="news-cards" class="news-grid" aria-live="polite"><p>운영 소식을 불러오는 중입니다.</p></div><p class="news-all"><a href="/news">지난 소식 보기 →</a></p></div></section>
+<div class="section-heading"><p class="eyebrow">02 <span>MEETINGS &amp; EVENTS</span><i></i></p><div class="heading-line"><h2 id="news-title">모임·행사</h2></div></div>
+<p class="news-section-intro">제주 독서모임, 글쓰기 클래스, 북토크 등 작가작업실 JEJU에서 열리는 다양한 모임과 행사를 만나보세요.</p>
+<section class="news-subsection" aria-labelledby="ongoing-title">
+<h3 class="news-subtitle" id="ongoing-title">진행 중인 모임·행사</h3>
+<div id="news-cards" class="news-grid" aria-live="polite"><p class="news-empty">진행 중인 모임·행사를 불러오는 중입니다.</p></div>
+<div class="news-actions"><button class="news-toggle" id="news-more" type="button" aria-expanded="false" hidden>진행 중인 모임·행사 더 보기 <span aria-hidden="true">⌄</span></button></div>
+</section>
+<section class="news-subsection" aria-labelledby="ended-title">
+<h3 class="news-subtitle" id="ended-title">종료된 모임·행사</h3>
+<div id="ended-cards" class="news-grid" aria-live="polite"><p class="news-empty">지난 모임·행사를 불러오는 중입니다.</p></div>
+<div class="news-actions"><a class="news-archive-link" href="/news">지난 모임·행사 전체 보기 <span aria-hidden="true">↗</span></a></div>
+</section>
+</div></section>
 <section aria-labelledby="space-title" class="section space-section" id="space">
 <div class="content-width">
 <div class="section-heading space-heading">
@@ -1257,6 +1286,12 @@ strong,b{font-weight:700}
 <div class="program-copy"><p>제주 이호테우에서 독서모임이나 글쓰기 모임, 소규모 북토크를 열 공간을 찾고 계신가요?</p><p>작가작업실 JEJU에서<br/>책과 이야기에만 집중할 수 있는 독립적인 공간을 대관합니다.</p><p>방해받지 않고 우리만의 편안한 시간을 만들어보세요.</p><p class="tiny-note">*공간 대관 연락처 | 010-5065-7776</p></div>
 <figure class="program-figure"><img alt="책상과 의자가 있는 모임 대관 공간" class="" decoding="async" loading="lazy" src="https://www.jakgastudio.com/assets/final_rental.webp"/></figure>
 </article>
+<aside id="rental-case-showcase" class="rental-case-showcase" aria-labelledby="rental-case-title" hidden>
+<h4 id="rental-case-title">이 공간에서 열린 모임·행사</h4>
+<p>작가작업실 JEJU를 대관해 진행한 모임과 행사의 기록을 소개합니다.</p>
+<div id="rental-case-grid" class="rental-case-grid"></div>
+<div class="rental-more"><a href="/news?operator=rental" class="news-archive-link">대관 사례 전체 보기 <span aria-hidden="true">↗</span></a></div>
+</aside>
 <article aria-labelledby="prog-05" class="program-row">
 <div class="program-heading"><div class="item-index">05<i></i></div><h3 id="prog-05">행사 기획 및 운영</h3>
 <p class="program-meta">(북토크 등)</p>
@@ -1497,8 +1532,8 @@ strong,b{font-weight:700}
 (()=>{
 const video=document.querySelector('#kv-hero .kv-video');
 if(video&&window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches){video.pause();video.removeAttribute('autoplay');}
-const grid=document.getElementById('news-cards');const safe=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const fmtEventDate=value=>{const v=String(value||'');if(!/^\d{4}-\d{2}-\d{2}$/.test(v))return '';const weekday=['일','월','화','수','목','금','토'][new Date(v+'T00:00:00Z').getUTCDay()];return v.replace(/-/g,'.')+' ('+weekday+')';};const newsDate=item=>{const start=fmtEventDate(item.event_date_start);if(!start)return '';const end=fmtEventDate(item.event_date_end);return '<div class="news-date">'+start+(end?' ~ '+end:'')+'</div>';};fetch('/api/news').then(r=>r.ok?r.json():Promise.reject()).then(d=>{const items=(d.items||[]).slice(0,6);grid.innerHTML=items.length?items.map(x=>'<a class="news-card" href="/news/'+encodeURIComponent(x.slug)+'">'+(x.cover?'<img loading="lazy" src="'+safe(x.cover)+'" alt="'+safe(x.title)+'">':'<div style="aspect-ratio:1;background:#f4f1eb"></div>')+'<h3>'+safe(x.title)+'</h3>'+newsDate(x)+'</a>').join(''):'<p>현재 등록된 운영 소식이 없습니다.</p>'}).catch(()=>grid.innerHTML='<p>운영 소식을 불러오지 못했습니다.</p>');
+
 })();
-</script><script defer src="/assets/schedule.js"></script>
+</script><script defer src="/assets/events.js"></script><script defer src="/assets/schedule.js"></script>
 </body>
 </html>
