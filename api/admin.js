@@ -16,7 +16,11 @@ module.exports=async(req,res)=>{try{
  }
  const token=await admin(req);
  if(req.method==='GET'){
-  const items=await query('/rest/v1/news_posts?select='+selected+'&order=updated_at.desc&limit=200','GET',undefined,token);
+  const items=[];
+  for(let offset=0;offset<10000;offset+=200){
+   const page=await query('/rest/v1/news_posts?select='+selected+'&order=updated_at.desc&limit=200&offset='+offset,'GET',undefined,token);
+   items.push(...page);if(page.length<200)break;
+  }
   return send(res,200,{items});
  }
  if(['POST','PATCH'].includes(req.method)){
@@ -39,8 +43,17 @@ module.exports=async(req,res)=>{try{
   if(mode!=='none'&&!validCalendarDate(event_date_start))return send(res,400,{error:'올바른 날짜를 입력해 주세요.'});
   if(mode==='range'&&(!validCalendarDate(event_date_end)||event_date_end<event_date_start))
     return send(res,400,{error:'종료일은 시작일 이후여야 합니다.'});
+  const event_type=String(b.event_type||'').trim();
+  const operator_type=String(b.operator_type||'').trim();
+  const external_organizer=operator_type==='rental'?String(b.external_organizer||'').trim():null;
+  if(!['reading','writing','themed','special'].includes(event_type))
+   return send(res,400,{error:'콘텐츠 유형을 선택해 주세요.'});
+  if(!['studio','rental'].includes(operator_type))
+   return send(res,400,{error:'운영 구분을 선택해 주세요.'});
+  if(operator_type==='rental'&&(!external_organizer||external_organizer.length>160))
+   return send(res,400,{error:'대관 행사 주최자 이름을 1~160자로 입력해 주세요.'});
   const cover_index=images.length?Math.max(0,Math.min(images.length-1,Number(b.cover_index)||0)):0;
-  const post={slug,title,content,images,cover_index,status,sort_order:Number(b.sort_order)||0,event_date_start,event_date_end};
+  const post={slug,title,content,images,cover_index,status,sort_order:Number(b.sort_order)||0,event_date_start,event_date_end,event_type,operator_type,external_organizer};
   if(req.method==='PATCH'){
    if(!/^[a-f0-9-]{36}$/i.test(b.id||''))return send(res,400,{error:'ID 오류'});
    const rows=await query('/rest/v1/news_posts?select=id,published_at&id=eq.'+encodeURIComponent(b.id),'GET',undefined,token);
