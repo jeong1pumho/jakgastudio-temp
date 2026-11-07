@@ -52,7 +52,7 @@ table{border-collapse:collapse;width:100%;font-size:13px}th,td{border-bottom:1px
 <div id="unconfigured" class="notice" hidden>솔라피 API가 아직 연결되지 않았습니다. API Key·Secret, 허용 IP 설정, 발신번호 승인 상태를 확인하세요. 연결 확인 전까지 관리자 단체문자 발송을 차단합니다.</div>
 <div class="stat-grid"><div class="stat">전체 등록자<b id="count-all">0</b></div><div class="stat">수신동의<b id="count-active">0</b></div><div class="stat">수신거부<b id="count-off">0</b></div></div>
 <div class="tabs"><button class="btn tab active" data-tab="people">등록자 목록</button><button class="btn tab" data-tab="compose">문자 작성</button><button class="btn tab" data-tab="history">발송 이력</button></div>
-<section class="card" id="panel-people"><div class="flex" style="justify-content:space-between"><h2>등록자 목록</h2><div class="flex"><button class="btn primary" type="button" id="manual-open" aria-expanded="false" aria-controls="manual-form-area">+ 방문자 직접 등록</button><button class="btn" type="button" id="sync-080">080 수신거부 동기화</button></div></div>
+<section class="card" id="panel-people"><div class="flex" style="justify-content:space-between"><h2>등록자 목록</h2><div class="flex"><button class="btn primary" type="button" id="manual-open" aria-expanded="false" aria-controls="manual-form-area">+ 방문자 직접 등록</button><button class="btn" type="button" id="sync-080">솔라피 수신거부 가져오기</button></div></div>
 <p class="muted">인증 및 동의가 확인된 등록자만 표시합니다. 발송 전에는 080 수신거부 목록을 다시 확인합니다.</p>
 
 <section id="manual-form-area" class="manual-register" aria-labelledby="manual-form-title" hidden>
