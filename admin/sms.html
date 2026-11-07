@@ -20,8 +20,8 @@ table{border-collapse:collapse;width:100%;font-size:13px}th,td{border-bottom:1px
 <main><h1>문자 알림 관리</h1><p class="muted">모임·행사 및 신규 프로그램 문자 알림 수신동의자 관리와 단체 SMS 발송</p>
 <section id="login-panel" class="card"><h2>관리자 로그인</h2><form id="login-form"><div class="row2"><div><label for="email">이메일</label><input class="field" type="email" id="email" autocomplete="username" required></div><div><label for="password">비밀번호</label><input class="field" type="password" id="password" autocomplete="current-password" required></div></div><p><button class="btn primary" type="submit">로그인</button></p></form></section>
 <section id="dashboard" hidden>
-<div class="flex" style="justify-content:space-between"><p id="connection" class="muted"></p><button class="btn" type="button" id="logout">로그아웃</button></div>
-<div id="unconfigured" class="notice" hidden>솔라피 API Key·Secret 및 발신번호가 아직 연결되지 않아 문자 인증·발송은 비활성화되어 있습니다. 연동 전에 개인정보를 수집하지 않습니다.</div>
+<div class="flex" style="justify-content:space-between"><p id="connection" class="muted"></p><div class="flex"><button class="btn" type="button" id="check-solapi">솔라피 연결 상태 확인</button><button class="btn" type="button" id="logout">로그아웃</button></div></div>
+<div id="unconfigured" class="notice" hidden>솔라피 API가 아직 연결되지 않았습니다. API Key·Secret, 허용 IP 설정, 발신번호 승인 상태를 확인하세요. 연결 확인 전까지 관리자 단체문자 발송을 차단합니다.</div>
 <div class="stat-grid"><div class="stat">전체 등록자<b id="count-all">0</b></div><div class="stat">수신동의<b id="count-active">0</b></div><div class="stat">수신거부<b id="count-off">0</b></div></div>
 <div class="tabs"><button class="btn tab active" data-tab="people">등록자 목록</button><button class="btn tab" data-tab="compose">문자 작성</button><button class="btn tab" data-tab="history">발송 이력</button></div>
 <section class="card" id="panel-people"><div class="flex" style="justify-content:space-between"><h2>등록자 목록</h2><button class="btn" type="button" id="sync-080">080 수신거부 동기화</button></div>

@@ -2,7 +2,7 @@
 "use strict";
 const API="https://qrbavxempotptnmflqoq.supabase.co/functions/v1/studio-sms-news", $=id=>document.getElementById(id);
 const session=window.JAKAdminSession;
-let token="",subscribers=[],events=[],campaigns=[],selected=new Set(),configured=false,sending=false;
+let token="",subscribers=[],events=[],campaigns=[],selected=new Set(),configured=false,verifiedConnection=false,sending=false;
 function notice(s,error=false){$("feedback").textContent=s||"";$("feedback").hidden=!s;$("feedback").classList.toggle("error",error);}
 function dashboard(yes){$("login-panel").hidden=yes;$("dashboard").hidden=!yes;}
 async function call(action,fields={}){
@@ -13,14 +13,39 @@ async function call(action,fields={}){
 }
 async function load(){
  const r=await call("status");subscribers=r.subscribers||[];events=r.events||[];campaigns=r.campaigns||[];configured=r.configured===true;
- $("unconfigured").hidden=configured;$("connection").textContent=configured?"솔라피 설정 연결됨":"테스트 사이트 · 솔라피 인증정보 설정 대기";
+ verifiedConnection=false;$("unconfigured").hidden=false;$("connection").textContent=configured?"설정값 확인됨 · API 검증 필요":"테스트 사이트 · 솔라피 인증정보 설정 대기";
  $("count-all").textContent=subscribers.length;
  $("count-active").textContent=subscribers.filter(x=>x.status==="active").length;
  $("count-off").textContent=subscribers.filter(x=>x.status==="unsubscribed").length;
  $("event").replaceChildren();
  for(const e of events){const opt=document.createElement("option");opt.value=e.id;opt.textContent=e.title+" · "+(e.status==="ongoing"?"진행 중":"종료");$("event").append(opt);}
  if(!events.length){const opt=document.createElement("option");opt.textContent="등록된 행사가 없습니다.";opt.value="";$("event").append(opt);}
- $("send").disabled=!configured||!events.length;renderPeople();renderHistory();preview();dashboard(true);
+ $("send").disabled=true;renderPeople();renderHistory();preview();dashboard(true);await checkConnection();
+}
+async function checkConnection(){
+ const button=$("check-solapi");button.disabled=true;$("send").disabled=true;verifiedConnection=false;
+ try{
+  const result=await call("connection_check");
+  verifiedConnection=!!(result.configured&&result.authenticated&&result.senderApproved&&result.blacklistAvailable&&result.balanceAvailable&&result.sufficientSmsBalance);
+  if(verifiedConnection){
+   $("unconfigured").hidden=true;$("connection").textContent="솔라피 인증·발신번호·080 수신거부 조회 정상";
+  }else{
+   $("unconfigured").hidden=false;
+   let message="솔라피 연결 점검 실패: ";
+   if(!result.configured)message+="API Key·Secret·발신번호 설정을 확인하세요.";
+   else if((result.errors||[]).some(x=>String(x).includes("403")))message+="API 접근이 차단되었습니다. 솔라피 API Key의 ‘허용 IP 제한’을 확인하세요.";
+   else if(!result.senderApproved)message+="등록된 발신번호가 ACTIVE 상태인지 확인하세요.";
+   else if(!result.sufficientSmsBalance)message+="문자 발송 잔액이 부족합니다.";
+   else message+="잔액 및 수신거부 목록 조회 설정을 확인하세요.";
+   $("unconfigured").textContent=message;
+   $("connection").textContent="솔라피 API 검증 실패 · 발송 차단";
+  }
+ }catch(error){
+  $("unconfigured").hidden=false;$("unconfigured").textContent="솔라피 연결 상태를 확인할 수 없습니다: "+error.message;
+  $("connection").textContent="API 점검 실패 · 발송 차단";
+ }finally{
+  button.disabled=false;$("send").disabled=!verifiedConnection||!events.length;
+ }
 }
 const cell=(tr,s)=>{const e=document.createElement("td");e.textContent=s;tr.append(e);return e;};
 function renderPeople(){
@@ -55,9 +80,10 @@ for(const b of document.querySelectorAll("[data-tab]"))b.addEventListener("click
 $("filter").addEventListener("change",renderPeople);
 $("message").addEventListener("input",preview);
 $("event").addEventListener("change",()=>{const e=events.find(x=>x.id===$("event").value);if(e){$("message").value="새로운 모임·행사 안내\n"+e.title+"\n일정 및 참여 방법: www.jakgastudio.com/news";preview()}});
+$("check-solapi").addEventListener("click",()=>checkConnection());
 $("sync-080").addEventListener("click",async()=>{const btn=$("sync-080");btn.disabled=true;try{const r=await call("sync_blocks");notice("080 수신거부 "+r.blocked+"건 확인, 신규 "+r.updated+"건 반영");await load()}catch(e){notice(e.message,true)}finally{btn.disabled=false}});
 $("send").addEventListener("click",async()=>{
- if(sending||!configured)return;
+ if(sending||!verifiedConnection)return;
  const eventId=$("event").value,text=$("message").value.trim(),mode=document.querySelector("input[name=targets]:checked").value;
  const target=subscribers.filter(x=>x.status==="active"&&(mode==="all"||selected.has(x.id)));
  if(!eventId||!text||!target.length)return notice("행사·문구·수신 대상을 확인해 주세요.",true);
@@ -66,7 +92,7 @@ $("send").addEventListener("click",async()=>{
  if(!confirm("솔라피 문자 발송 비용이 발생합니다.\n행사: "+events.find(x=>x.id===eventId)?.title+"\n수신 대상: 최대 "+target.length+"명\n\n수신거부를 제외하고 발송 접수하시겠습니까?"))return;
  sending=true;$("send").disabled=true;notice("");
  try{const r=await call("send",{eventId,text,mode,selectedIds:[...selected],confirmed:true});notice("솔라피 접수 "+r.accepted+"명, 수신거부 제외 "+r.blocked+"명. 실제 전달 결과는 솔라피에서 확인해 주세요.");await load();document.querySelector('[data-tab="history"]').click();}
- catch(e){notice(e.message,true)}finally{sending=false;$("send").disabled=!configured;}
+ catch(e){notice(e.message,true)}finally{sending=false;$("send").disabled=!verifiedConnection;}
 });
 $("login-form").addEventListener("submit",async e=>{
  e.preventDefault();const btn=e.target.querySelector("button");btn.disabled=true;notice("");
