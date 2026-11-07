@@ -2,7 +2,7 @@
 "use strict";
 const API="https://qrbavxempotptnmflqoq.supabase.co/functions/v1/studio-sms-news", $=id=>document.getElementById(id);
 const session=window.JAKAdminSession;
-let token="",subscribers=[],events=[],campaigns=[],selected=new Set(),configured=false,verifiedConnection=false,sending=false,lastDraftEvent=null;
+let token="",subscribers=[],events=[],campaigns=[],selected=new Set(),configured=false,verifiedConnection=false,sending=false,lastDraftEvent=null,editingManualId=null;
 function notice(s,error=false){$("feedback").textContent=s||"";$("feedback").hidden=!s;$("feedback").classList.toggle("error",error);}
 function dashboard(yes){$("login-panel").hidden=yes;$("dashboard").hidden=!yes;}
 async function call(action,fields={}){
@@ -88,17 +88,82 @@ function renderPeople(){
   box.setAttribute("aria-label",p.name+" 선택");box.addEventListener("change",()=>{if(box.checked)selected.add(p.id);else selected.delete(p.id);updateCount();});
   const first=document.createElement("td");first.append(box);tr.append(first);
   const name=cell(tr,p.name),phone=document.createElement("small");phone.textContent=p.phone;name.append(phone);
+  const origin=document.createElement("span");origin.className="manual-source"+(p.entry_source==="manual"?"":" web");
+  origin.textContent=p.entry_source==="manual"?"현장 동의 · 문자 미인증":"온라인 SMS 인증";
+  name.append(origin);
   cell(tr,p.status==="active"?"수신동의":"수신거부");
   cell(tr,new Date(p.subscribed_at).toLocaleDateString("ko-KR",{timeZone:"Asia/Seoul"}));
   const action=document.createElement("td");
-  if(p.status==="active"){const btn=document.createElement("button");btn.className="btn";btn.textContent="수신거부";
-   btn.addEventListener("click",async()=>{if(!confirm(p.name+"님의 수신을 거부 처리합니까?"))return;try{await call("unsubscribe",{id:p.id});notice("수신거부가 반영되었습니다.");selected.delete(p.id);await load()}catch(e){notice(e.message,true)}});action.append(btn);}
-  else action.textContent="-";
+  if(p.status==="active"){
+   if(p.entry_source==="manual"){
+    const edit=document.createElement("button");edit.type="button";edit.className="btn";edit.textContent="수정";
+    edit.addEventListener("click",()=>openManualForm(p));action.append(edit,document.createTextNode(" "));
+   }
+   const btn=document.createElement("button");btn.className="btn";btn.type="button";btn.textContent="수신거부";
+   btn.addEventListener("click",async()=>{if(!confirm(p.name+"님의 수신을 거부 처리합니까?"))return;try{await call("unsubscribe",{id:p.id});notice("수신거부가 반영되었습니다.");selected.delete(p.id);await load()}catch(e){notice(e.message,true)}});action.append(btn);
+  }else action.textContent="처리 완료";
   tr.append(action);dest.append(tr);
  }
  if(!dest.children.length){const tr=document.createElement("tr"),td=document.createElement("td");td.colSpan=5;td.textContent="등록자가 없습니다.";tr.append(td);dest.append(tr)}
  updateCount();
 }
+
+const todaySeoul=()=>new Date(Date.now()+9*3600000).toISOString().slice(0,10);
+function closeManualForm(){
+ editingManualId=null;$("manual-form-area").hidden=true;
+ $("manual-open").setAttribute("aria-expanded","false");$("manual-form").reset();
+ $("manual-form-title").textContent="방문자 직접 등록";
+ $("manual-save").textContent="방문자 등록";
+}
+function openManualForm(existing=null){
+ editingManualId=existing?.id||null;
+ $("manual-form").reset();
+ $("manual-consent-date").max=todaySeoul();
+ $("manual-consent-date").value=existing?.manual_consent_date||todaySeoul();
+ if(existing){
+  if(existing.entry_source!=="manual"||existing.status!=="active")return notice("현장 등록한 활성 수신동의자만 직접 수정할 수 있습니다.",true);
+  $("manual-name").value=existing.name;$("manual-phone").value=existing.phone;
+  $("manual-consent-method").value=existing.consent_method||"";
+  $("manual-evidence").value=existing.consent_evidence||"";
+  $("manual-form-title").textContent="현장 등록자 수정";
+  $("manual-save").textContent="정보 수정";
+ }else{
+  $("manual-form-title").textContent="방문자 직접 등록";$("manual-save").textContent="방문자 등록";
+ }
+ // The administrator must actively re-acknowledge both separately obtained consents.
+ $("manual-privacy").checked=false;$("manual-marketing").checked=false;
+ $("manual-form-area").hidden=false;$("manual-open").setAttribute("aria-expanded","true");
+ $("manual-form-area").scrollIntoView({behavior:"smooth",block:"nearest"});
+ $("manual-name").focus();
+ notice("");
+}
+$("manual-open").addEventListener("click",()=>$("manual-form-area").hidden?openManualForm():closeManualForm());
+$("manual-cancel").addEventListener("click",closeManualForm);
+$("manual-form").addEventListener("submit",async e=>{
+ e.preventDefault();
+ const name=$("manual-name").value.trim(),phone=$("manual-phone").value.replace(/\D/g,"");
+ const consentDate=$("manual-consent-date").value,consentMethod=$("manual-consent-method").value;
+ const evidence=$("manual-evidence").value.trim();
+ if(!/^01[016789]\d{7,8}$/.test(phone))return notice("정확한 휴대폰 번호를 입력해 주세요.",true);
+ if(!name||name.length>40||evidence.length<10||evidence.length>500)return notice("이름과 동의 기록(10~500자)을 확인해 주세요.",true);
+ if(!$("manual-privacy").checked||!$("manual-marketing").checked)return notice("방문자의 개인정보 및 광고성 SMS 수신 동의를 각각 확인해 주세요.",true);
+ const existing=editingManualId?subscribers.find(x=>x.id===editingManualId):null;
+ const changingPhone=!!(existing&&phone!==existing.phone);
+ const summary=(editingManualId?"현장 등록자의 정보 수정":"현장 방문자 신규 등록")+"\n"+
+   "이름: "+name+"\n휴대폰: "+phone+"\n동의 방법: "+$("manual-consent-method").selectedOptions[0]?.textContent+"\n동의일: "+consentDate+
+   (changingPhone?"\n\n휴대폰 번호가 변경되었습니다. 새 번호의 명시적 동의 확인 기록이 필요합니다.":"")+
+   "\n\n방문자가 개인정보 수집·이용과 광고성 문자 수신에 명시적으로 동의했는지 확인한 후 저장하시겠습니까?";
+ if(!confirm(summary))return;
+ const button=$("manual-save");button.disabled=true;button.textContent="확인 중...";
+ try{
+  const payload={name,phone,consentDate,consentMethod,evidence,privacyAgreed:true,marketingAgreed:true};
+  const result=await call(editingManualId?"manual_update":"manual_register",editingManualId?{...payload,id:editingManualId}:payload);
+  closeManualForm();
+  await load();
+  notice(result.message||"현장 방문자 등록을 완료했습니다.");
+ }catch(error){notice(error.message,true);}
+ finally{button.disabled=false;if(!$("manual-form-area").hidden)button.textContent=editingManualId?"정보 수정":"방문자 등록";}
+});
 function updateCount(){$("chosen-count").textContent=subscribers.filter(p=>p.status==="active"&&selected.has(p.id)).length}
 function renderHistory(){const dest=$("history");dest.replaceChildren();
  for(const c of campaigns){const tr=document.createElement("tr");cell(tr,new Date(c.created_at).toLocaleString("ko-KR",{timeZone:"Asia/Seoul"}));cell(tr,c.event_title);cell(tr,String(c.recipient_count));cell(tr,String(c.blocked_count));cell(tr,c.status==="accepted"?"솔라피 접수":c.status==="failed"?"발송 확인 필요":"접수 준비 중");dest.append(tr);}

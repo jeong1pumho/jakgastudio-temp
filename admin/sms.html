@@ -15,6 +15,22 @@ input.field,select.field,textarea.field{border:1px solid #d7cabc;padding:12px;ba
 table{border-collapse:collapse;width:100%;font-size:13px}th,td{border-bottom:1px solid #ece6de;text-align:left;padding:11px 7px}th{background:#faf8f5;color:#75685d}td small{display:block;color:#84776e}
 .table{overflow-x:auto}.preview{background:#f5f0e9;border:1px solid #ded2c6;min-height:185px;padding:17px;white-space:pre-wrap;overflow-wrap:anywhere}
 [hidden]{display:none!important}@media(max-width:700px){.card{padding:15px}main{padding:20px 12px}.row2{grid-template-columns:1fr}.stat-grid{gap:6px}.stat{padding:10px}.table table{min-width:580px}}
+
+.manual-register{margin:15px 0 24px;padding:22px;background:#fcfaf7;border:1px solid #d7c9ba}
+.manual-register h3{font-size:19px;font-weight:600;margin:0 0 9px}
+.manual-register p{margin:5px 0 15px}
+.manual-register .field{background:#fff}
+.manual-register .consent-list{margin:15px 0 17px;padding:13px 15px;background:#f2ece6;border:1px solid #e4d9cf}
+.manual-register .consent-list label{display:flex;gap:10px;align-items:flex-start;margin:10px 0;font-size:13px}
+.manual-register .consent-list input{flex:0 0 17px;margin-top:5px;accent-color:#574335;width:17px;height:17px}
+.manual-register .consent-list strong{font-weight:650}
+.manual-register .consent-example{padding:12px;border-left:3px solid #b49a80;background:#fff;color:#5f5348;font-size:13px;line-height:1.8}
+.manual-register .group{margin:10px 0}
+.manual-register textarea{min-height:95px;resize:vertical}
+.manual-register .form-actions{display:flex;align-items:center;gap:8px;margin-top:18px;flex-wrap:wrap}
+.manual-register .warning{font-size:12px;color:#8b5e44}
+.manual-source{display:inline-block;padding:2px 7px;margin-left:7px;background:#eee7df;color:#685445;font-size:11px;white-space:nowrap}
+.manual-source.web{background:#eaeff0;color:#526f75}
 </style></head><body>
 <header><strong>작가작업실 JEJU</strong><nav><a href="/admin/">모임·행사</a><a class="active" href="/admin/sms.html" aria-current="page">문자 알림</a><a href="/admin/schedule.html">스케줄</a><a href="/admin/space.html">공간소개</a></nav></header>
 <main><h1>문자 알림 관리</h1><p class="muted">모임·행사 및 신규 프로그램 문자 알림 수신동의자 관리와 단체 SMS 발송</p>
@@ -24,10 +40,43 @@ table{border-collapse:collapse;width:100%;font-size:13px}th,td{border-bottom:1px
 <div id="unconfigured" class="notice" hidden>솔라피 API가 아직 연결되지 않았습니다. API Key·Secret, 허용 IP 설정, 발신번호 승인 상태를 확인하세요. 연결 확인 전까지 관리자 단체문자 발송을 차단합니다.</div>
 <div class="stat-grid"><div class="stat">전체 등록자<b id="count-all">0</b></div><div class="stat">수신동의<b id="count-active">0</b></div><div class="stat">수신거부<b id="count-off">0</b></div></div>
 <div class="tabs"><button class="btn tab active" data-tab="people">등록자 목록</button><button class="btn tab" data-tab="compose">문자 작성</button><button class="btn tab" data-tab="history">발송 이력</button></div>
-<section class="card" id="panel-people"><div class="flex" style="justify-content:space-between"><h2>등록자 목록</h2><button class="btn" type="button" id="sync-080">080 수신거부 동기화</button></div>
+<section class="card" id="panel-people"><div class="flex" style="justify-content:space-between"><h2>등록자 목록</h2><div class="flex"><button class="btn primary" type="button" id="manual-open" aria-expanded="false" aria-controls="manual-form-area">+ 방문자 직접 등록</button><button class="btn" type="button" id="sync-080">080 수신거부 동기화</button></div></div>
 <p class="muted">인증 및 동의가 확인된 등록자만 표시합니다. 발송 전에는 080 수신거부 목록을 다시 확인합니다.</p>
+
+<section id="manual-form-area" class="manual-register" aria-labelledby="manual-form-title" hidden>
+<h3 id="manual-form-title">방문자 직접 등록</h3>
+<p class="muted">현장 방문자가 <strong>개인정보 수집·이용</strong>과 <strong>신규 모임·행사 광고성 SMS 수신</strong>에 각각 명시적으로 동의한 경우에만 등록하세요. 현장 등록은 문자 인증 완료로 표시하지 않습니다.</p>
+<form id="manual-form">
+ <div class="row2">
+  <div class="group"><label for="manual-name">이름 *</label><input class="field" type="text" id="manual-name" maxlength="40" autocomplete="off" placeholder="방문자 이름" required></div>
+  <div class="group"><label for="manual-phone">휴대폰 번호 *</label><input class="field" type="tel" id="manual-phone" inputmode="tel" autocomplete="off" maxlength="15" placeholder="010-0000-0000" required></div>
+  <div class="group"><label for="manual-consent-date">동의받은 날짜 *</label><input class="field" type="date" id="manual-consent-date" required></div>
+  <div class="group"><label for="manual-consent-method">동의 확인 방법 *</label><select class="field" id="manual-consent-method" required>
+   <option value="">동의 확인 방법 선택</option>
+   <option value="paper_signed">서면 동의 · 동의서 보관</option>
+   <option value="verbal_explicit">현장 구두 명시적 동의</option>
+  </select></div>
+ </div>
+ <div class="group"><label for="manual-evidence">동의 확인 기록 *</label>
+ <textarea class="field" id="manual-evidence" maxlength="500" minlength="10" required placeholder="예: 2026.11.07 현장 방문 시 광고성 SMS 수신 및 연락처 수집 목적·보유기간을 안내하고 개별적으로 동의받음. 동의서: 서류함 A-1"></textarea>
+ <p class="muted">10~500자. 서면 동의서 보관 위치 또는 구두 동의 당시 안내·확인 내용을 적어 주세요. 불필요한 개인정보는 적지 않습니다.</p></div>
+ <div class="consent-example">
+  <strong>방문자에게 고지할 내용</strong><br>
+  작가작업실 JEJU에서 이름과 휴대폰 번호를 수집하여 신규 모임·행사 및 프로그램 광고성 SMS 안내에 이용합니다. 정보는 구독 해지 시까지 보유하며, 광고문자는 언제든 무료로 수신거부할 수 있습니다. 개인정보 수집·이용과 광고성 문자 수신에 각각 동의하십니까?
+ </div>
+ <div class="consent-list">
+  <label><input type="checkbox" id="manual-privacy" required><span><strong>[필수] 방문자로부터 개인정보 수집·이용에 대한 명시적 동의를 확인했습니다.</strong></span></label>
+  <label><input type="checkbox" id="manual-marketing" required><span><strong>[필수] 방문자로부터 모임·행사 및 신규 프로그램의 광고성 SMS 수신에 대한 명시적 동의를 별도로 확인했습니다.</strong></span></label>
+ </div>
+ <p class="warning">단순히 전화번호만 남긴 고객이나 수신을 거부한 고객은 등록할 수 없습니다. 번호는 솔라피 080 수신거부 목록과 대조합니다.</p>
+ <div class="form-actions">
+  <button class="btn primary" id="manual-save" type="submit">방문자 등록</button>
+  <button class="btn" id="manual-cancel" type="button">취소</button>
+ </div>
+</form>
+</section>
 <label for="filter">수신 상태 필터</label><select class="field" id="filter" style="max-width:250px;margin-bottom:14px"><option value="all">전체</option><option value="active">수신동의</option><option value="unsubscribed">수신거부</option></select>
-<div class="table"><table><thead><tr><th>선택</th><th>이름·번호</th><th>상태</th><th>신청일</th><th>관리</th></tr></thead><tbody id="people"></tbody></table></div><p class="muted">해지 후 재수신은 신청자 본인이 새로 인증하고 동의해야 합니다.</p></section>
+<div class="table"><table><thead><tr><th>선택</th><th>이름·번호 / 등록 방식</th><th>상태</th><th>신청일</th><th>관리</th></tr></thead><tbody id="people"></tbody></table></div><p class="muted">해지 후 재수신은 신청자 본인이 새로 인증하고 동의해야 합니다.</p></section>
 <section class="card" id="panel-compose" hidden><h2>단체 문자 작성</h2><div class="row2"><div><label for="event">안내할 행사</label><select class="field" id="event"></select>
 <p><label><input type="radio" name="targets" value="all" checked> 전체 수신동의자</label><label><input type="radio" name="targets" value="selected"> 선택한 등록자만 (<span id="chosen-count">0</span>명)</label></p>
 <label for="message">문자 내용 (700자 이하)</label><textarea class="field" id="message" rows="7" maxlength="700" placeholder="새로운 모임·행사를 소개해 주세요."></textarea></div>
