@@ -31,6 +31,17 @@ table{border-collapse:collapse;width:100%;font-size:13px}th,td{border-bottom:1px
 .manual-register .warning{font-size:12px;color:#8b5e44}
 .manual-source{display:inline-block;padding:2px 7px;margin-left:7px;background:#eee7df;color:#685445;font-size:11px;white-space:nowrap}
 .manual-source.web{background:#eaeff0;color:#526f75}
+  .people-controls{display:flex;gap:14px;align-items:end;flex-wrap:wrap;margin:14px 0 10px}
+  .people-controls .search-control{flex:1 1 260px;max-width:430px}
+  .people-controls .state-control{flex:0 1 220px}
+  .people-controls input[type="search"]{appearance:auto}
+  .people-result-count{margin:0 0 10px;font-size:12px;color:#82766d}
+  .name-edit-area{margin:14px 0 19px;padding:19px;border:1px solid #d8c9ba;background:#fcfaf7}
+  .name-edit-area h3{font-size:18px;margin:0 0 8px}
+  .name-edit-area p{margin:0 0 14px}
+  .name-edit-area .form-actions{display:flex;gap:8px;margin-top:14px}
+  .person-actions{display:flex;gap:7px;flex-wrap:wrap}
+  @media(max-width:700px){.people-controls .state-control,.people-controls .search-control{max-width:none;flex:1 1 100%}}
 </style></head><body>
 <header><strong>작가작업실 JEJU</strong><nav><a href="/admin/">모임·행사</a><a class="active" href="/admin/sms.html" aria-current="page">문자 알림</a><a href="/admin/schedule.html">스케줄</a><a href="/admin/space.html">공간소개</a></nav></header>
 <main><h1>문자 알림 관리</h1><p class="muted">모임·행사 및 신규 프로그램 문자 알림 수신동의자 관리와 단체 SMS 발송</p>
@@ -75,7 +86,22 @@ table{border-collapse:collapse;width:100%;font-size:13px}th,td{border-bottom:1px
  </div>
 </form>
 </section>
-<label for="filter">수신 상태 필터</label><select class="field" id="filter" style="max-width:250px;margin-bottom:14px"><option value="all">전체</option><option value="active">수신동의</option><option value="unsubscribed">수신거부</option></select>
+<section id="name-edit-area" class="name-edit-area" aria-labelledby="name-edit-title" hidden>
+  <h3 id="name-edit-title">등록자 이름 수정</h3>
+  <p class="muted">이름은 본인인증 항목이 아닙니다. 휴대폰 번호, 수신동의 상태와 인증 이력은 그대로 유지됩니다.</p>
+  <form id="name-edit-form">
+   <div class="row2">
+    <div><label for="name-edit-name">변경할 이름</label><input class="field" type="text" id="name-edit-name" maxlength="40" required></div>
+    <div><label for="name-edit-phone">등록된 휴대폰 번호 (변경 불가)</label><input class="field" type="tel" id="name-edit-phone" readonly></div>
+   </div>
+   <div class="form-actions"><button class="btn primary" id="name-edit-save" type="submit">이름 저장</button><button class="btn" id="name-edit-cancel" type="button">취소</button></div>
+  </form>
+ </section>
+ <div class="people-controls">
+  <div class="search-control"><label for="people-search">등록자 검색</label><input id="people-search" class="field" type="search" autocomplete="off" placeholder="이름 또는 휴대폰 번호 (끝 4자리도 가능)" aria-describedby="people-search-hint"><span class="muted" id="people-search-hint">이름 일부·번호 일부·끝 4자리로 검색합니다.</span></div>
+  <div class="state-control"><label for="filter">수신 상태 필터</label><select class="field" id="filter"><option value="all">전체</option><option value="active">수신동의</option><option value="unsubscribed">수신거부</option></select></div>
+ </div>
+ <p id="people-result-count" class="people-result-count" aria-live="polite"></p>
 <div class="table"><table><thead><tr><th>선택</th><th>이름·번호 / 등록 방식</th><th>상태</th><th>신청일</th><th>관리</th></tr></thead><tbody id="people"></tbody></table></div><p class="muted">해지 후 재수신은 신청자 본인이 새로 인증하고 동의해야 합니다.</p></section>
 <section class="card" id="panel-compose" hidden><h2>단체 문자 작성</h2><div class="row2"><div><label for="event">안내할 행사</label><select class="field" id="event"></select>
 <p><label><input type="radio" name="targets" value="all" checked> 전체 수신동의자</label><label><input type="radio" name="targets" value="selected"> 선택한 등록자만 (<span id="chosen-count">0</span>명)</label></p>

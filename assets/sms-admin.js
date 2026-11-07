@@ -2,7 +2,7 @@
 "use strict";
 const API="https://qrbavxempotptnmflqoq.supabase.co/functions/v1/studio-sms-news", $=id=>document.getElementById(id);
 const session=window.JAKAdminSession;
-let token="",subscribers=[],events=[],campaigns=[],selected=new Set(),configured=false,verifiedConnection=false,sending=false,lastDraftEvent=null,editingManualId=null;
+let token="",subscribers=[],events=[],campaigns=[],selected=new Set(),configured=false,verifiedConnection=false,sending=false,lastDraftEvent=null,editingManualId=null,editingNameId=null;
 function notice(s,error=false){$("feedback").textContent=s||"";$("feedback").hidden=!s;$("feedback").classList.toggle("error",error);}
 function dashboard(yes){$("login-panel").hidden=yes;$("dashboard").hidden=!yes;}
 async function call(action,fields={}){
@@ -80,9 +80,20 @@ async function checkConnection(){
  }
 }
 const cell=(tr,s)=>{const e=document.createElement("td");e.textContent=s;tr.append(e);return e;};
+function normalizedPhone(s){return String(s||"").replace(/\D/g,"");}
+function matchesPerson(p,query){
+ const raw=String(query||"").trim();
+ if(!raw)return true;
+ if(String(p.name||"").toLocaleLowerCase("ko-KR").includes(raw.toLocaleLowerCase("ko-KR")))return true;
+ const digits=normalizedPhone(raw);
+ return digits.length>0&&/^[\d\s()+-]+$/.test(raw)&&normalizedPhone(p.phone).includes(digits);
+}
 function renderPeople(){
  const dest=$("people");dest.replaceChildren();const filter=$("filter").value;
- for(const p of subscribers.filter(x=>filter==="all"||x.status===filter)){
+ const query=$("people-search").value;
+ const visible=subscribers.filter(p=>(filter==="all"||p.status===filter)&&matchesPerson(p,query));
+ $("people-result-count").textContent="검색 결과 "+visible.length+"명 / 전체 "+subscribers.length+"명";
+ for(const p of visible){
   const tr=document.createElement("tr"),box=document.createElement("input");
   box.type="checkbox";box.checked=selected.has(p.id);box.disabled=p.status!=="active";
   box.setAttribute("aria-label",p.name+" 선택");box.addEventListener("change",()=>{if(box.checked)selected.add(p.id);else selected.delete(p.id);updateCount();});
@@ -93,20 +104,55 @@ function renderPeople(){
   name.append(origin);
   cell(tr,p.status==="active"?"수신동의":"수신거부");
   cell(tr,new Date(p.subscribed_at).toLocaleDateString("ko-KR",{timeZone:"Asia/Seoul"}));
-  const action=document.createElement("td");
+  const action=document.createElement("td"),actions=document.createElement("div");actions.className="person-actions";
+  const editName=document.createElement("button");editName.className="btn";editName.type="button";editName.textContent="이름 수정";
+  editName.addEventListener("click",()=>openNameEditor(p));actions.append(editName);
   if(p.status==="active"){
    if(p.entry_source==="manual"){
     const edit=document.createElement("button");edit.type="button";edit.className="btn";edit.textContent="수정";
-    edit.addEventListener("click",()=>openManualForm(p));action.append(edit,document.createTextNode(" "));
+    edit.addEventListener("click",()=>openManualForm(p));actions.append(edit);
    }
    const btn=document.createElement("button");btn.className="btn";btn.type="button";btn.textContent="수신거부";
-   btn.addEventListener("click",async()=>{if(!confirm(p.name+"님의 수신을 거부 처리합니까?"))return;try{await call("unsubscribe",{id:p.id});notice("수신거부가 반영되었습니다.");selected.delete(p.id);await load()}catch(e){notice(e.message,true)}});action.append(btn);
-  }else action.textContent="처리 완료";
-  tr.append(action);dest.append(tr);
+   btn.addEventListener("click",async()=>{if(!confirm(p.name+"님의 수신을 거부 처리합니까?"))return;try{await call("unsubscribe",{id:p.id});notice("수신거부가 반영되었습니다.");selected.delete(p.id);await load()}catch(e){notice(e.message,true)}});actions.append(btn);
+  }else{const off=document.createElement("span");off.textContent="수신거부 완료";off.className="muted";actions.append(off);}
+  action.append(actions);tr.append(action);dest.append(tr);
  }
- if(!dest.children.length){const tr=document.createElement("tr"),td=document.createElement("td");td.colSpan=5;td.textContent="등록자가 없습니다.";tr.append(td);dest.append(tr)}
+ if(!dest.children.length){const tr=document.createElement("tr"),td=document.createElement("td");td.colSpan=5;td.textContent=query.trim()?"검색 결과가 없습니다. 이름 또는 휴대폰 번호를 다시 확인해 주세요.":"등록자가 없습니다.";tr.append(td);dest.append(tr)}
  updateCount();
 }
+
+
+function closeNameEditor(){
+ editingNameId=null;$("name-edit-area").hidden=true;
+ $("name-edit-form").reset();
+}
+function openNameEditor(person){
+ if(!$("manual-form-area").hidden)closeManualForm();
+ editingNameId=person.id;
+ $("name-edit-name").value=person.name==="이름 미제공"?"":person.name;
+ $("name-edit-phone").value=person.phone;
+ $("name-edit-area").hidden=false;
+ $("name-edit-area").scrollIntoView({behavior:"smooth",block:"nearest"});
+ $("name-edit-name").focus();$("name-edit-name").select();notice("");
+}
+$("name-edit-cancel").addEventListener("click",closeNameEditor);
+$("name-edit-form").addEventListener("submit",async e=>{
+ e.preventDefault();
+ const p=subscribers.find(x=>x.id===editingNameId),name=$("name-edit-name").value.trim();
+ if(!p)return notice("수정할 등록자를 다시 선택해 주세요.",true);
+ if(!name||name.length>40)return notice("이름은 1~40자로 입력해 주세요.",true);
+ if(name===p.name){closeNameEditor();return notice("기존 이름과 동일합니다.");}
+ if(!confirm("휴대폰 번호 "+p.phone+"의 이름을\\n'"+p.name+"' → '"+name+"'(으)로 변경하시겠습니까?\\n\\n인증 및 수신동의 정보는 변경되지 않습니다."))return;
+ const button=$("name-edit-save");button.disabled=true;
+ try{
+  const result=await call("rename_subscriber",{id:p.id,name,expectedUpdatedAt:p.updated_at});
+  closeNameEditor();
+  await load();
+  notice(result.message||"이름을 수정했습니다.");
+ }catch(error){notice(error.message,true);}
+ finally{button.disabled=false;}
+});
+$("people-search").addEventListener("input",renderPeople);
 
 const todaySeoul=()=>new Date(Date.now()+9*3600000).toISOString().slice(0,10);
 function closeManualForm(){
@@ -117,6 +163,7 @@ function closeManualForm(){
 }
 function openManualForm(existing=null){
  editingManualId=existing?.id||null;
+ if(!$("name-edit-area").hidden)closeNameEditor();
  $("manual-form").reset();
  $("manual-consent-date").max=todaySeoul();
  $("manual-consent-date").value=existing?.manual_consent_date||todaySeoul();
