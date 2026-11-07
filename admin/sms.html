@@ -1,0 +1,39 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow">
+<title>문자 알림 관리 | 작가작업실 JEJU</title>
+<style>
+*{box-sizing:border-box}body{margin:0;color:#3c342d;background:#faf8f5;font:14px/1.65 "Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+header{background:#302d2a;color:white;padding:15px 22px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+header strong{font-size:19px}nav{display:flex;flex-wrap:wrap;gap:9px}nav a{color:#dacdc0;text-decoration:none;font-size:13px;padding:7px 10px}nav a.active{background:#675244;color:white}
+main{max-width:1150px;margin:auto;padding:35px 18px 90px}h1{margin:0;font-size:29px;font-weight:550}h2{font-size:21px;font-weight:550;margin:0 0 15px}
+.muted{color:#82766d;font-size:13px}.card{background:#fff;border:1px solid #e2d8cf;padding:22px;margin:19px 0}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.stat{border:1px solid #e2d8cf;background:#fff;padding:17px}.stat b{font-size:26px;display:block}
+.btn{border:1px solid #b8a494;color:#604b3c;padding:10px 14px;background:white;cursor:pointer;font:inherit}.btn.primary,.tab.active{background:#4b3c31;color:white;border-color:#4b3c31}.btn:disabled{opacity:.45;cursor:not-allowed}.btn:hover:not(:disabled){background:#eee7e0}.btn.primary:hover:not(:disabled){background:#392d25}
+input.field,select.field,textarea.field{border:1px solid #d7cabc;padding:12px;background:white;font:inherit;width:100%;border-radius:0}label{display:block;margin-bottom:5px}
+.flex{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.tabs{display:flex;gap:8px;margin-top:21px;flex-wrap:wrap}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:20px}.notice{border:1px solid #dfcaa7;color:#7c5d39;background:#fff8eb;padding:13px;margin:17px 0}
+.status{border:1px solid #dbcfc4;padding:12px;margin:16px 0;background:white}.status.error{background:#fff2f0;color:#a2483a}
+table{border-collapse:collapse;width:100%;font-size:13px}th,td{border-bottom:1px solid #ece6de;text-align:left;padding:11px 7px}th{background:#faf8f5;color:#75685d}td small{display:block;color:#84776e}
+.table{overflow-x:auto}.preview{background:#f5f0e9;border:1px solid #ded2c6;min-height:185px;padding:17px;white-space:pre-wrap;overflow-wrap:anywhere}
+[hidden]{display:none!important}@media(max-width:700px){.card{padding:15px}main{padding:20px 12px}.row2{grid-template-columns:1fr}.stat-grid{gap:6px}.stat{padding:10px}.table table{min-width:580px}}
+</style></head><body>
+<header><strong>작가작업실 JEJU</strong><nav><a href="/admin/">모임·행사</a><a class="active" href="/admin/sms.html" aria-current="page">문자 알림</a><a href="/admin/schedule.html">스케줄</a><a href="/admin/space.html">공간소개</a></nav></header>
+<main><h1>문자 알림 관리</h1><p class="muted">모임·행사 및 신규 프로그램 문자 알림 수신동의자 관리와 단체 SMS 발송</p>
+<section id="login-panel" class="card"><h2>관리자 로그인</h2><form id="login-form"><div class="row2"><div><label for="email">이메일</label><input class="field" type="email" id="email" autocomplete="username" required></div><div><label for="password">비밀번호</label><input class="field" type="password" id="password" autocomplete="current-password" required></div></div><p><button class="btn primary" type="submit">로그인</button></p></form></section>
+<section id="dashboard" hidden>
+<div class="flex" style="justify-content:space-between"><p id="connection" class="muted"></p><button class="btn" type="button" id="logout">로그아웃</button></div>
+<div id="unconfigured" class="notice" hidden>솔라피 API Key·Secret 및 발신번호가 아직 연결되지 않아 문자 인증·발송은 비활성화되어 있습니다. 연동 전에 개인정보를 수집하지 않습니다.</div>
+<div class="stat-grid"><div class="stat">전체 등록자<b id="count-all">0</b></div><div class="stat">수신동의<b id="count-active">0</b></div><div class="stat">수신거부<b id="count-off">0</b></div></div>
+<div class="tabs"><button class="btn tab active" data-tab="people">등록자 목록</button><button class="btn tab" data-tab="compose">문자 작성</button><button class="btn tab" data-tab="history">발송 이력</button></div>
+<section class="card" id="panel-people"><div class="flex" style="justify-content:space-between"><h2>등록자 목록</h2><button class="btn" type="button" id="sync-080">080 수신거부 동기화</button></div>
+<p class="muted">인증 및 동의가 확인된 등록자만 표시합니다. 발송 전에는 080 수신거부 목록을 다시 확인합니다.</p>
+<label for="filter">수신 상태 필터</label><select class="field" id="filter" style="max-width:250px;margin-bottom:14px"><option value="all">전체</option><option value="active">수신동의</option><option value="unsubscribed">수신거부</option></select>
+<div class="table"><table><thead><tr><th>선택</th><th>이름·번호</th><th>상태</th><th>신청일</th><th>관리</th></tr></thead><tbody id="people"></tbody></table></div><p class="muted">해지 후 재수신은 신청자 본인이 새로 인증하고 동의해야 합니다.</p></section>
+<section class="card" id="panel-compose" hidden><h2>단체 문자 작성</h2><div class="row2"><div><label for="event">안내할 행사</label><select class="field" id="event"></select>
+<p><label><input type="radio" name="targets" value="all" checked> 전체 수신동의자</label><label><input type="radio" name="targets" value="selected"> 선택한 등록자만 (<span id="chosen-count">0</span>명)</label></p>
+<label for="message">문자 내용 (700자 이하)</label><textarea class="field" id="message" rows="7" maxlength="700" placeholder="새로운 모임·행사를 소개해 주세요."></textarea></div>
+<div><label>전송 문자 미리보기</label><div id="preview" class="preview"></div><p class="muted" id="bytes"></p>
+<button class="btn primary" id="send" type="button">발송 전 최종 확인</button><p class="muted">실제 발송은 확인창 승인을 거친 뒤 진행합니다. 21:00~08:00 광고문자 발송은 금지됩니다.</p></div></div></section>
+<section class="card" id="panel-history" hidden><h2>발송 이력</h2><p class="muted">‘솔라피 접수’는 실제 수신 성공을 뜻하지 않습니다.</p>
+<div class="table"><table><thead><tr><th>요청 일시</th><th>행사</th><th>발송 대상</th><th>수신거부 제외</th><th>상태</th></tr></thead><tbody id="history"></tbody></table></div></section>
+</section><p id="feedback" role="alert" class="status" hidden></p></main>
+<script src="/assets/admin-session.js"></script><script defer src="/assets/sms-admin.js"></script></body></html>
