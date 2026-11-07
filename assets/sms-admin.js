@@ -2,7 +2,7 @@
 "use strict";
 const API="https://qrbavxempotptnmflqoq.supabase.co/functions/v1/studio-sms-news", $=id=>document.getElementById(id);
 const session=window.JAKAdminSession;
-let token="",subscribers=[],events=[],campaigns=[],selected=new Set(),configured=false,verifiedConnection=false,sending=false;
+let token="",subscribers=[],events=[],campaigns=[],selected=new Set(),configured=false,verifiedConnection=false,sending=false,lastDraftEvent=null;
 function notice(s,error=false){$("feedback").textContent=s||"";$("feedback").hidden=!s;$("feedback").classList.toggle("error",error);}
 function dashboard(yes){$("login-panel").hidden=yes;$("dashboard").hidden=!yes;}
 async function call(action,fields={}){
@@ -10,6 +10,38 @@ async function call(action,fields={}){
  let data={};try{data=await resp.json()}catch{}
  if(!resp.ok)throw Error(data.error||"요청 처리 실패");
  return data;
+}
+function currentEvent(){return events.find(e=>e.id===$("event").value);}
+function eventUrl(e){
+ const slug=String(e?.slug||"");
+ return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)
+   ?"https://www.jakgastudio.com/news/"+encodeURIComponent(slug):"";
+}
+const oldNewsUrl=/(?:https?:\/\/)?(?:www\.)?jakgastudio\.com\/news(?:\/[a-z0-9-]+)?(?:\?[^\s]*)?/gi;
+function syncEventMessage(){
+ const e=currentEvent(),url=eventUrl(e);
+ if(!url){
+  $("send").disabled=true;
+  notice("선택한 행사에 고유 상세주소가 없습니다. 행사 정보를 확인해 주세요.",true);
+  return false;
+ }
+ let body=$("message").value.trim();
+ if(!body)body="새로운 모임·행사 안내\n"+e.title+"\n일정 및 참여 방법: "+url;
+ else{
+  if(lastDraftEvent?.title&&lastDraftEvent.title!==e.title){
+   const previous="\n"+lastDraftEvent.title+"\n";
+   if(body.includes(previous))body=body.replace(previous,"\n"+e.title+"\n");
+  }
+  oldNewsUrl.lastIndex=0;
+  if(oldNewsUrl.test(body)){
+   oldNewsUrl.lastIndex=0;
+   body=body.replace(oldNewsUrl,url);
+  }else body+="\n일정 및 참여 방법: "+url;
+ }
+ $("message").value=body;
+ lastDraftEvent={id:e.id,title:e.title};
+ preview();
+ return true;
 }
 async function load(){
  const r=await call("status");subscribers=r.subscribers||[];events=r.events||[];campaigns=r.campaigns||[];configured=r.configured===true;
@@ -20,7 +52,7 @@ async function load(){
  $("event").replaceChildren();
  for(const e of events){const opt=document.createElement("option");opt.value=e.id;opt.textContent=e.title+" · "+(e.status==="ongoing"?"진행 중":"종료");$("event").append(opt);}
  if(!events.length){const opt=document.createElement("option");opt.textContent="등록된 행사가 없습니다.";opt.value="";$("event").append(opt);}
- $("send").disabled=true;renderPeople();renderHistory();preview();dashboard(true);await checkConnection();
+ $("send").disabled=true;renderPeople();renderHistory();syncEventMessage();dashboard(true);await checkConnection();
 }
 async function checkConnection(){
  const button=$("check-solapi");button.disabled=true;$("send").disabled=true;verifiedConnection=false;
@@ -79,12 +111,14 @@ for(const b of document.querySelectorAll("[data-tab]"))b.addEventListener("click
 });
 $("filter").addEventListener("change",renderPeople);
 $("message").addEventListener("input",preview);
-$("event").addEventListener("change",()=>{const e=events.find(x=>x.id===$("event").value);if(e){$("message").value="새로운 모임·행사 안내\n"+e.title+"\n일정 및 참여 방법: www.jakgastudio.com/news";preview()}});
+$("event").addEventListener("change",()=>syncEventMessage());
 $("check-solapi").addEventListener("click",()=>checkConnection());
 $("sync-080").addEventListener("click",async()=>{const btn=$("sync-080");btn.disabled=true;try{const r=await call("sync_blocks");notice("080 수신거부 "+r.blocked+"건 확인, 신규 "+r.updated+"건 반영");await load()}catch(e){notice(e.message,true)}finally{btn.disabled=false}});
 $("send").addEventListener("click",async()=>{
  if(sending||!verifiedConnection)return;
- const eventId=$("event").value,text=$("message").value.trim(),mode=document.querySelector("input[name=targets]:checked").value;
+ const eventId=$("event").value;
+ if(!syncEventMessage())return;
+ const text=$("message").value.trim(),mode=document.querySelector("input[name=targets]:checked").value;
  const target=subscribers.filter(x=>x.status==="active"&&(mode==="all"||selected.has(x.id)));
  if(!eventId||!text||!target.length)return notice("행사·문구·수신 대상을 확인해 주세요.",true);
  const hour=new Date(Date.now()+9*3600000).getUTCHours();

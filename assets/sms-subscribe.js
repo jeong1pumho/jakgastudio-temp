@@ -19,7 +19,7 @@
   $("sms-consent-block").hidden=unsub;$("sms-privacy-accept").required=!unsub;$("sms-marketing-accept").required=!unsub;
   $("sms-verify-btn").textContent=unsub?"인증 확인 및 알림 해지":"인증 확인 및 신청 완료";
   $("sms-request-btn").textContent="인증번호 받기";
-  show(0);dlg.showModal();$("sms-user-phone").focus();
+  show(0);dlg.showModal();$(unsub?"sms-user-phone":"sms-user-name").focus();
  }
  async function post(body){
   let result;try{result=await fetch(ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});}
