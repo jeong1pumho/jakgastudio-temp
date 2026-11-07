@@ -50,6 +50,20 @@ table{border-collapse:collapse;width:100%;font-size:13px}th,td{border-bottom:1px
 <section id="dashboard" hidden>
 <div class="flex" style="justify-content:space-between"><p id="connection" class="muted"></p><div class="flex"><button class="btn" type="button" id="check-solapi">솔라피 연결 상태 확인</button><button class="btn" type="button" id="logout">로그아웃</button></div></div>
 <div id="unconfigured" class="notice" hidden>솔라피 API가 아직 연결되지 않았습니다. API Key·Secret, 허용 IP 설정, 발신번호 승인 상태를 확인하세요. 연결 확인 전까지 관리자 단체문자 발송을 차단합니다.</div>
+<section id="signup-email-card" class="card" aria-labelledby="signup-email-title">
+<div class="flex" style="justify-content:space-between;gap:14px">
+ <div><h2 id="signup-email-title">신규 신청 Gmail 알림</h2>
+ <p class="muted" style="margin:0">방문자가 휴대폰 인증을 완료하고 새로 등록되면 작가작업실 JEJU로 이메일을 보냅니다.</p></div>
+ <button class="btn" type="button" id="signup-email-retry" disabled>미발송 알림 재시도</button>
+</div>
+<div style="margin-top:12px;padding:13px;background:#f6f2ed;border:1px solid #e6ddd4">
+ <p style="margin:0 0 6px">수신 메일: <strong>jakgastudio@gmail.com</strong></p>
+ <p id="signup-email-config" class="muted" style="margin:0">이메일 발송 서비스 상태 확인 중</p>
+ <p id="signup-email-counts" class="muted" style="margin:4px 0 0">발송 대기 0건 · 발송 완료 0건 · 실패 0건</p>
+ <p id="signup-email-last" class="muted" style="margin:4px 0 0" hidden></p>
+</div>
+<p class="muted">고객 이름·휴대폰 번호를 이메일에 넣지 않습니다. 세부 정보는 이 관리자 화면에서 확인하세요. 현장 수기 등록은 이 알림 대상이 아닙니다.</p>
+</section>
 <div class="stat-grid"><div class="stat">전체 등록자<b id="count-all">0</b></div><div class="stat">수신동의<b id="count-active">0</b></div><div class="stat">수신거부<b id="count-off">0</b></div></div>
 <div class="tabs"><button class="btn tab active" data-tab="people">등록자 목록</button><button class="btn tab" data-tab="compose">문자 작성</button><button class="btn tab" data-tab="history">발송 이력</button></div>
 <section class="card" id="panel-people"><div class="flex" style="justify-content:space-between"><h2>등록자 목록</h2><div class="flex"><button class="btn primary" type="button" id="manual-open" aria-expanded="false" aria-controls="manual-form-area">+ 방문자 직접 등록</button><button class="btn" type="button" id="sync-080">솔라피 수신거부 가져오기</button></div></div>

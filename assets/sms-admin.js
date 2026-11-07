@@ -2,7 +2,7 @@
 "use strict";
 const API="https://qrbavxempotptnmflqoq.supabase.co/functions/v1/studio-sms-news", $=id=>document.getElementById(id);
 const session=window.JAKAdminSession;
-let token="",subscribers=[],events=[],campaigns=[],selected=new Set(),configured=false,verifiedConnection=false,sending=false,lastDraftEvent=null,editingManualId=null,editingNameId=null;
+let token="",subscribers=[],events=[],campaigns=[],selected=new Set(),configured=false,verifiedConnection=false,sending=false,lastDraftEvent=null,editingManualId=null,editingNameId=null,emailNotificationState=null;
 function notice(s,error=false){$("feedback").textContent=s||"";$("feedback").hidden=!s;$("feedback").classList.toggle("error",error);}
 function dashboard(yes){$("login-panel").hidden=yes;$("dashboard").hidden=!yes;}
 async function call(action,fields={}){
@@ -43,8 +43,22 @@ function syncEventMessage(){
  preview();
  return true;
 }
+function renderSignupEmailStatus(state){
+ emailNotificationState=state||null;
+ const canSend=state?.configured===true;
+ const count=state?.counts||{queued:0,processing:0,sent:0,failed:0};
+ $("signup-email-config").textContent=canSend?
+  "이메일 발송 설정 완료 · 새로운 온라인 신청이 접수되면 Gmail로 알림을 보냅니다.":
+  "이메일 발송 설정 대기 · 테스트 Supabase Secrets에 RESEND_API_KEY와 RESEND_FROM_EMAIL 등록 필요";
+ $("signup-email-counts").textContent="발송 대기 "+((count.queued||0)+(count.processing||0))+"건 · 발송 완료 "+(count.sent||0)+"건 · 실패 "+(count.failed||0)+"건";
+ const last=state?.last?.find(x=>x.status==="failed");
+ $("signup-email-last").hidden=!last;
+ $("signup-email-last").textContent=last?"최근 실패: "+(last.last_error||"알림 전송 실패"):"";
+ $("signup-email-retry").disabled=!canSend||((count.queued||0)+(count.failed||0)===0);
+}
 async function load(){
  const r=await call("status");subscribers=r.subscribers||[];events=r.events||[];campaigns=r.campaigns||[];configured=r.configured===true;
+ renderSignupEmailStatus(r.emailNotifications);
  verifiedConnection=false;$("unconfigured").hidden=false;$("connection").textContent=configured?"설정값 확인됨 · API 검증 필요":"테스트 사이트 · 솔라피 인증정보 설정 대기";
  $("count-all").textContent=subscribers.length;
  $("count-active").textContent=subscribers.filter(x=>x.status==="active").length;
@@ -225,6 +239,16 @@ $("filter").addEventListener("change",renderPeople);
 $("message").addEventListener("input",preview);
 $("event").addEventListener("change",()=>syncEventMessage());
 $("check-solapi").addEventListener("click",()=>checkConnection());
+$("signup-email-retry").addEventListener("click",async()=>{
+ if(!emailNotificationState?.configured)return notice("이메일 발송 서비스 설정을 완료해 주세요.",true);
+ const btn=$("signup-email-retry");btn.disabled=true;notice("");
+ try{
+  const result=await call("retry_signup_emails");
+  await load();
+  notice(result.message||"이메일 알림 재시도 요청을 처리했습니다.");
+ }catch(error){notice(error.message,true);}
+ finally{btn.disabled=false;}
+});
 $("sync-080").addEventListener("click",async()=>{const btn=$("sync-080");btn.disabled=true;try{const r=await call("sync_blocks");notice("080 수신거부 "+r.blocked+"건 확인, 신규 "+r.updated+"건 반영");await load()}catch(e){notice(e.message,true)}finally{btn.disabled=false}});
 $("send").addEventListener("click",async()=>{
  if(sending||!verifiedConnection)return;
