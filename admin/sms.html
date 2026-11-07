@@ -45,10 +45,10 @@ table{border-collapse:collapse;width:100%;font-size:13px}th,td{border-bottom:1px
 
 <section id="manual-form-area" class="manual-register" aria-labelledby="manual-form-title" hidden>
 <h3 id="manual-form-title">방문자 직접 등록</h3>
-<p class="muted">현장 방문자가 <strong>개인정보 수집·이용</strong>과 <strong>신규 모임·행사 광고성 SMS 수신</strong>에 각각 명시적으로 동의한 경우에만 등록하세요. 현장 등록은 문자 인증 완료로 표시하지 않습니다.</p>
+<p class="muted">현장 방문자가 <strong>개인정보 수집·이용</strong>과 <strong>신규 모임·행사 광고성 SMS 수신</strong>에 각각 명시적으로 동의한 경우에만 등록하세요. 이름은 선택사항이며, 번호만 받은 경우 이름을 비워두세요. 현장 등록은 문자 인증 완료로 표시하지 않습니다.</p>
 <form id="manual-form">
  <div class="row2">
-  <div class="group"><label for="manual-name">이름 *</label><input class="field" type="text" id="manual-name" maxlength="40" autocomplete="off" placeholder="방문자 이름" required></div>
+  <div class="group"><label for="manual-name">이름 (선택)</label><input class="field" type="text" id="manual-name" maxlength="40" autocomplete="off" placeholder="이름을 모르는 경우 비워두세요"></div>
   <div class="group"><label for="manual-phone">휴대폰 번호 *</label><input class="field" type="tel" id="manual-phone" inputmode="tel" autocomplete="off" maxlength="15" placeholder="010-0000-0000" required></div>
   <div class="group"><label for="manual-consent-date">동의받은 날짜 *</label><input class="field" type="date" id="manual-consent-date" required></div>
   <div class="group"><label for="manual-consent-method">동의 확인 방법 *</label><select class="field" id="manual-consent-method" required>
@@ -62,7 +62,7 @@ table{border-collapse:collapse;width:100%;font-size:13px}th,td{border-bottom:1px
  <p class="muted">10~500자. 서면 동의서 보관 위치 또는 구두 동의 당시 안내·확인 내용을 적어 주세요. 불필요한 개인정보는 적지 않습니다.</p></div>
  <div class="consent-example">
   <strong>방문자에게 고지할 내용</strong><br>
-  작가작업실 JEJU에서 이름과 휴대폰 번호를 수집하여 신규 모임·행사 및 프로그램 광고성 SMS 안내에 이용합니다. 정보는 구독 해지 시까지 보유하며, 광고문자는 언제든 무료로 수신거부할 수 있습니다. 개인정보 수집·이용과 광고성 문자 수신에 각각 동의하십니까?
+  작가작업실 JEJU에서 휴대폰 번호(필수)와 이름(선택)을 수집하여 신규 모임·행사 및 프로그램 광고성 SMS 안내에 이용합니다. 정보는 구독 해지 시까지 보유하며, 광고문자는 언제든 무료로 수신거부할 수 있습니다. 개인정보 수집·이용과 광고성 문자 수신에 각각 동의하십니까?
  </div>
  <div class="consent-list">
   <label><input type="checkbox" id="manual-privacy" required><span><strong>[필수] 방문자로부터 개인정보 수집·이용에 대한 명시적 동의를 확인했습니다.</strong></span></label>

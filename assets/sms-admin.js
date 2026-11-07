@@ -122,7 +122,7 @@ function openManualForm(existing=null){
  $("manual-consent-date").value=existing?.manual_consent_date||todaySeoul();
  if(existing){
   if(existing.entry_source!=="manual"||existing.status!=="active")return notice("현장 등록한 활성 수신동의자만 직접 수정할 수 있습니다.",true);
-  $("manual-name").value=existing.name;$("manual-phone").value=existing.phone;
+  $("manual-name").value=existing.name==="이름 미제공"?"":existing.name;$("manual-phone").value=existing.phone;
   $("manual-consent-method").value=existing.consent_method||"";
   $("manual-evidence").value=existing.consent_evidence||"";
   $("manual-form-title").textContent="현장 등록자 수정";
@@ -145,12 +145,12 @@ $("manual-form").addEventListener("submit",async e=>{
  const consentDate=$("manual-consent-date").value,consentMethod=$("manual-consent-method").value;
  const evidence=$("manual-evidence").value.trim();
  if(!/^01[016789]\d{7,8}$/.test(phone))return notice("정확한 휴대폰 번호를 입력해 주세요.",true);
- if(!name||name.length>40||evidence.length<10||evidence.length>500)return notice("이름과 동의 기록(10~500자)을 확인해 주세요.",true);
+ if(name.length>40||evidence.length<10||evidence.length>500)return notice("이름은 선택사항이며 동의 기록은 10~500자로 입력해야 합니다.",true);
  if(!$("manual-privacy").checked||!$("manual-marketing").checked)return notice("방문자의 개인정보 및 광고성 SMS 수신 동의를 각각 확인해 주세요.",true);
  const existing=editingManualId?subscribers.find(x=>x.id===editingManualId):null;
  const changingPhone=!!(existing&&phone!==existing.phone);
  const summary=(editingManualId?"현장 등록자의 정보 수정":"현장 방문자 신규 등록")+"\n"+
-   "이름: "+name+"\n휴대폰: "+phone+"\n동의 방법: "+$("manual-consent-method").selectedOptions[0]?.textContent+"\n동의일: "+consentDate+
+   "이름: "+(name||"이름 미제공")+"\n휴대폰: "+phone+"\n동의 방법: "+$("manual-consent-method").selectedOptions[0]?.textContent+"\n동의일: "+consentDate+
    (changingPhone?"\n\n휴대폰 번호가 변경되었습니다. 새 번호의 명시적 동의 확인 기록이 필요합니다.":"")+
    "\n\n방문자가 개인정보 수집·이용과 광고성 문자 수신에 명시적으로 동의했는지 확인한 후 저장하시겠습니까?";
  if(!confirm(summary))return;
