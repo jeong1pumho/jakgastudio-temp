@@ -14,7 +14,7 @@
   $("sms-subscribe-form").reset();$("sms-verify-form").reset();
   const unsub=nextMode==="unsubscribe";
   $("sms-dialog-title").textContent=unsub?"문자 알림 해지":"빠르게 소식 받기";
-  $("sms-dialog-desc").textContent=unsub?"문자 알림을 해지하려면 등록한 휴대폰 번호를 인증해 주세요.":"새로운 독서모임, 글쓰기 클래스와 특별행사 소식을 문자로 알려드립니다. 회원가입은 필요하지 않습니다.";
+  $("sms-dialog-desc").textContent=unsub?"문자 알림을 해지하려면 등록한 휴대폰 번호를 인증해 주세요.":"회원가입은 필요하지 않습니다.\n새로운 독서모임, 글쓰기 클래스와 특별행사 소식을 무료로 알려드립니다.";
   $("sms-name-field").hidden=unsub;$("sms-user-name").required=!unsub;
   $("sms-consent-block").hidden=unsub;$("sms-privacy-accept").required=!unsub;$("sms-marketing-accept").required=!unsub;
   $("sms-verify-btn").textContent=unsub?"인증 확인 및 알림 해지":"인증 확인 및 신청 완료";
