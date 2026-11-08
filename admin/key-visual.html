@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Key Visual 관리 | 작가작업실 JEJU</title>
+<style>
+:root{font-family:system-ui,sans-serif;color:#382d26;background:#faf7f3}body{max-width:960px;margin:auto;padding:24px}a{color:#66442d}button,input{font:inherit}button{padding:8px 12px;border:1px solid #ad9381;border-radius:5px;background:#fff;color:inherit;cursor:pointer}button:disabled{opacity:.45;cursor:default}.primary{background:#523b2e;color:white}.actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}#list{list-style:none;padding:0;display:grid;gap:12px}.card{background:#fff;padding:14px;border:1px solid #e1d5ca;border-radius:8px;display:grid;grid-template-columns:150px 1fr;gap:14px}.thumb{width:100%;aspect-ratio:16/9;object-fit:contain;background:#35271f}.details{display:grid;gap:8px}.details input{max-width:100%;box-sizing:border-box;padding:6px}.notice{min-height:1.5em}dialog{max-width:min(680px,90vw);max-height:88vh;border:1px solid #ad9381;border-radius:9px;color:inherit}dialog::backdrop{background:#201a15aa}.crop-stage{display:grid;place-items:center;background:#35271f;margin:10px 0}canvas{display:block;max-width:100%;max-height:45vh;object-fit:contain;touch-action:none}.sliders{display:grid;gap:6px;margin-bottom:10px}.sliders label{display:grid;grid-template-columns:100px 1fr;gap:8px}.preview{position:relative;background:#35271f;width:min(100%,640px);aspect-ratio:16/9;overflow:hidden;margin:10px auto}.preview.mobile{width:min(260px,100%);aspect-ratio:9/16}.preview>img{width:100%;height:100%;object-fit:contain}.preview-copy{position:absolute;inset:0;background:linear-gradient(90deg,#14120f7a,transparent 76%);color:white;padding:22% 10% 0;font-size:clamp(11px,2vw,15px)}.preview-copy img{width:47%}.mobile .preview-copy{padding:57% 8% 0}.mobile .preview-copy img{width:85%}.preview p{margin:8px 0}[hidden]{display:none!important}@media(max-width:500px){body{padding:14px}.card{grid-template-columns:1fr}.thumb{max-width:200px}}
+</style></head><body>
+<nav><a href="/admin/">관리자 홈</a> · <a href="/" target="_blank" rel="noopener">테스트 홈페이지</a></nav>
+<h1>Key Visual 관리</h1><p>사진을 최대 10장 등록할 수 있습니다. 사진 한 장마다 PC용과 모바일용으로 보일 영역을 지정하세요.</p>
+<p id="message" class="notice" role="status"></p>
+<div id="editor" hidden><div class="actions"><button id="add" type="button">사진 추가</button><button id="publish" type="button" class="primary">홈페이지에 반영</button><span id="count"></span></div>
+<ol id="list"></ol></div>
+<input id="file" type="file" accept="image/jpeg,image/png,image/webp,image/avif" hidden>
+<dialog id="cropDialog" aria-labelledby="cropTitle"><h2 id="cropTitle"></h2><p>사진 위에서 선택 상자를 끌거나 아래 슬라이더로 위치와 크기를 조절하세요.</p>
+<div class="crop-stage"><canvas id="cropCanvas" aria-hidden="true"></canvas></div>
+<div class="sliders"><label>가로 위치<input id="cropX" type="range" min="0" max="100" value="50"></label><label>세로 위치<input id="cropY" type="range" min="0" max="100" value="50"></label><label>선택 영역 크기<input id="cropSize" type="range" min="25" max="100" value="100"></label></div>
+<p id="dimensions" role="status"></p><div class="actions"><button id="cancelCrop" type="button">취소</button><button id="acceptCrop" type="button" class="primary"></button></div></dialog>
+<dialog id="previewDialog" aria-labelledby="previewTitle"><h2 id="previewTitle">홈페이지 미리보기</h2>
+<div class="actions"><button type="button" data-mode="fhd">Full HD</button><button type="button" data-mode="qhd">QHD</button><button type="button" data-mode="mobile">모바일</button></div>
+<p id="previewInfo"></p><div class="preview" id="previewFrame"><img id="previewPhoto" alt=""><div class="preview-copy"><img src="/assets/hero-original-CI.svg" alt="작가작업실 JEJU"><p>누구나 편하게 책을 읽고, 글을 쓸 수 있도록<br>제주 이호테우에 마련한 공간입니다.</p></div></div>
+<form method="dialog"><button>닫기</button></form></dialog>
+<script src="/assets/admin-session.js"></script><script src="/assets/key-visual-admin.js"></script>
+</body></html>

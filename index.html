@@ -1217,7 +1217,10 @@ strong,b{font-weight:700}
   const viewport=document.getElementById('kv-carousel');
   const track=document.getElementById('kv-carousel-track');
   if(!hero||!viewport||!track)return;
-  const buttons=[...hero.querySelectorAll('.kv-dot')];
+  const dots=hero.querySelector('.kv-carousel-dots');
+  let buttons=[...dots.querySelectorAll('.kv-dot')];
+  const prev=hero.querySelector('#kv-prev'),next=hero.querySelector('#kv-next');
+  let total=buttons.length;
   const status=hero.querySelector('#kv-carousel-status');
   const reduced=window.matchMedia('(prefers-reduced-motion: reduce)');
   let index=1,locked=false,startX=null;
@@ -1228,29 +1231,56 @@ strong,b{font-weight:700}
     const offset=(viewport.clientWidth-width)/2-index*(width+gap);
     track.style.transitionDuration=(!animate||reduced.matches)?'0ms':'1200ms';
     track.style.transform='translate3d('+offset+'px,0,0)';
-    const logical=(index+6)%7;
+    const logical=(index+total-1)%total;
     buttons.forEach((b,i)=>b.setAttribute('aria-current',i===logical?'true':'false'));
-    status.textContent='사진 '+(logical+1)+' / 7';
+    status.textContent='사진 '+(logical+1)+' / '+total;
   }
   function go(next){
-    if(locked||next===index)return;
+    if(total<2||locked||next===index)return;
     index=next;locked=true;translate(true);
     if(reduced.matches){finish();}
   }
   function finish(){
-    if(index===0)index=7;
-    if(index===8)index=1;
+    if(index===0)index=total;
+    if(index===total+1)index=1;
     translate(false);locked=false;
   }
   track.addEventListener('transitionend',e=>{
     if(e.target===track&&e.propertyName==='transform')finish();
   });
-  hero.querySelector('#kv-prev').addEventListener('click',()=>go(index-1));
-  hero.querySelector('#kv-next').addEventListener('click',()=>go(index+1));
-  buttons.forEach(b=>b.addEventListener('click',()=>{
-    if(locked)return;
-    go(Number(b.dataset.slide));
-  }));
+  prev.addEventListener('click',()=>go(index-1));
+  next.addEventListener('click',()=>go(index+1));
+  dots.addEventListener('click',e=>{
+    const button=e.target.closest('.kv-dot');
+    if(button)go(Number(button.dataset.slide));
+  });
+  function renderPublished(items){
+    const makeSlide=(item,i,clone)=>{
+      const slide=document.createElement('div');
+      slide.className='kv-slide';slide.setAttribute('role','group');
+      slide.setAttribute('aria-roledescription','슬라이드');
+      slide.setAttribute('aria-label',(i+1)+' / '+total);
+      if(clone)slide.setAttribute('aria-hidden','true');
+      const picture=document.createElement('picture');
+      const mobile=document.createElement('source');
+      mobile.media='(max-width:700px) and (orientation:portrait)';mobile.srcset=item.mobile;
+      const img=document.createElement('img');
+      img.src=item.desktop;img.alt=clone?'':item.alt;img.draggable=false;
+      img.loading=i===0&&!clone?'eager':'lazy';img.decoding='async';
+      picture.append(mobile,img);slide.append(picture);return slide;
+    };
+    total=items.length;index=1;locked=false;
+    track.replaceChildren(makeSlide(items[total-1],total-1,true),
+      ...items.map((item,i)=>makeSlide(item,i,false)),makeSlide(items[0],0,true));
+    buttons=items.map((item,i)=>{
+      const button=document.createElement('button');
+      button.type='button';button.className='kv-dot';button.dataset.slide=i+1;
+      button.setAttribute('aria-label',(i+1)+'번 사진 보기');return button;
+    });
+    dots.replaceChildren(...buttons);
+    [prev,next,dots].forEach(el=>{el.style.display=total===1?'none':'';});
+    translate(false);
+  }
   viewport.addEventListener('pointerdown',e=>{if(e.pointerType!=='mouse'||e.button===0)startX=e.clientX;});
   viewport.addEventListener('pointerup',e=>{
     if(startX===null)return;
@@ -1266,6 +1296,9 @@ strong,b{font-weight:700}
   window.addEventListener('resize',()=>translate(false));
   if('ResizeObserver'in window)new ResizeObserver(()=>translate(false)).observe(viewport);
   translate(false);
+  fetch('/api/key-visual').then(response=>response.ok?response.json():null).then(data=>{
+    if(data?.revision>0 && Array.isArray(data.slides) && data.slides.length>=1 && data.slides.length<=10) renderPublished(data.slides);
+  }).catch(()=>{});
 })();
 </script>
 <!-- Approved introduction: brand image only; all copy is searchable HTML -->

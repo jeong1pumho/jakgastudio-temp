@@ -1,0 +1,73 @@
+'use strict';
+const {root, key, query, send, admin} = require('../lib/core');
+const initial = [
+  {
+    "desktop": "/assets/kv-20261109-01.webp",
+    "mobile": "/assets/kv-20261109-01.webp",
+    "alt": "펜던트 조명과 큰 창이 보이는 책방 전경"
+  },
+  {
+    "desktop": "/assets/kv-20261109-02.webp",
+    "mobile": "/assets/kv-20261109-02.webp",
+    "alt": "작가작업실 JEJU 간판과 유리창이 보이는 건물 외관"
+  },
+  {
+    "desktop": "/assets/kv-20261109-03.webp",
+    "mobile": "/assets/kv-20261109-03.webp",
+    "alt": "크리스마스트리 옆 책 진열대"
+  },
+  {
+    "desktop": "/assets/kv-20261109-04.webp",
+    "mobile": "/assets/kv-20261109-04.webp",
+    "alt": "책방 테이블에 둘러앉은 독서모임"
+  },
+  {
+    "desktop": "/assets/kv-20261109-05.webp",
+    "mobile": "/assets/kv-20261109-05.webp",
+    "alt": "작은 조명 옆에 늘어선 책장"
+  },
+  {
+    "desktop": "/assets/kv-20261109-06.webp",
+    "mobile": "/assets/kv-20261109-06.webp",
+    "alt": "크리스마스트리와 책장, 테이블이 보이는 실내"
+  },
+  {
+    "desktop": "/assets/kv-20261109-07.webp",
+    "mobile": "/assets/kv-20261109-07.webp",
+    "alt": "창가 테이블 위에 놓인 책"
+  }
+];
+const endpoint = '/rest/v1/key_visual?id=eq.1';
+module.exports = async (req, res) => {
+  try {
+    if (root() !== 'https://qrbavxempotptnmflqoq.supabase.co') return send(res, 503, {error:'테스트 저장소 연결을 확인해 주세요.'});
+    if (req.method === 'GET') {
+      if (req.query?.admin === '1') await admin(req);
+      const [row] = await query(endpoint + '&select=slides,revision');
+      return send(res, 200, row || {slides:initial,revision:0});
+    }
+    if (req.method !== 'PUT') return send(res, 405, {error:'지원하지 않는 요청입니다.'});
+    const token = await admin(req);
+    const {slides, revision} = req.body || {};
+    const prefix = root() + '/storage/v1/object/public/key-visual/';
+    const isUpload = value => typeof value === 'string' && value.startsWith(prefix) &&
+      /^[a-f0-9-]{36}\\.(webp|png)$/.test(value.slice(prefix.length));
+    const isAsset = value => initial.some(item => item.desktop === value) || isUpload(value);
+    if (!Number.isInteger(revision) || revision < 0 || !Array.isArray(slides) || slides.length < 1 || slides.length > 10 ||
+        !slides.every(item => item && isAsset(item.desktop) && isAsset(item.mobile) && typeof item.alt === 'string' && item.alt.trim() && item.alt.length <= 150)) {
+      return send(res, 400, {error:'사진은 1~10장, 사진 설명은 1~150자로 입력해 주세요.'});
+    }
+    const payload = {slides:slides.map(({desktop,mobile,alt})=>({desktop,mobile,alt:alt.trim()})),revision:revision+1};
+    const files = [...new Set(payload.slides.flatMap(item => [item.desktop,item.mobile]).filter(isUpload))];
+    const checks = await Promise.all(files.map(url => fetch(url,{method:'HEAD'})));
+    if (checks.some(response => !response.ok)) return send(res, 400, {error:'등록한 사진 파일을 확인할 수 없습니다.'});
+    const rows = revision === 0
+      ? await query('/rest/v1/key_visual?select=revision','POST',{id:1,...payload},token)
+      : await query(endpoint+'&revision=eq.'+revision+'&select=revision','PATCH',payload,token);
+    if (!rows.length) return send(res, 409, {error:'공개 목록이 바뀌었습니다. 다시 열어 확인해 주세요.'});
+    return send(res, 200, rows[0]);
+  } catch (error) {
+    const status = error.status || 500;
+    return send(res, status, {error:status===409?'공개 목록이 바뀌었습니다. 다시 열어 확인해 주세요.':status>=500?'Key Visual 저장소에 연결할 수 없습니다.':error.message});
+  }
+};
