@@ -1102,44 +1102,97 @@ strong,b{font-weight:700}
 .news-sms-unsub{font:inherit;font-size:12px;color:#75675b;text-decoration:underline;background:none;border:0;cursor:pointer;padding:8px}
 @media(max-width:700px){.news-sms-actions{justify-content:center;gap:8px}.news-sms-cta{font-size:15px;padding:11px 15px}.sms-modal{padding:24px 21px 23px}.sms-dialog h2{font-size:23px}.sms-intro{font-size:13px}}
 </style>
+<style id="test-approved-keyvisual-20261108">
+/* Approved seven-photo full-frame Key Visual and single fixed top menu; other sections unchanged. */
+#kv-hero.carousel-keyvisual{height:100svh;min-height:560px;background:#35271f}
+#kv-hero .kv-carousel-viewport{inset:0;width:100%;height:100%;z-index:1}
+#kv-hero .kv-carousel-track{gap:0;height:100%;transform:translate3d(-100vw,0,0)}
+#kv-hero .kv-slide{flex:0 0 100vw;width:100vw;height:100%;border-radius:0}
+#kv-hero .kv-slide img{width:100%;height:100%;object-fit:cover;object-position:center}
+#kv-hero .kv-carousel-scrim{inset:0;width:100%;height:100%;border-radius:0;background:linear-gradient(90deg,rgba(20,18,15,.48),rgba(20,18,15,.14) 50%,transparent 76%)}
+#kv-hero .kv-text{left:clamp(30px,10vw,190px);top:40%;bottom:auto;width:min(35vw,540px);max-width:calc(100vw - 60px)}
+#kv-hero .kv-text img{width:min(30vw,480px)}
+#kv-hero .kv-description-divider{margin:clamp(24px,3svh,36px) 0}
+#kv-hero .kv-arrow{top:51%;z-index:8}
+#kv-hero .kv-arrow-prev{left:2%}
+#kv-hero .kv-arrow-next{right:2%}
+#kv-hero .kv-carousel-dots{bottom:4.3svh;gap:14px;z-index:9}
+.kv-sticky-header{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(51,37,29,.98);height:74px;color:#fff;box-shadow:0 1px 5px rgba(0,0,0,.13)}
+.kv-sticky-inner{height:100%;width:calc(100% - 8%);max-width:1760px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.kv-sticky-ci{width:clamp(165px,17vw,248px);height:auto;max-height:38px;object-fit:contain;object-position:left center;filter:brightness(0) invert(1)}
+.kv-main-menu{display:flex;align-items:center;justify-content:flex-end;gap:clamp(15px,2.3vw,39px);white-space:nowrap}
+.kv-main-menu span{color:#fff;font-size:clamp(12px,.92vw,16px);font-weight:500;line-height:1.4;cursor:default}
+@media(max-width:850px){
+ .kv-sticky-header{height:auto;min-height:66px}
+ .kv-sticky-inner{width:calc(100% - 32px);padding:10px 0;flex-direction:column;gap:8px}
+ .kv-sticky-ci{width:185px;max-height:27px;align-self:flex-start}
+ .kv-main-menu{width:100%;overflow-x:auto;justify-content:flex-start;gap:19px;scrollbar-width:none}
+ .kv-main-menu::-webkit-scrollbar{display:none}
+ .kv-main-menu span{font-size:12px;flex-shrink:0}
+ #kv-hero .kv-text{left:8vw;top:42%;width:85vw;max-width:85vw}
+ #kv-hero .kv-text img{width:min(76vw,390px)}
+ #kv-hero .kv-arrow-prev{left:2vw}
+ #kv-hero .kv-arrow-next{right:2vw}
+}
+@media(max-width:700px){
+ #kv-hero .kv-carousel-viewport{top:0;height:100%}
+ #kv-hero .kv-carousel-track{gap:0;transform:translate3d(-100vw,0,0)}
+ #kv-hero .kv-slide{width:100vw;flex-basis:100vw;border-radius:0}
+ #kv-hero .kv-carousel-scrim{inset:0;width:100%;height:100%;border-radius:0;background:linear-gradient(90deg,rgba(16,15,12,.58),rgba(16,15,12,.10) 100%)}
+ #kv-hero .kv-text{left:8vw;top:43%;bottom:auto;width:80vw}
+ #kv-hero .kv-arrow{top:54%}
+ #kv-hero .kv-carousel-dots{bottom:4svh}
+}
+</style>
 </head><body class="variant-a">
+<header class="kv-sticky-header" aria-label="작가작업실 JEJU 상단 메뉴">
+  <div class="kv-sticky-inner">
+    <img class="kv-sticky-ci" src="/assets/ci-one-line.svg" alt="작가작업실 JEJU" width="609" height="53"/>
+    <nav class="kv-main-menu" aria-label="향후 페이지 메뉴">
+      <span>Home</span>
+      <span>모임·행사</span>
+      <span>월간 캘린더</span>
+      <span>공간소개</span>
+      <span>운영 프로그램</span>
+      <span>방문 안내</span>
+    </nav>
+  </div>
+</header>
 <main id="top">
 <section aria-label="작가작업실 JEJU 사진 소개" class="hero video-keyvisual carousel-keyvisual" id="kv-hero">
-  <div class="kv-carousel-viewport" id="kv-carousel" role="region" aria-roledescription="캐러셀" aria-label="작가작업실 JEJU의 다섯 장 사진">
+  <div class="kv-carousel-viewport" id="kv-carousel" role="region" aria-roledescription="캐러셀" aria-label="작가작업실 JEJU의 일곱 장 사진">
     <div class="kv-carousel-track" id="kv-carousel-track">
-      <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="5 / 5" aria-hidden="true">
-        <picture class="kv-mobile-picture"><source media="(max-width:700px)" type="image/webp" srcset="/assets/hero-06-mobile.webp"/><img src="/assets/hero-06.jpg" alt="" draggable="false" loading="lazy" decoding="async"/></picture>
+      <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="7 / 7" aria-hidden="true">
+        <img src="/assets/kv-final-07.webp" alt="" draggable="false" loading="lazy" decoding="async"/>
       </div>
-      <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="1 / 5" >
-        <picture class="kv-mobile-picture"><source media="(max-width:700px)" type="image/webp" srcset="/assets/hero-01-mobile.webp"/><img src="/assets/hero-01.jpg" alt="" draggable="false" fetchpriority="high" loading="eager" decoding="async"/></picture>
+      <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="1 / 7">
+        <img src="/assets/kv-final-01.webp" alt="" draggable="false" fetchpriority="high" loading="eager" decoding="async"/>
       </div>
-      <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="2 / 5" >
-        <picture class="kv-mobile-picture"><source media="(max-width:700px)" type="image/webp" srcset="/assets/hero-02-mobile.webp"/><img src="/assets/hero-02.jpg" alt="" draggable="false" loading="lazy" decoding="async"/></picture>
+      <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="2 / 7">
+        <img src="/assets/kv-final-02.webp" alt="" draggable="false" loading="lazy" decoding="async"/>
       </div>
-      <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="3 / 5" >
-        <picture class="kv-mobile-picture"><source media="(max-width:700px)" type="image/webp" srcset="/assets/hero-03-mobile.webp"/><img src="/assets/hero-03.jpg" alt="" draggable="false" loading="lazy" decoding="async"/></picture>
+      <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="3 / 7">
+        <img src="/assets/kv-final-03.webp" alt="" draggable="false" loading="lazy" decoding="async"/>
       </div>
-      <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="4 / 5" >
-        <picture class="kv-mobile-picture"><source media="(max-width:700px)" type="image/webp" srcset="/assets/hero-04-mobile.webp"/><img src="/assets/hero-04.jpg" alt="" draggable="false" loading="lazy" decoding="async"/></picture>
+      <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="4 / 7">
+        <img src="/assets/kv-final-04.webp" alt="" draggable="false" loading="lazy" decoding="async"/>
       </div>
-      <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="5 / 5" >
-        <picture class="kv-mobile-picture"><source media="(max-width:700px)" type="image/webp" srcset="/assets/hero-06-mobile.webp"/><img src="/assets/hero-06.jpg" alt="" draggable="false" loading="lazy" decoding="async"/></picture>
+      <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="5 / 7">
+        <img src="/assets/kv-final-05.webp" alt="" draggable="false" loading="lazy" decoding="async"/>
       </div>
-      <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="1 / 5" aria-hidden="true">
-        <picture class="kv-mobile-picture"><source media="(max-width:700px)" type="image/webp" srcset="/assets/hero-01-mobile.webp"/><img src="/assets/hero-01.jpg" alt="" draggable="false" loading="lazy" decoding="async"/></picture>
+      <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="6 / 7">
+        <img src="/assets/kv-final-06.webp" alt="" draggable="false" loading="lazy" decoding="async"/>
+      </div>
+      <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="7 / 7">
+        <img src="/assets/kv-final-07.webp" alt="" draggable="false" loading="lazy" decoding="async"/>
+      </div>
+      <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="1 / 7" aria-hidden="true">
+        <img src="/assets/kv-final-01.webp" alt="" draggable="false" loading="lazy" decoding="async"/>
       </div>
     </div>
   </div>
   <div class="kv-carousel-scrim" aria-hidden="true"></div>
-  <nav class="kv-video-nav" aria-label="홈페이지 섹션 바로가기">
-    <a href="#kv-hero">Home</a>
-    <a href="#news">모임·행사</a>
-    <a href="#schedule">월간 캘린더</a>
-    <a href="#space">공간소개</a>
-    <a href="#program">운영 프로그램</a>
-    <a href="#hours">방문 안내</a>
-  </nav>
-  <div class="kv-text">
+    <div class="kv-text">
     <h1 class="sr-only">작가작업실 JEJU | 책방 그리고 글쓰기와 독서모임</h1>
     <img src="/assets/hero-original-CI.svg" alt="" width="299" height="90" fetchpriority="high"/>
     <span class="kv-description-divider" aria-hidden="true"></span>
@@ -1153,8 +1206,10 @@ strong,b{font-weight:700}
     <button type="button" class="kv-dot" data-slide="3" aria-label="3번 사진 보기" aria-current="false"></button>
     <button type="button" class="kv-dot" data-slide="4" aria-label="4번 사진 보기" aria-current="false"></button>
     <button type="button" class="kv-dot" data-slide="5" aria-label="5번 사진 보기" aria-current="false"></button>
+    <button type="button" class="kv-dot" data-slide="6" aria-label="6번 사진 보기" aria-current="false"></button>
+    <button type="button" class="kv-dot" data-slide="7" aria-label="7번 사진 보기" aria-current="false"></button>
   </div>
-  <span class="sr-only" id="kv-carousel-status" aria-live="polite">사진 1 / 5</span>
+  <span class="sr-only" id="kv-carousel-status" aria-live="polite">사진 1 / 7</span>
 </section>
 <script id="hero-six-carousel-behavior">
 (()=>{
@@ -1173,9 +1228,9 @@ strong,b{font-weight:700}
     const offset=(viewport.clientWidth-width)/2-index*(width+gap);
     track.style.transitionDuration=(!animate||reduced.matches)?'0ms':'1200ms';
     track.style.transform='translate3d('+offset+'px,0,0)';
-    const logical=(index+4)%5;
+    const logical=(index+6)%7;
     buttons.forEach((b,i)=>b.setAttribute('aria-current',i===logical?'true':'false'));
-    status.textContent='사진 '+(logical+1)+' / 5';
+    status.textContent='사진 '+(logical+1)+' / 7';
   }
   function go(next){
     if(locked||next===index)return;
@@ -1183,8 +1238,8 @@ strong,b{font-weight:700}
     if(reduced.matches){finish();}
   }
   function finish(){
-    if(index===0)index=5;
-    if(index===6)index=1;
+    if(index===0)index=7;
+    if(index===8)index=1;
     translate(false);locked=false;
   }
   track.addEventListener('transitionend',e=>{
@@ -1215,13 +1270,7 @@ strong,b{font-weight:700}
 </script>
 <!-- Approved introduction: brand image only; all copy is searchable HTML -->
 <div class="page-with-header">
-<header aria-label="상단 고정 브랜드" class="sticky-brand-header">
-<div class="content-width sticky-brand-inner">
-<a aria-label="작가작업실 JEJU — 홈페이지 맨 위로 이동" class="sticky-brand-home" href="#top" title="맨 위로 이동">
-<img alt="작가작업실 JEJU | 책방 그리고 글쓰기와 독서모임" height="53" src="/assets/ci-one-line.svg" width="609"/>
-</a>
-</div>
-</header>
+
 <section aria-labelledby="intro-title" class="intro-section" id="brand-story">
 <div class="content-width brand-container"><div class="section-heading brand-section-heading"><p class="eyebrow">01 <span>BRAND</span><i></i></p><div class="heading-line"><h2>브랜드</h2></div></div><div class="brand-art"><div aria-hidden="true" class="intro-photo"></div>
 <div class="intro-inner">
