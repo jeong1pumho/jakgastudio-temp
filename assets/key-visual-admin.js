@@ -9,6 +9,8 @@
   const canvas = $('cropCanvas');
   const context = canvas.getContext('2d');
   const previewDialog = $('previewDialog');
+  const originalBucket = 'key-visual-originals';
+  const originalTypes = {'image/jpeg':'jpg','image/png':'png','image/webp':'webp','image/avif':'avif'};
   const ranges = ['cropX','cropY','cropSize'].map($);
   let slides = [], revision = 0, busy = false, editIndex = -1, crop, previewSlide, drag;
 
@@ -49,7 +51,8 @@
         button('위로',()=>move(-1),busy || i===0),
         button('아래로',()=>move(1),busy || i===slides.length-1),
         button('PC·모바일 미리보기',()=>{previewSlide=item; showPreview('fhd'); previewDialog.showModal();}),
-        button('원본 선택·크롭',()=>choose(i),busy),
+        ...(item.original ? [button('크롭 수정',()=>reopen(i),busy)] : []),
+        button(item.original?'원본 교체·크롭':'원본 선택·크롭',()=>choose(i),busy),
         button('목록에서 제거',()=>{release(item);slides.splice(i,1);render();},busy)
       );
       card.append(img,actions); return card;
@@ -72,18 +75,47 @@
     if (!['image/jpeg','image/png','image/webp','image/avif'].includes(file.type) || file.size > 30*1024*1024) {
       message('JPG·PNG·WebP·AVIF 파일을 30MB 이하로 선택해 주세요.'); return;
     }
+    await openCrop(file,{blob:file});
+  });
+  async function openCrop(file, original) {
     const url = URL.createObjectURL(file);
     try {
       const image = new Image(); image.src=url; await image.decode();
-      crop = {image,url,mode:'desktop',pending:{}};
+      crop = {image,url,original,settings:{},pending:{}};
       setCropMode('desktop'); cropDialog.showModal();
     } catch {
       URL.revokeObjectURL(url); crop=null; message('사진 파일을 열 수 없습니다.');
     }
-  });
+  }
+  async function storageConfig() {
+    const config=await api('/api/admin?action=config');
+    if(config.url!=='https://qrbavxempotptnmflqoq.supabase.co')throw Error('테스트 저장소 연결을 확인해 주세요.');
+    return config;
+  }
+  async function reopen(i) {
+    if(busy)return;
+    editIndex=i;
+    const original=slides[i].original;
+    busy=true;render();
+    try {
+      let file=original.blob;
+      if(!file){
+        message('비공개 원본을 불러오는 중입니다…');
+        const config=await storageConfig();
+        const response=await fetch(config.url+'/storage/v1/object/authenticated/'+originalBucket+'/'+encodeURIComponent(original.name),
+          {headers:{apikey:config.key,Authorization:'Bearer '+token},cache:'no-store'});
+        if(!response.ok)throw Error('비공개 원본을 불러오지 못했습니다. (HTTP '+response.status+')');
+        file=await response.blob();
+      }
+      message('');
+      await openCrop(file,original);
+    }catch(error){message(error.message);}
+    finally{busy=false;render();}
+  }
   function setCropMode(mode) {
     crop.mode = mode;
-    ranges[0].value=50; ranges[1].value=50; ranges[2].value=100;
+    const settings=crop.original[mode] || [50,50,100];
+    ranges.forEach((range,i)=>{range.value=settings[i];});
     $('cropTitle').textContent=mode==='desktop'?'PC 영역 선택 (16:9)':'모바일 영역 선택 (9:16)';
     $('acceptCrop').textContent=mode==='desktop'?'모바일 영역 선택하기':'두 크롭 적용';
     const {naturalWidth:w,naturalHeight:h}=crop.image;
@@ -190,8 +222,9 @@
       const blob=await new Promise(resolve=>output.toBlob(resolve,'image/png'));
       if (!blob || blob.size > 24*1024*1024) throw Error('크롭 이미지가 24MB를 초과합니다. 선택 영역을 줄이거나 용량이 작은 원본을 사용해 주세요.');
       crop.pending[crop.mode]={blob,preview:URL.createObjectURL(blob)};
+      crop.settings[crop.mode]=ranges.map(range=>Number(range.value));
       if(crop.mode==='desktop'){setCropMode('mobile');return;}
-      const item={pending:crop.pending};
+      const item={pending:crop.pending,original:{...crop.original,...crop.settings}};
       if(editIndex===-1)slides.push(item);
       else{release(slides[editIndex]);slides[editIndex]=item;}
       crop.pending={};cropDialog.close();render();message('크롭을 적용했습니다. 발행하면 홈페이지에 표시됩니다.');
@@ -208,17 +241,30 @@
     file.url=base+'public/key-visual/'+name;
     return file.url;
   }
+  async function saveOriginal(original, config) {
+    if(!original)return undefined;
+    if(!original.name){
+      const {blob}=original;
+      const name=crypto.randomUUID()+'.'+originalTypes[blob.type];
+      const response=await fetch(config.url+'/storage/v1/object/'+originalBucket+'/'+name,{method:'POST',
+        headers:{apikey:config.key,Authorization:'Bearer '+token,'Content-Type':blob.type,'x-upsert':'false'},body:blob});
+      if(!response.ok)throw Error('비공개 원본 저장에 실패했습니다. (HTTP '+response.status+')');
+      original.name=name;
+    }
+    const {name,desktop,mobile}=original;
+    return {name,desktop,mobile};
+  }
   $('publish').addEventListener('click',async () => {
     if(busy)return;
     busy=true;render();message('사진을 업로드하고 있습니다…');
     try {
-      const config=await api('/api/admin?action=config');
-      if(config.url!=='https://qrbavxempotptnmflqoq.supabase.co')throw Error('테스트 저장소 연결을 확인해 주세요.');
+      const config=await storageConfig();
       const published=[];
       for(const item of slides){
         const desktop=item.pending?await upload(item.pending.desktop,config):item.desktop;
         const mobile=item.pending?await upload(item.pending.mobile,config):item.mobile;
-        published.push({desktop,mobile,alt:item.alt});
+        const original=await saveOriginal(item.original,config);
+        published.push({desktop,mobile,alt:item.alt,original});
       }
       const saved=await api('/api/key-visual',{method:'PUT',body:JSON.stringify({slides:published,revision})});
       slides.forEach(release);slides=published;revision=saved.revision;message('테스트 홈페이지에 반영했습니다.');
