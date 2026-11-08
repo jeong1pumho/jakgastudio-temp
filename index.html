@@ -1108,7 +1108,7 @@ strong,b{font-weight:700}
 #kv-hero .kv-carousel-viewport{inset:0;width:100%;height:100%;z-index:1}
 #kv-hero .kv-carousel-track{gap:0;height:100%;transform:translate3d(-100vw,0,0)}
 #kv-hero .kv-slide{flex:0 0 100vw;width:100vw;height:100%;border-radius:0}
-#kv-hero .kv-slide img{width:100%;height:100%;object-fit:cover;object-position:center}
+#kv-hero .kv-slide img{width:100%;height:100%;object-fit:contain;object-position:center}
 #kv-hero .kv-carousel-scrim{inset:0;width:100%;height:100%;border-radius:0;background:linear-gradient(90deg,rgba(20,18,15,.48),rgba(20,18,15,.14) 50%,transparent 76%)}
 #kv-hero .kv-text{left:clamp(30px,10vw,190px);top:40%;bottom:auto;width:min(35vw,540px);max-width:calc(100vw - 60px)}
 #kv-hero .kv-text img{width:min(30vw,480px)}
@@ -1143,39 +1143,6 @@ strong,b{font-weight:700}
  #kv-hero .kv-arrow{top:54%}
  #kv-hero .kv-carousel-dots{bottom:4svh}
 }
-/* TEST-SITE KEY VISUAL — 2026-11-08: verified 7-slide image mapping.
-   Frames 2, 4, 7 use the exact original portrait photos and the yellow-box
-   bands supplied by the owner, rather than an incorrectly pre-cropped derivative.
-   Keep all seven slides full-bleed; no thumbnail row. */
-#kv-hero .kv-slide[aria-label="1 / 7"] img{object-position:50% 50%}
-#kv-hero .kv-slide[aria-label="2 / 7"] img{object-position:50% 44%}
-#kv-hero .kv-slide[aria-label="3 / 7"] img{object-position:50% 50%}
-#kv-hero .kv-slide[aria-label="4 / 7"] img{object-position:50% 58%}
-#kv-hero .kv-slide[aria-label="5 / 7"] img{object-position:50% 50%}
-#kv-hero .kv-slide[aria-label="6 / 7"] img{object-position:50% 50%}
-#kv-hero .kv-slide[aria-label="7 / 7"] img{object-position:50% 83%}
-@media(max-width:700px){
- #kv-hero .kv-slide[aria-label="2 / 7"] img{object-position:50% 44%}
- #kv-hero .kv-slide[aria-label="4 / 7"] img{object-position:50% 58%}
- #kv-hero .kv-slide[aria-label="7 / 7"] img{object-position:50% 83%}
-}
-
-/* Fixed intrinsic SVG crop windows reflect the owner's yellow boxes.
-   Unlike object-position, these crop coordinates do not vary with viewport dimensions.
-   No additional sections are modified. */
-#kv-hero .kv-slide .kv-crop-art{display:block;width:100%;height:100%;pointer-events:none;user-select:none;overflow:hidden}
-#kv-hero .kv-slide .kv-crop-art image{pointer-events:none}
-</style>
-
-<style id="kv-approved-02-04-20261109">
-/* Owner-approved frames 02/04, landscape images, full-bleed across the slide. */
-#kv-hero .kv-slide[aria-label="2 / 7"] img,
-#kv-hero .kv-slide[aria-label="4 / 7"] img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center center;
-}
 </style>
 </head><body class="variant-a">
 <header class="kv-sticky-header" aria-label="작가작업실 JEJU 상단 메뉴">
@@ -1196,31 +1163,31 @@ strong,b{font-weight:700}
   <div class="kv-carousel-viewport" id="kv-carousel" role="region" aria-roledescription="캐러셀" aria-label="작가작업실 JEJU의 일곱 장 사진">
     <div class="kv-carousel-track" id="kv-carousel-track">
       <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="7 / 7" aria-hidden="true">
-        <svg class="kv-crop-art" viewBox="0 976 1536 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false" role="presentation"><image href="/assets/space-refresh-20261104-05.webp" x="0" y="0" width="1536" height="2048" preserveAspectRatio="none"/></svg>
+        <img src="/assets/kv-20261109-07.webp" alt="" draggable="false" loading="lazy" decoding="async"/>
       </div>
       <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="1 / 7">
-        <img src="/assets/kv-final-01.webp" alt="" draggable="false" fetchpriority="high" loading="eager" decoding="async"/>
+        <img src="/assets/kv-20261109-01.webp" alt="펜던트 조명과 큰 창이 보이는 책방 전경" draggable="false" fetchpriority="high" loading="eager" decoding="async"/>
       </div>
       <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="2 / 7">
-        <img src="/assets/kv-approved-02.webp" alt="작가작업실 JEJU의 크리스마스트리와 책방 공간" draggable="false" loading="lazy" decoding="async"/>
+        <img src="/assets/kv-20261109-02.webp" alt="작가작업실 JEJU 간판과 유리창이 보이는 건물 외관" draggable="false" loading="lazy" decoding="async"/>
       </div>
       <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="3 / 7">
-        <img src="/assets/kv-final-03.webp" alt="" draggable="false" loading="lazy" decoding="async"/>
+        <img src="/assets/kv-20261109-03.webp" alt="크리스마스트리 옆 책 진열대" draggable="false" loading="lazy" decoding="async"/>
       </div>
       <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="4 / 7">
-        <img src="/assets/kv-approved-04.webp" alt="" draggable="false" loading="lazy" decoding="async"/>
+        <img src="/assets/kv-20261109-04.webp" alt="책방 테이블에 둘러앉은 독서모임" draggable="false" loading="lazy" decoding="async"/>
       </div>
       <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="5 / 7">
-        <img src="/assets/kv-final-02.webp" alt="" draggable="false" loading="lazy" decoding="async"/>
+        <img src="/assets/kv-20261109-05.webp" alt="작은 조명 옆에 늘어선 책장" draggable="false" loading="lazy" decoding="async"/>
       </div>
       <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="6 / 7">
-        <img src="/assets/kv-final-06.webp" alt="" draggable="false" loading="lazy" decoding="async"/>
+        <img src="/assets/kv-20261109-06.webp" alt="크리스마스트리와 책장, 테이블이 보이는 실내" draggable="false" loading="lazy" decoding="async"/>
       </div>
       <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="7 / 7">
-        <svg class="kv-crop-art" viewBox="0 976 1536 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false" role="presentation"><image href="/assets/space-refresh-20261104-05.webp" x="0" y="0" width="1536" height="2048" preserveAspectRatio="none"/></svg>
+        <img src="/assets/kv-20261109-07.webp" alt="창가 테이블 위에 놓인 책" draggable="false" loading="lazy" decoding="async"/>
       </div>
       <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="1 / 7" aria-hidden="true">
-        <img src="/assets/kv-final-01.webp" alt="" draggable="false" loading="lazy" decoding="async"/>
+        <img src="/assets/kv-20261109-01.webp" alt="" draggable="false" loading="lazy" decoding="async"/>
       </div>
     </div>
   </div>
