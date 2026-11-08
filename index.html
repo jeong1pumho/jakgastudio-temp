@@ -1143,15 +1143,21 @@ strong,b{font-weight:700}
  #kv-hero .kv-arrow{top:54%}
  #kv-hero .kv-carousel-dots{bottom:4svh}
 }
-/* TEST ONLY — use the authentic portrait source, with the precise approved focal band.
-   Slides 4, 5 and 7; the still-unavailable original for slide 6 stays unchanged. */
-#kv-hero .kv-slide img[src$="space-refresh-20261104-17.webp"]{object-position:50% 55%}
-#kv-hero .kv-slide img[src$="space-refresh-20261104-05.webp"]{object-position:50% 82%}
-#kv-hero .kv-slide img[src$="space-refresh-20261104-02.webp"]{object-position:50% 46%}
+/* TEST-SITE KEY VISUAL — 2026-11-08: verified 7-slide image mapping.
+   Frames 2, 4, 7 use the exact original portrait photos and the yellow-box
+   bands supplied by the owner, rather than an incorrectly pre-cropped derivative.
+   Keep all seven slides full-bleed; no thumbnail row. */
+#kv-hero .kv-slide[aria-label="1 / 7"] img{object-position:50% 50%}
+#kv-hero .kv-slide[aria-label="2 / 7"] img{object-position:50% 44%}
+#kv-hero .kv-slide[aria-label="3 / 7"] img{object-position:50% 50%}
+#kv-hero .kv-slide[aria-label="4 / 7"] img{object-position:50% 58%}
+#kv-hero .kv-slide[aria-label="5 / 7"] img{object-position:50% 50%}
+#kv-hero .kv-slide[aria-label="6 / 7"] img{object-position:50% 50%}
+#kv-hero .kv-slide[aria-label="7 / 7"] img{object-position:50% 83%}
 @media(max-width:700px){
- #kv-hero .kv-slide img[src$="space-refresh-20261104-17.webp"]{object-position:50% 58%}
- #kv-hero .kv-slide img[src$="space-refresh-20261104-05.webp"]{object-position:50% 88%}
- #kv-hero .kv-slide img[src$="space-refresh-20261104-02.webp"]{object-position:50% 48%}
+ #kv-hero .kv-slide[aria-label="2 / 7"] img{object-position:50% 44%}
+ #kv-hero .kv-slide[aria-label="4 / 7"] img{object-position:50% 58%}
+ #kv-hero .kv-slide[aria-label="7 / 7"] img{object-position:50% 83%}
 }
 </style>
 </head><body class="variant-a">
@@ -1173,28 +1179,28 @@ strong,b{font-weight:700}
   <div class="kv-carousel-viewport" id="kv-carousel" role="region" aria-roledescription="캐러셀" aria-label="작가작업실 JEJU의 일곱 장 사진">
     <div class="kv-carousel-track" id="kv-carousel-track">
       <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="7 / 7" aria-hidden="true">
-        <img src="/assets/space-refresh-20261104-02.webp" alt="" draggable="false" loading="lazy" decoding="async"/>
+        <img src="/assets/space-refresh-20261104-05.webp" alt="" draggable="false" loading="lazy" decoding="async"/>
       </div>
       <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="1 / 7">
         <img src="/assets/kv-final-01.webp" alt="" draggable="false" fetchpriority="high" loading="eager" decoding="async"/>
       </div>
       <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="2 / 7">
-        <img src="/assets/kv-final-02.webp" alt="" draggable="false" loading="lazy" decoding="async"/>
+        <img src="/assets/space-refresh-20261104-02.webp" alt="" draggable="false" loading="lazy" decoding="async"/>
       </div>
       <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="3 / 7">
         <img src="/assets/kv-final-03.webp" alt="" draggable="false" loading="lazy" decoding="async"/>
       </div>
       <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="4 / 7">
-        <img src="/assets/kv-final-04.webp" alt="" draggable="false" loading="lazy" decoding="async"/>
+        <img src="/assets/space-refresh-20261104-17.webp" alt="" draggable="false" loading="lazy" decoding="async"/>
       </div>
       <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="5 / 7">
-        <img src="/assets/space-refresh-20261104-05.webp" alt="" draggable="false" loading="lazy" decoding="async"/>
+        <img src="/assets/kv-final-02.webp" alt="" draggable="false" loading="lazy" decoding="async"/>
       </div>
       <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="6 / 7">
         <img src="/assets/kv-final-06.webp" alt="" draggable="false" loading="lazy" decoding="async"/>
       </div>
       <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="7 / 7">
-        <img src="/assets/space-refresh-20261104-02.webp" alt="" draggable="false" loading="lazy" decoding="async"/>
+        <img src="/assets/space-refresh-20261104-05.webp" alt="" draggable="false" loading="lazy" decoding="async"/>
       </div>
       <div class="kv-slide" role="group" aria-roledescription="슬라이드" aria-label="1 / 7" aria-hidden="true">
         <img src="/assets/kv-final-01.webp" alt="" draggable="false" loading="lazy" decoding="async"/>
