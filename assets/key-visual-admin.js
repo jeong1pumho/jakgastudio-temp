@@ -41,14 +41,6 @@
       card.className = 'card';
       const img = document.createElement('img');
       img.className = 'thumb'; img.src = photo(item,'desktop'); img.alt = '';
-      const details = document.createElement('div'); details.className = 'details';
-      const label = document.createElement('label');
-      label.textContent = (i+1)+'번 사진 설명 ';
-      const input = document.createElement('input'); input.value = item.alt;
-      input.maxLength = 150; input.required = true; input.disabled = busy;
-      input.placeholder = '사진에 보이는 내용을 입력하세요';
-      input.addEventListener('input',()=>{item.alt=input.value;});
-      label.append(input);
       const actions = document.createElement('div'); actions.className = 'actions';
       const move = direction => {
         [slides[i],slides[i+direction]] = [slides[i+direction],slides[i]]; render();
@@ -60,13 +52,13 @@
         button('원본 선택·크롭',()=>choose(i),busy),
         button('목록에서 제거',()=>{release(item);slides.splice(i,1);render();},busy)
       );
-      details.append(label,actions); card.append(img,details); return card;
+      card.append(img,actions); return card;
     }));
   }
   function showPreview(mode) {
     const mobile = mode==='mobile';
     $('previewPhoto').src = photo(previewSlide,mobile?'mobile':'desktop');
-    $('previewPhoto').alt = previewSlide.alt;
+    $('previewPhoto').alt = previewSlide.alt || '';
     $('previewFrame').classList.toggle('mobile',mobile);
     $('previewInfo').textContent = {fhd:'Full HD · 1920 × 1080',qhd:'QHD · 2560 × 1440',mobile:'모바일 · 9:16'}[mode]+' 화면 비율 미리보기';
     previewDialog.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===mode)));
@@ -199,7 +191,7 @@
       if (!blob || blob.size > 24*1024*1024) throw Error('크롭 이미지가 24MB를 초과합니다. 선택 영역을 줄이거나 용량이 작은 원본을 사용해 주세요.');
       crop.pending[crop.mode]={blob,preview:URL.createObjectURL(blob)};
       if(crop.mode==='desktop'){setCropMode('mobile');return;}
-      const item={alt:slides[editIndex]?.alt || '',pending:crop.pending};
+      const item={pending:crop.pending};
       if(editIndex===-1)slides.push(item);
       else{release(slides[editIndex]);slides[editIndex]=item;}
       crop.pending={};cropDialog.close();render();message('크롭을 적용했습니다. 발행하면 홈페이지에 표시됩니다.');
@@ -218,7 +210,6 @@
   }
   $('publish').addEventListener('click',async () => {
     if(busy)return;
-    if(slides.some(item=>!item.alt.trim())){message('모든 사진에 설명을 입력해 주세요.');return;}
     busy=true;render();message('사진을 업로드하고 있습니다…');
     try {
       const config=await api('/api/admin?action=config');
@@ -227,7 +218,7 @@
       for(const item of slides){
         const desktop=item.pending?await upload(item.pending.desktop,config):item.desktop;
         const mobile=item.pending?await upload(item.pending.mobile,config):item.mobile;
-        published.push({desktop,mobile,alt:item.alt.trim()});
+        published.push({desktop,mobile,alt:item.alt});
       }
       const saved=await api('/api/key-visual',{method:'PUT',body:JSON.stringify({slides:published,revision})});
       slides.forEach(release);slides=published;revision=saved.revision;message('테스트 홈페이지에 반영했습니다.');

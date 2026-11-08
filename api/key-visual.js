@@ -59,13 +59,10 @@ module.exports = async (req, res) => {
     if (!Array.isArray(slides) || slides.length < 1 || slides.length > 10) {
       return send(res, 400, {error:'사진은 1~10장까지 반영할 수 있습니다.'});
     }
-    if (!slides.every(item => item && typeof item.alt === 'string' && item.alt.trim() && item.alt.length <= 150)) {
-      return send(res, 400, {error:'각 사진의 설명을 1~150자로 입력해 주세요.'});
-    }
-    if (!slides.every(item => isAsset(item.desktop) && isAsset(item.mobile))) {
+    if (!slides.every(item => item && isAsset(item.desktop) && isAsset(item.mobile))) {
       return send(res, 400, {error:'PC용 또는 모바일용 사진 주소가 올바르지 않습니다.'});
     }
-    const payload = {slides:slides.map(({desktop,mobile,alt})=>({desktop,mobile,alt:alt.trim()})),revision:revision+1};
+    const payload = {slides:slides.map(({desktop,mobile,alt})=>({desktop,mobile,alt:typeof alt === 'string' ? alt.trim().slice(0,150) : ''})),revision:revision+1};
     const files = [...new Set(payload.slides.flatMap(item => [item.desktop,item.mobile]).filter(isUpload))];
     const checks = await Promise.all(files.map(url => fetch(url,{method:'HEAD'})));
     if (checks.some(response => !response.ok)) return send(res, 400, {error:'등록한 사진 파일을 확인할 수 없습니다.'});
