@@ -9,7 +9,7 @@
 *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:"Noto Sans KR",system-ui,sans-serif;font-size:14px}
 button,input{font:inherit}button{cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}a{text-decoration:none;color:inherit}
 .container{max-width:1180px;margin:auto;padding:0 22px 80px}
-header{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;border-bottom:1px solid var(--edge);padding:15px 0;margin-bottom:34px}
+header{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;border-bottom:1px solid var(--edge);padding:15px 0;margin-bottom:34px;position:sticky;top:0;z-index:50;background:var(--paper)}
 .wordmark{font-size:19px;font-weight:650;letter-spacing:-.04em}.wordmark small{display:block;font-size:12px;font-weight:400;color:var(--muted);letter-spacing:0}
 nav{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px}nav a{padding:9px 12px;border-radius:4px}
 nav a.active{background:#ece1d7;border:1px solid #c9af9e;font-weight:650}nav a:hover{background:#eee9e3}
@@ -39,7 +39,7 @@ label{display:block;font-weight:600;font-size:13px;margin:17px 0 7px}.field{bord
 </style></head><body><div class="container">
 <header><a class="wordmark" href="/#space">작가작업실 JEJU <small>관리자</small></a>
 <nav aria-label="관리자 메뉴"><a href="/admin/">모임·행사 관리</a><a href="/admin/schedule.html">스케줄 관리</a>
-<a href="/admin/space.html" class="active" aria-current="page">공간소개 관리</a><a href="/admin/sms.html">문자 알림 관리</a><button class="btn secondary small" id="logout" hidden>로그아웃</button></nav></header>
+<a href="/admin/space.html" class="active" aria-current="page">공간소개 관리</a><a href="/admin/sms.html">문자 알림 관리</a><a href="/admin/key-visual.html">Key Visual 관리</a><button class="btn secondary small" id="logout" hidden>로그아웃</button></nav></header>
 <p id="status" class="status" role="status" aria-live="polite"></p>
 <section id="loginView" class="panel login"><h1>관리자 로그인</h1><p class="note">기존 관리자 계정으로 로그인하세요.</p>
 <form id="loginForm"><label for="email">이메일</label><input class="field" id="email" type="email" autocomplete="username" required>

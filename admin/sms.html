@@ -2,7 +2,7 @@
 <title>문자 알림 관리 | 작가작업실 JEJU</title>
 <style>
 *{box-sizing:border-box}body{margin:0;color:#3c342d;background:#faf8f5;font:14px/1.65 "Apple SD Gothic Neo","Malgun Gothic",sans-serif}
-header{background:#302d2a;color:white;padding:15px 22px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+header{background:#302d2a;color:white;padding:15px 22px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;position:sticky;top:0;z-index:50}
 header strong{font-size:19px}nav{display:flex;flex-wrap:wrap;gap:9px}nav a{color:#dacdc0;text-decoration:none;font-size:13px;padding:7px 10px}nav a.active{background:#675244;color:white}
 main{max-width:1150px;margin:auto;padding:35px 18px 90px}h1{margin:0;font-size:29px;font-weight:550}h2{font-size:21px;font-weight:550;margin:0 0 15px}
 .muted{color:#82766d;font-size:13px}.card{background:#fff;border:1px solid #e2d8cf;padding:22px;margin:19px 0}
@@ -44,7 +44,7 @@ table{border-collapse:collapse;width:100%;font-size:13px}th,td{border-bottom:1px
   .person-actions{display:flex;gap:7px;flex-wrap:wrap}
   @media(max-width:700px){.people-controls .state-control,.people-controls .search-control{max-width:none;flex:1 1 100%}}
 </style></head><body>
-<header><strong>작가작업실 JEJU</strong><nav><a href="/admin/">모임·행사</a><a class="active" href="/admin/sms.html" aria-current="page">문자 알림</a><a href="/admin/schedule.html">스케줄</a><a href="/admin/space.html">공간소개</a></nav></header>
+<header><strong>작가작업실 JEJU</strong><nav><a href="/admin/">모임·행사</a><a class="active" href="/admin/sms.html" aria-current="page">문자 알림</a><a href="/admin/schedule.html">스케줄</a><a href="/admin/space.html">공간소개</a><a href="/admin/key-visual.html">Key Visual 관리</a></nav></header>
 <main><h1>문자 알림 관리</h1><p class="muted">모임·행사 및 신규 프로그램 문자 알림 수신동의자 관리와 단체 SMS 발송</p>
 <section id="login-panel" class="card"><h2>관리자 로그인</h2><form id="login-form"><div class="row2"><div><label for="email">이메일</label><input class="field" type="email" id="email" autocomplete="username" required></div><div><label for="password">비밀번호</label><input class="field" type="password" id="password" autocomplete="current-password" required></div></div><p><button class="btn primary" type="submit">로그인</button></p></form></section>
 <section id="dashboard" hidden>
