@@ -99,9 +99,10 @@
     canvas.width=Math.max(1,Math.round(w*scale)); canvas.height=Math.max(1,Math.round(h*scale));
     draw();
   }
+  const cropRatio = () => crop.mode==='desktop'?[16,9]:[9,16];
   function bounds() {
     const {naturalWidth:w,naturalHeight:h}=crop.image;
-    const [rw,rh]=crop.mode==='desktop'?[16,9]:[9,16];
+    const [rw,rh]=cropRatio();
     const units=Math.max(1,Math.floor(Math.min(w/rw,h/rh)*Number(ranges[2].value)/100));
     const width=units*rw,height=units*rh;
     return {x:Math.round((w-width)*Number(ranges[0].value)/100),
@@ -118,21 +119,68 @@
     context.fillRect(0,top,left,bottom-top); context.fillRect(right,top,w-right,bottom-top);
     context.strokeStyle='#ffef32'; context.lineWidth=2;
     context.strokeRect(left,top,right-left,bottom-top);
+    context.fillStyle='#ffef32';
+    for(const x of [left,right]) for(const y of [top,bottom]) {
+      context.fillRect(Math.max(0,Math.min(w-10,x-5)),Math.max(0,Math.min(h-10,y-5)),10,10);
+    }
     $('dimensions').textContent=width+' × '+height+' px'+(mode==='desktop'&&width<2560?' · QHD 권장 너비 2560px 미만':'');
   }
   ranges.forEach(r=>r.addEventListener('input',draw));
+  function pointerTarget(event, box, rect) {
+    const sx=rect.width/crop.image.naturalWidth,sy=rect.height/crop.image.naturalHeight;
+    const x=event.clientX-rect.left,y=event.clientY-rect.top;
+    const left=box.x*sx,right=(box.x+box.width)*sx;
+    const top=box.y*sy,bottom=(box.y+box.height)*sy;
+    const radius=event.pointerType==='touch'?20:13;
+    const cornerX=Math.abs(x-left)<=Math.abs(x-right)?-1:1;
+    const cornerY=Math.abs(y-top)<=Math.abs(y-bottom)?-1:1;
+    if(Math.abs(x-(cornerX<0?left:right))<=radius && Math.abs(y-(cornerY<0?top:bottom))<=radius) {
+      return {cornerX,cornerY,cursor:cornerX===cornerY?'nwse-resize':'nesw-resize'};
+    }
+    if(x>=left&&x<=right&&y>=top&&y<=bottom) return {cursor:'move'};
+    return null;
+  }
+  function setPosition(x,y,width,height) {
+    const w=crop.image.naturalWidth-width,h=crop.image.naturalHeight-height;
+    ranges[0].value=w>0?100*x/w:50;
+    ranges[1].value=h>0?100*y/h:50;
+  }
   canvas.addEventListener('pointerdown',event=>{
+    if(drag || event.button!==0)return;
+    const box=bounds(),rect=canvas.getBoundingClientRect();
+    const target=pointerTarget(event,box,rect);
+    if(!target)return;
     canvas.setPointerCapture(event.pointerId);
-    drag={...bounds(),clientX:event.clientX,clientY:event.clientY};
+    drag={...box,...target,clientX:event.clientX,clientY:event.clientY,pointerId:event.pointerId};
   });
   canvas.addEventListener('pointermove',event=>{
-    if (!drag || !canvas.hasPointerCapture(event.pointerId)) return;
-    const rect=canvas.getBoundingClientRect(),w=crop.image.naturalWidth,h=crop.image.naturalHeight;
-    if (w>drag.width) ranges[0].value=(drag.x+(event.clientX-drag.clientX)*w/rect.width)*100/(w-drag.width);
-    if (h>drag.height) ranges[1].value=(drag.y+(event.clientY-drag.clientY)*h/rect.height)*100/(h-drag.height);
+    const rect=canvas.getBoundingClientRect();
+    if(!drag){
+      canvas.style.cursor=pointerTarget(event,bounds(),rect)?.cursor||'default';
+      return;
+    }
+    if(drag.pointerId!==event.pointerId || !canvas.hasPointerCapture(event.pointerId))return;
+    const w=crop.image.naturalWidth,h=crop.image.naturalHeight;
+    const dx=(event.clientX-drag.clientX)*w/rect.width,dy=(event.clientY-drag.clientY)*h/rect.height;
+    if(drag.cornerX){
+      const [rw,rh]=cropRatio();
+      const anchorX=drag.cornerX>0?drag.x:drag.x+drag.width;
+      const anchorY=drag.cornerY>0?drag.y:drag.y+drag.height;
+      const maxUnits=Math.min(w/rw,h/rh);
+      const minUnits=Math.max(1,Math.floor(maxUnits*Number(ranges[2].min)/100));
+      const limit=Math.floor(Math.min((drag.cornerX>0?w-anchorX:anchorX)/rw,(drag.cornerY>0?h-anchorY:anchorY)/rh));
+      const projected=(drag.cornerX*dx*rw+drag.cornerY*dy*rh)/(rw*rw+rh*rh);
+      const units=Math.max(minUnits,Math.min(limit,Math.round(drag.width/rw+projected)));
+      const width=units*rw,height=units*rh;
+      // Select a point inside this integer crop-size step to avoid rounding down.
+      ranges[2].value=100*(units+0.25)/maxUnits;
+      setPosition(drag.cornerX>0?anchorX:anchorX-width,drag.cornerY>0?anchorY:anchorY-height,width,height);
+    }else{
+      setPosition(drag.x+dx,drag.y+dy,drag.width,drag.height);
+    }
     draw();
   });
-  canvas.addEventListener('lostpointercapture',()=>{drag=null;});
+  canvas.addEventListener('lostpointercapture',()=>{drag=null;canvas.style.cursor='default';});
   $('cancelCrop').addEventListener('click',()=>cropDialog.close());
   cropDialog.addEventListener('cancel',event=>{if($('acceptCrop').disabled)event.preventDefault();});
   cropDialog.addEventListener('close',()=>{
