@@ -220,7 +220,8 @@
       const output=document.createElement('canvas'); output.width=width; output.height=height;
       output.getContext('2d').drawImage(crop.image,x,y,width,height,0,0,width,height);
       const blob=await new Promise(resolve=>output.toBlob(resolve,'image/png'));
-      if (!blob || blob.size > 24*1024*1024) throw Error('크롭 이미지가 24MB를 초과합니다. 선택 영역을 줄이거나 용량이 작은 원본을 사용해 주세요.');
+      if (!blob) throw Error('크롭 이미지를 만들지 못했습니다.');
+      if (blob.size > 50*1024*1024) throw Error('크롭 이미지가 50MB를 초과합니다. 선택 영역을 줄이거나 용량이 작은 원본을 사용해 주세요.');
       crop.pending[crop.mode]={blob,preview:URL.createObjectURL(blob)};
       crop.settings[crop.mode]=ranges.map(range=>Number(range.value));
       if(crop.mode==='desktop'){setCropMode('mobile');return;}
