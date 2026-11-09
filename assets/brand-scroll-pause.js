@@ -7,6 +7,24 @@
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   let used = false, holding = false, timer, wheelAt = -Infinity;
   let previousY = window.scrollY;
+  let motionPlayed = false;
+  const heading = brand.querySelector('.brand-visual-title');
+  function drawRule() {
+    if (motionPlayed || !desktop.matches || reduced.matches) return;
+    motionPlayed = true;
+    brand.classList.add('brand-arrived');
+  }
+  function checkArrival() {
+    if (!heading || motionPlayed) return;
+    const headerHeight = document.querySelector('.kv-sticky-header')?.getBoundingClientRect().height || 0;
+    const titleRect = heading.getBoundingClientRect();
+    if (brand.getBoundingClientRect().top <= headerHeight + 2 &&
+        titleRect.top >= headerHeight && titleRect.bottom <= innerHeight) drawRule();
+  }
+  if (desktop.matches && !reduced.matches) brand.classList.add('brand-motion-ready');
+  window.addEventListener('load', checkArrival, {once:true});
+  window.addEventListener('pageshow', checkArrival);
+  requestAnimationFrame(checkArrival);
   const position = () => Math.max(0, window.scrollY + brand.getBoundingClientRect().top -
     (document.querySelector('.kv-sticky-header')?.getBoundingClientRect().height || 0));
   const allowed = () => desktop.matches && !reduced.matches && !document.querySelector('dialog[open],.lightbox:not([hidden])');
@@ -20,7 +38,7 @@
     used = true;
     holding = true;
     align();
-    brand.classList.add('brand-arrived');
+    drawRule();
     timer = setTimeout(release, 500);
   }
   function nestedScroll(target) {
@@ -46,6 +64,7 @@
     }
   }, {passive: false});
   window.addEventListener('scroll', () => {
+    checkArrival();
     const y = window.scrollY;
     if (holding) {
       if (!allowed() || y < position() - 2) release();

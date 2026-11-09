@@ -24,8 +24,9 @@
 /* Draw the editorial rule once, synchronized with the desktop arrival pause. */
 @keyframes brand-rule-draw{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 @media(min-width:701px) and (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
+ #brand-story.brand-motion-ready:not(.brand-arrived) .brand-visual-rule{transform:scaleX(0);transform-origin:left center}
  #brand-story.brand-arrived .brand-visual-rule{
   transform-origin:left center;
-  animation:brand-rule-draw 400ms cubic-bezier(.22,1,.36,1) both;
+  animation:brand-rule-draw 400ms cubic-bezier(.4,0,.2,1) both;
  }
 }
