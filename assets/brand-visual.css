@@ -24,19 +24,17 @@
 /* Draw the editorial rule once, synchronized with the desktop arrival pause. */
 @keyframes brand-rule-draw{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 @media(min-width:701px) and (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
- #brand-story.brand-motion-ready:not(.brand-arrived) .brand-visual-rule{transform:scaleX(0);transform-origin:left center}
- #brand-story.brand-arrived .brand-visual-rule{
+ #brand-story.brand-motion-ready:not(.brand-type-complete) .brand-visual-rule{transform:scaleX(0);transform-origin:left center}
+ #brand-story.brand-type-complete .brand-visual-rule{
   transform-origin:left center;
-  animation:brand-rule-draw 400ms cubic-bezier(.4,0,.2,1) var(--type-duration, 0ms) both;
+  animation:brand-rule-draw 400ms cubic-bezier(.4,0,.2,1) both;
  }
 }
 
-/* Complete Korean syllables appear in discrete 160ms steps, without layout shifts. */
-@keyframes brand-type-letter{from{visibility:hidden}to{visibility:visible}}
-@keyframes brand-type-caret{0%,99%{opacity:1}100%{opacity:0}}
+
+/* Fixed-width glyph slots prevent layout shifts while timers reveal each syllable. */
 @media(min-width:701px) and (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
  #brand-story .brand-type-char{display:inline-block;position:relative;white-space:pre}
- #brand-story.brand-motion-ready:not(.brand-arrived) .brand-type-char{visibility:hidden}
- #brand-story.brand-arrived .brand-type-char{animation:brand-type-letter 1ms step-end var(--type-delay) both}
- #brand-story.brand-arrived .brand-type-char::after{content:'';position:absolute;right:-2px;top:.12em;height:.9em;border-right:1px solid currentColor;opacity:0;animation:brand-type-caret 160ms step-end var(--type-delay) both}
+ #brand-story.brand-motion-ready .brand-type-char:not(.is-typed){visibility:hidden}
+ #brand-story .brand-type-char.is-current::after{content:'';position:absolute;right:-2px;top:.12em;height:.9em;border-right:1px solid currentColor}
 }

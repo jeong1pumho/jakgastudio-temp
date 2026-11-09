@@ -30,6 +30,17 @@
     if (motionPlayed || !desktop.matches || reduced.matches) return;
     motionPlayed = true;
     brand.classList.add('brand-arrived');
+    const letters = [...heading.querySelectorAll('.brand-type-char')];
+    letters.forEach((letter, index) => {
+      setTimeout(() => {
+        letters.forEach(item => item.classList.remove('is-current'));
+        letter.classList.add('is-typed', 'is-current');
+        if (index === letters.length - 1) {
+          brand.classList.add('brand-type-complete');
+          setTimeout(() => letter.classList.remove('is-current'), 160);
+        }
+      }, (index + 1) * 160);
+    });
   }
   function checkArrival() {
     if (!heading || motionPlayed) return;
