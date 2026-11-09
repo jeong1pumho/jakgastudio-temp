@@ -9,6 +9,23 @@
   let previousY = window.scrollY;
   let motionPlayed = false;
   const heading = brand.querySelector('.brand-visual-title');
+  // Keep complete accessible text and reserve every glyph's width.
+  if (heading && desktop.matches && !reduced.matches) {
+    const title = heading.textContent;
+    heading.setAttribute('aria-label', title);
+    const letters = Array.from(title);
+    const fragment = document.createDocumentFragment();
+    letters.forEach((letter, index) => {
+      const span = document.createElement('span');
+      span.className = 'brand-type-char';
+      span.setAttribute('aria-hidden', 'true');
+      span.textContent = letter;
+      span.style.setProperty('--type-delay', ((index + 1) * 160) + 'ms');
+      fragment.append(span);
+    });
+    heading.replaceChildren(fragment);
+    brand.style.setProperty('--type-duration', (letters.length * 160) + 'ms');
+  }
   function drawRule() {
     if (motionPlayed || !desktop.matches || reduced.matches) return;
     motionPlayed = true;
