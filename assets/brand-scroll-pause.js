@@ -20,6 +20,7 @@
     used = true;
     holding = true;
     align();
+    brand.classList.add('brand-arrived');
     timer = setTimeout(release, 500);
   }
   function nestedScroll(target) {
