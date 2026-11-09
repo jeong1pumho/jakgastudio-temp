@@ -1,7 +1,7 @@
 'use strict';
 /*
  * Public, server-rendered calendar discovery pages.
- * The existing interactive calendar at /#schedule remains unchanged.
+ * The existing interactive calendar at /calendar remains unchanged.
  * Do not query schedule_event_memos or publish private notes.
  */
 const {query,ready,esc}=require('../lib/core');
@@ -42,7 +42,7 @@ function output(req,res,status,title,description,body,meta={}){
  // Retain test-domain deindexing; Vercel blanket header also applies.
  if(!isProduction(req)||status!==200)res.setHeader('X-Robots-Tag','noindex, nofollow');
  const robots=isProduction(req)&&status===200?'index,follow':'noindex,nofollow';
- res.end('<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="'+robots+'">'+seo+'<style>'+css+'</style></head><body><header class="bar"><div class="bar-inner"><a class="brand" href="/">작가작업실 JEJU</a><a class="back" href="/#schedule">월간 캘린더로 돌아가기</a></div></header><main class="container">'+body+'</main></body></html>');
+ res.end('<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="'+robots+'">'+seo+'<style>'+css+'</style></head><body><header class="bar"><div class="bar-inner"><a class="brand" href="/">작가작업실 JEJU</a><a class="back" href="/calendar">월간 캘린더로 돌아가기</a></div></header><main class="container">'+body+'</main></body></html>');
 }
 function monthSpan(){
  const now=dateNow(),first=now.year+'-'+pad(now.month)+'-01';
@@ -52,7 +52,7 @@ function monthSpan(){
 }
 function errorHtml(req,res,code,message){
  return output(req,res,code,(code===404?'일정을 찾을 수 없습니다':'일정을 불러올 수 없습니다')+' | '+webName,
- message,'<h1>'+esc(message)+'</h1><p><a href="/#schedule">월간 캘린더 보기</a></p>',{path:'/calendar'});
+ message,'<h1>'+esc(message)+'</h1><p><a href="/calendar">월간 캘린더 보기</a></p>',{path:'/calendar'});
 }
 module.exports=async(req,res)=>{
  try{
@@ -78,7 +78,7 @@ module.exports=async(req,res)=>{
     '<dt>시간</dt><dd><time datetime="'+esc(date+'T'+onlyTime(e.start_time)+':00+09:00')+'">'+esc(onlyTime(e.start_time))+'</time> – <time datetime="'+esc(date+'T'+onlyTime(e.end_time)+':00+09:00')+'">'+esc(onlyTime(e.end_time))+'</time></dd>'+
     '<dt>장소</dt><dd>'+esc(place.name)+' · '+esc(place.address)+'</dd></dl>'+
     '<p class="hint">이 페이지는 월간 캘린더에 공개된 일정 정보입니다. 참가·예약 가능 여부와 신청 방법은 별도로 확인해 주세요.</p>'+
-    '<div class="links"><a href="/#schedule">월간 캘린더 확인</a><a href="/#program">프로그램 안내</a><a href="/news">운영 소식 확인</a></div>';
+    '<div class="links"><a href="/calendar">월간 캘린더 확인</a><a href="/programs">프로그램 안내</a><a href="/news">운영 소식 확인</a></div>';
    return output(req,res,200,title+' | 제주 '+categoryName(e)+' · '+webName,eventDesc,body,{
     path:urlPath,schema:{'@context':'https://schema.org','@type':'WebPage',url:base+urlPath,
       name:title,description:eventDesc,inLanguage:'ko-KR',
@@ -102,10 +102,10 @@ module.exports=async(req,res)=>{
   }).join('');
   const body='<p class="eyebrow">JEJU / CALENDAR</p><h1>작가작업실 JEJU 모임·행사 일정</h1>'+
    '<p class="lead">'+esc(description)+'</p>'+
-   '<p class="hint">기본 운영시간은 화~토 10:00–17:00이며 점심시간은 12–13시입니다. 일·월은 정기휴무입니다. 자유방문 가능 시간과 임시휴무·대관 현황은 <a href="/#schedule">월간 캘린더</a>에서 확인해 주세요.</p>'+
+   '<p class="hint">기본 운영시간은 화~토 09:00–17:00이며 점심시간은 12–13시입니다. 일·월은 정기휴무입니다. 자유방문 가능 시간과 임시휴무·대관 현황은 <a href="/calendar">월간 캘린더</a>에서 확인해 주세요.</p>'+
    '<h2>예정된 공개 모임·행사</h2>'+
    (cards?'<div class="cards">'+cards+'</div>':'<p class="empty">현재 등록된 공개 모임·행사가 없습니다. 새로운 일정은 월간 캘린더에서 확인해 주세요.</p>')+
-   '<div class="links"><a href="/#schedule">월간 캘린더로 돌아가기</a><a href="/news">운영 소식 전체 보기</a></div>';
+   '<div class="links"><a href="/calendar">월간 캘린더로 돌아가기</a><a href="/news">운영 소식 전체 보기</a></div>';
   const schema={'@context':'https://schema.org','@type':'CollectionPage',
     name:'작가작업실 JEJU 모임·행사 일정',description,url:base+'/calendar',inLanguage:'ko-KR',
     mainEntity:{'@type':'ItemList',itemListElement:visible.map((e,i)=>({

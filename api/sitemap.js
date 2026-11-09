@@ -13,7 +13,9 @@ module.exports=async(req,res)=>{
       posts.push(...rows);
       if(rows.length<500)break;
     }
-    const urls=[{path:'/'},{path:'/news'},{path:'/calendar'}];
+    const urls=[{path:'/'},{path:'/news'},{path:'/calendar'},{path:'/books'},{path:'/space'},{path:'/programs'},{path:'/visit'}];
+    const books=await query('/rest/v1/recommended_books?select=id,updated_at&published=eq.true&limit=1000');
+    for(const book of books)urls.push({path:'/books/'+book.id,lastmod:isoDate(book.updated_at)});
     const seen=new Set();
     for(const p of posts){
       if(!['ongoing','ended'].includes(p.status)||!p.published_at||!SLUG.test(String(p.slug||''))||seen.has(p.slug))continue;

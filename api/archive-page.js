@@ -19,7 +19,7 @@ function card(p){
  return '<a class="card" href="/news/'+encodeURIComponent(p.slug)+'">'+
   (cover?'<img src="'+esc(cover)+'" alt="'+esc(p.title)+'" loading="lazy" decoding="async">':'<div class="placeholder">사진 없음</div>')+
   badges+'<h2>'+esc(p.title)+'</h2>'+(date?'<p class="date">'+date+(p.event_date_end?' ~ '+formatDate(p.event_date_end):'')+'</p>':'')+
-  '<span class="state">종료</span></a>';
+  '<span class="state">'+(p.status==='ongoing'?'진행 중':'종료')+'</span></a>';
 }
 function pager(page,max,rental){
  if(max<=1)return '';
@@ -52,18 +52,18 @@ module.exports=async(req,res)=>{
   const page=Number(rawPage),op=req.query?.operator||'';
   if(op&&op!=='rental')return res.status(400).send('올바르지 않은 행사 분류입니다.');
   const rental=op==='rental',offset=(page-1)*pageSize;
-  const path='/rest/v1/news_posts?select='+selected+'&status=eq.ended'+
+  const path='/rest/v1/news_posts?select='+selected+'&status=in.(ongoing,ended)'+
    (rental?'&operator_type=eq.rental':'')+
-   '&order=published_at.desc.nullslast,created_at.desc&limit='+pageSize+'&offset='+offset;
+   '&order=status.desc,sort_order.desc,published_at.desc.nullslast,created_at.desc&limit='+pageSize+'&offset='+offset;
   const r=await fetch(root()+path,{headers:{apikey:key(),Accept:'application/json',Prefer:'count=exact'}});
   if(!r.ok)throw Object.assign(Error('목록을 불러오지 못했습니다.'),{status:r.status});
   const items=await r.json(),range=r.headers.get('content-range')||'';
   const total=Number(range.split('/').pop());
   if(!Number.isSafeInteger(total))throw Object.assign(Error('목록 페이지 수량을 확인할 수 없습니다.'),{status:503});
   const pages=Math.max(1,Math.ceil(total/pageSize));
-  if(page>pages)return res.status(404).send('해당 페이지에 지난 모임·행사가 없습니다.');
+  if(page>pages)return res.status(404).send('해당 페이지에 모임·행사가 없습니다.');
   const base=origin(req),self=base+urlFor(page,rental);
-  const pageTitle=(rental?'제주 공간대관 사례 · 지난 모임·행사':'제주 독서모임·글쓰기·북토크 지난 모임·행사')+
+  const pageTitle=(rental?'제주 공간대관 사례 · 모임·행사':'제주 독서모임·글쓰기·북토크 모임·행사')+
    (page>1?' · '+page+'페이지':'')+' | 작가작업실 JEJU';
   const intro=rental
    ?'제주 이호테우 작가작업실 JEJU에서 외부 주최자가 진행한 실제 독서모임, 글쓰기, 특강, 북토크 대관 사례입니다.'
@@ -76,18 +76,18 @@ module.exports=async(req,res)=>{
    '<meta property="og:title" content="'+esc(pageTitle)+'"><meta property="og:description" content="'+esc(intro)+'">'+
    '<script type="application/ld+json">'+jsonLd(schema)+'</script><style>'+style+'</style></head><body>'+
    '<header><div class="header-inner"><a href="/#news">작가작업실 JEJU</a><a href="/#news">모임·행사</a></div></header>'+
-   '<main><div class="section-title"><p class="eyebrow">02 — MEETINGS &amp; EVENTS</p><h1>'+(rental?'대관 사례':'지난 모임·행사')+'</h1></div>'+
+   '<main><div class="section-title"><p class="eyebrow">02 — MEETINGS &amp; EVENTS</p><h1>'+(rental?'대관 사례':'모임·행사')+'</h1></div>'+
    '<p class="intro">'+esc(intro)+'</p>'+
-   '<nav class="tabs" aria-label="지난 행사 분류"><a href="/news"'+(!rental?' class="current" aria-current="page"':'')+'>전체 지난 모임·행사</a>'+
+   '<nav class="tabs" aria-label="지난 행사 분류"><a href="/news"'+(!rental?' class="current" aria-current="page"':'')+'>전체 모임·행사</a>'+
    '<a href="/news?operator=rental"'+(rental?' class="current" aria-current="page"':'')+'>대관 행사만 보기</a></nav>'+
    '<p class="count">총 '+total+'개 · 최신 게시순</p>'+
-   (items.length?'<div class="cards">'+items.map(card).join('')+'</div>':'<p class="empty">등록된 지난 모임·행사가 없습니다.</p>')+
+   (items.length?'<div class="cards">'+items.map(card).join('')+'</div>':'<p class="empty">등록된 모임·행사가 없습니다.</p>')+
    pager(page,pages,rental)+
-   (rental?'<a class="return" href="/#rental-program">공간 대관 안내 보기 ↗</a>':'')+
+   (rental?'<a class="return" href="/programs">공간 대관 안내 보기 ↗</a>':'')+
    '<a class="return" href="/#news">모임·행사로 돌아가기</a></main></body></html>';
   res.setHeader('Content-Type','text/html; charset=utf-8');
   res.setHeader('Cache-Control','no-store');
   res.setHeader('X-Robots-Tag','noindex, nofollow, noarchive');
   return res.status(200).send(body);
- }catch(e){return res.status(e.status||500).send('지난 모임·행사를 불러오지 못했습니다.');}
+ }catch(e){return res.status(e.status||500).send('모임·행사를 불러오지 못했습니다.');}
 };
