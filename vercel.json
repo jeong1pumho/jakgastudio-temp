@@ -2,28 +2,32 @@
   "version": 2,
   "rewrites": [
     {
+      "source": "/api/books",
+      "destination": "/api/news?_route=books"
+    },
+    {
       "source": "/",
-      "destination": "/api/home"
+      "destination": "/api/news?_route=home"
     },
     {
       "source": "/books",
-      "destination": "/api/home?page=books"
+      "destination": "/api/news?_route=home&page=books"
     },
     {
       "source": "/books/:id",
-      "destination": "/api/home?page=books&book=:id"
+      "destination": "/api/news?_route=home&page=books&book=:id"
     },
     {
       "source": "/space",
-      "destination": "/api/home?page=space"
+      "destination": "/api/news?_route=home&page=space"
     },
     {
       "source": "/programs",
-      "destination": "/api/home?page=programs"
+      "destination": "/api/news?_route=home&page=programs"
     },
     {
       "source": "/visit",
-      "destination": "/api/home?page=visit"
+      "destination": "/api/news?_route=home&page=visit"
     },
     {
       "source": "/robots.txt",
@@ -43,7 +47,7 @@
     },
     {
       "source": "/calendar",
-      "destination": "/api/home?page=calendar"
+      "destination": "/api/news?_route=home&page=calendar"
     },
     {
       "source": "/calendar/events/:id",
@@ -66,7 +70,7 @@
     }
   ],
   "functions": {
-    "api/home.js": {
+    "api/news.js": {
       "includeFiles": "lib/*.html"
     }
   }

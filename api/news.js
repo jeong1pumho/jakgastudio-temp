@@ -13,6 +13,8 @@ async function allOngoing(){
  return items.map(withCover);
 }
 module.exports=async(req,res)=>{
+ if(req.query?._route==='home')return require('../lib/handlers/home')(req,res);
+ if(req.query?._route==='books')return require('../lib/handlers/books')(req,res);
  try{
   if(req.method!=='GET')return send(res,405,{error:'Method not allowed'});
   if(!ready())return send(res,503,{error:'Database not configured'});
