@@ -7,16 +7,16 @@
 #brand-story .brand-visual::before{background:rgba(255,255,255,.4)}
 #brand-story .brand-visual::after{background:linear-gradient(90deg,rgba(255,255,255,.69),rgba(255,255,255,.37) 37%,transparent 66%)}
 #brand-story .brand-visual-copy{position:relative;z-index:1;padding:8.85vw 5.98vw 7.8vw;letter-spacing:normal}
-#brand-story .brand-visual-title{font-size:3.828vw;font-weight:400;line-height:1.2;letter-spacing:-.12vw;margin:0}
+#brand-story .brand-visual-title{font-size:3.0624vw;font-weight:400;line-height:1.2;letter-spacing:-.12vw;margin:0}
 #brand-story .brand-visual-rule{width:4.426vw;height:2px;background:#353535;margin:2.033vw 0 2.631vw}
-#brand-story .brand-visual-copy p{font-size:1.794vw;font-weight:400;line-height:1.6;letter-spacing:-.036vw;margin:0 0 2.033vw}
-#brand-story .brand-visual-copy .brand-visual-sign{margin:3.29vw 0 0;font-size:1.675vw;font-weight:300}
+#brand-story .brand-visual-copy p{font-size:1.4352vw;font-weight:400;line-height:1.6;letter-spacing:-.036vw;margin:0 0 2.033vw}
+#brand-story .brand-visual-copy .brand-visual-sign{margin:3.29vw 0 0;font-size:1.34vw;font-weight:300}
 @media(max-width:700px){
  #brand-story .brand-visual{min-height:780px;background-position:61% 39%}
  #brand-story .brand-visual::after{background:linear-gradient(90deg,rgba(255,255,255,.82),rgba(255,255,255,.58) 65%,rgba(255,255,255,.12))}
  #brand-story .brand-visual-copy{padding:64px 24px 64px}
- #brand-story .brand-visual-title{font-size:clamp(28px,7.2vw,42px);letter-spacing:-.8px}
+ #brand-story .brand-visual-title{font-size:clamp(22.4px,5.76vw,33.6px);letter-spacing:-.8px}
  #brand-story .brand-visual-rule{width:52px;margin:28px 0 36px}
- #brand-story .brand-visual-copy p{max-width:510px;font-size:clamp(16px,3.8vw,21px);letter-spacing:-.3px;line-height:1.85;margin:0 0 28px;word-break:keep-all;overflow-wrap:break-word}
- #brand-story .brand-visual-copy .brand-visual-sign{margin-top:40px;font-size:18px}
+ #brand-story .brand-visual-copy p{max-width:510px;font-size:clamp(12.8px,3.04vw,16.8px);letter-spacing:-.3px;line-height:1.85;margin:0 0 28px;word-break:keep-all;overflow-wrap:break-word}
+ #brand-story .brand-visual-copy .brand-visual-sign{margin-top:40px;font-size:14.4px}
 }
