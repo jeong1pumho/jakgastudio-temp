@@ -96,6 +96,8 @@
   }
  }
  function showDay(y,m,d){
+  const helper=host.querySelector('.sc-top small');if(helper)helper.hidden=true;
+  $('sc-back').textContent='← 돌아가기';
   if(keyFor(y,m,d)<=OPEN_DATE)return;
   const dow=new Date(Date.UTC(y,m-1,d)).getUTCDay(),data=getDay(y,m,d);
   $('sc-month').hidden=true;$('sc-detail-view').hidden=false;
@@ -135,6 +137,7 @@
     records.get(item.event_date).push(item);
    }
    drawMonth();setState('모바일에서는 캘린더를 좌우로 움직여 확인하세요.');
+   if(requestedDay){const [y,m,d]=requestedDay.split('-').map(Number);showDay(y,m,d);setState('');requestedDay=null;}
   }catch(e){
    if(id!==currentRequest)return;
    $('sc-days').replaceChildren();setState('일정 조회 오류: '+e.message,true);
@@ -144,6 +147,11 @@
  $('sc-prev').addEventListener('click',()=>changeMonth(-1));
  $('sc-next').addEventListener('click',()=>changeMonth(1));
  $('sc-current').addEventListener('click',()=>{year=readPart('year');month=readPart('month');load();});
- $('sc-back').addEventListener('click',()=>{$('sc-detail-view').hidden=true;$('sc-month').hidden=false;});
+ $('sc-back').addEventListener('click',()=>{if(fromHome){location.assign('/#weekly-schedule');return;}$('sc-detail-view').hidden=true;$('sc-month').hidden=false;const helper=host.querySelector('.sc-top small');if(helper)helper.hidden=false;history.replaceState(null,'','/calendar#schedule');});
+ const params=new URLSearchParams(location.search);
+ const fromHome=params.get('from')==='home';
+ let requestedDay=params.get('date');
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(requestedDay||'')||!Number.isFinite(Date.parse(requestedDay+'T00:00:00Z'))||new Date(requestedDay+'T00:00:00Z').toISOString().slice(0,10)!==requestedDay||requestedDay<=OPEN_DATE||requestedDay>'2100-12-31')requestedDay=null;
+ if(requestedDay){const parts=requestedDay.split('-').map(Number);year=parts[0];month=parts[1];}
  load();
 })();
