@@ -11,7 +11,7 @@
     },
     {
       "source": "/books",
-      "destination": "/api/news?_route=home&page=books"
+      "destination": "/api/news?_route=home&_view=books"
     },
     {
       "source": "/books/:id",
