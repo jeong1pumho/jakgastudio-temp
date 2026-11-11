@@ -82,3 +82,13 @@
  #schedule .sc-selected-date{font-size:21px}
  #schedule .sc-detail{padding:15px}
 }
+
+/* Approved monthly page layout. */
+#schedule.calendar-page-schedule{padding:0;background:transparent}
+#schedule.calendar-page-schedule>.content-width{width:100%;max-width:none}
+#schedule .sc-summary{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:18px 24px;border-bottom:1px solid #eee7df;flex-wrap:wrap}
+#schedule .sc-summary .sc-legend{padding:0;border:0}
+#schedule .sc-hours{color:#26382c}
+#schedule .sc-hours strong{font-size:17px;font-weight:500}
+#schedule .sc-hours p{font-size:12px;color:#625950;line-height:1.7;margin:3px 0 0}
+@media(max-width:760px){#schedule .sc-summary{padding:16px 14px;gap:16px}#schedule .sc-hours{width:100%}#schedule .sc-hours strong{font-size:15px}}
