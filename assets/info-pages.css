@@ -1,6 +1,6 @@
 .approved-space-gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
-.approved-space-gallery a{display:block;overflow:hidden;aspect-ratio:3/2}
-.approved-space-gallery a:first-child{grid-column:1/-1;aspect-ratio:2/1;margin-bottom:12px}
+.approved-space-gallery .space-gallery-item{display:block;overflow:hidden;aspect-ratio:3/2}
+.approved-space-gallery .space-gallery-item:first-child{grid-column:1/-1;aspect-ratio:2/1;margin-bottom:12px}
 .approved-space-gallery img{display:block;width:100%;height:100%;object-fit:cover}
 .approved-info.visit-page>.subpage-heading{margin-bottom:100px}
 .approved-info.visit-page>.subpage-heading>.subpage-intro{display:none}
@@ -24,4 +24,6 @@
 .visit-map-controls{position:absolute;right:12px;top:12px;display:grid;gap:4px}.visit-map-controls button{width:38px;height:38px;border:1px solid #e4ded6;background:#fffdfa;color:#625950;font-size:21px;cursor:pointer}
 .visit-map-open{position:absolute;right:12px;bottom:12px;padding:12px 16px;background:#fffdfa;color:#625950;font-size:12px;text-decoration:none}
 .approved-info a:focus-visible,.approved-info button:focus-visible{outline:2px solid #26382c;outline-offset:4px}
-@media(max-width:760px){.approved-space-gallery{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.approved-space-gallery a:first-child{aspect-ratio:3/2;margin-bottom:0}.approved-info.visit-page>.subpage-heading{margin-bottom:65px}.visit-columns{grid-template-columns:1fr;gap:40px}.approved-visit .visit-block{margin-bottom:65px}.approved-visit .visit-block h2{font-size:29px;margin-bottom:30px}.approved-visit .visit-emphasis{font-size:32px}.approved-visit address{font-size:27px}.approved-visit p{font-size:16px}.visit-free{margin-top:32px}.visit-map{aspect-ratio:1.6/1}.visit-link{font-size:18px}.approved-visit .visit-time{font-size:44px}}
+@media(max-width:760px){.approved-space-gallery{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.approved-space-gallery .space-gallery-item:first-child{aspect-ratio:3/2;margin-bottom:0}.approved-info.visit-page>.subpage-heading{margin-bottom:65px}.visit-columns{grid-template-columns:1fr;gap:40px}.approved-visit .visit-block{margin-bottom:65px}.approved-visit .visit-block h2{font-size:29px;margin-bottom:30px}.approved-visit .visit-emphasis{font-size:32px}.approved-visit address{font-size:27px}.approved-visit p{font-size:16px}.visit-free{margin-top:32px}.visit-map{aspect-ratio:1.6/1}.visit-link{font-size:18px}.approved-visit .visit-time{font-size:44px}}
+
+.approved-space-gallery .space-gallery-item{width:100%;padding:0;border:0;background:transparent;cursor:zoom-in}
