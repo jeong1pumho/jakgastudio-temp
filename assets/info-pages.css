@@ -27,3 +27,5 @@
 @media(max-width:760px){.approved-space-gallery{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.approved-space-gallery .space-gallery-item:first-child{aspect-ratio:3/2;margin-bottom:0}.approved-info.visit-page>.subpage-heading{margin-bottom:65px}.visit-columns{grid-template-columns:1fr;gap:40px}.approved-visit .visit-block{margin-bottom:65px}.approved-visit .visit-block h2{font-size:29px;margin-bottom:30px}.approved-visit .visit-emphasis{font-size:32px}.approved-visit address{font-size:27px}.approved-visit p{font-size:16px}.visit-free{margin-top:32px}.visit-map{aspect-ratio:1.6/1}.visit-link{font-size:18px}.approved-visit .visit-time{font-size:44px}}
 
 .approved-space-gallery .space-gallery-item{width:100%;padding:0;border:0;background:transparent;cursor:zoom-in}
+
+.approved-info .lightbox{z-index:10000}
