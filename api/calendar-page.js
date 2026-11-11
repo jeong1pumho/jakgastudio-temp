@@ -42,7 +42,7 @@ function output(req,res,status,title,description,body,meta={}){
  // Retain test-domain deindexing; Vercel blanket header also applies.
  if(!isProduction(req)||status!==200)res.setHeader('X-Robots-Tag','noindex, nofollow');
  const robots=isProduction(req)&&status===200?'index,follow':'noindex,nofollow';
- res.end('<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="'+robots+'">'+seo+'<style>'+css+'</style></head><body><header class="bar"><div class="bar-inner"><a class="brand" href="/">작가작업실 JEJU</a><a class="back" href="/calendar">월간 캘린더로 돌아가기</a></div></header><main class="container">'+body+'</main></body></html>');
+ res.end('<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="'+robots+'">'+seo+'<style>'+css+'</style></head><body><header class="bar"><div class="bar-inner"><a class="brand" href="/">작가작업실 JEJU</a><a class="back" data-page-return href="/calendar">이전 페이지로 돌아가기</a></div></header><main class="container">'+body+'</main><script defer src="/assets/page-return.js"></script></body></html>');
 }
 function monthSpan(){
  const now=dateNow(),first=now.year+'-'+pad(now.month)+'-01';
@@ -105,7 +105,7 @@ module.exports=async(req,res)=>{
    '<p class="hint">기본 운영시간은 화~토 09:00–17:00이며 점심시간은 12–13시입니다. 일·월은 정기휴무입니다. 자유방문 가능 시간과 임시휴무·대관 현황은 <a href="/calendar">월간 캘린더</a>에서 확인해 주세요.</p>'+
    '<h2>예정된 공개 모임·행사</h2>'+
    (cards?'<div class="cards">'+cards+'</div>':'<p class="empty">현재 등록된 공개 모임·행사가 없습니다. 새로운 일정은 월간 캘린더에서 확인해 주세요.</p>')+
-   '<div class="links"><a href="/calendar">월간 캘린더로 돌아가기</a><a href="/news">운영 소식 전체 보기</a></div>';
+   '<div class="links"><a data-page-return href="/calendar">이전 페이지로 돌아가기</a><a href="/news">운영 소식 전체 보기</a></div>';
   const schema={'@context':'https://schema.org','@type':'CollectionPage',
     name:'작가작업실 JEJU 모임·행사 일정',description,url:base+'/calendar',inLanguage:'ko-KR',
     mainEntity:{'@type':'ItemList',itemListElement:visible.map((e,i)=>({

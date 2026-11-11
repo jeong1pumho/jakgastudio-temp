@@ -147,7 +147,7 @@
  $('sc-prev').addEventListener('click',()=>changeMonth(-1));
  $('sc-next').addEventListener('click',()=>changeMonth(1));
  $('sc-current').addEventListener('click',()=>{year=readPart('year');month=readPart('month');load();});
- $('sc-back').addEventListener('click',()=>{if(fromHome){location.assign('/#weekly-schedule');return;}$('sc-detail-view').hidden=true;$('sc-month').hidden=false;const helper=host.querySelector('.sc-top small');if(helper)helper.hidden=false;history.replaceState(null,'','/calendar#schedule');});
+ $('sc-back').addEventListener('click',()=>{if(fromHome){if(window.jejuGoBack)window.jejuGoBack('/#weekly-schedule');else location.assign('/#weekly-schedule');return;}$('sc-detail-view').hidden=true;$('sc-month').hidden=false;const helper=host.querySelector('.sc-top small');if(helper)helper.hidden=false;history.replaceState(null,'','/calendar#schedule');});
  const params=new URLSearchParams(location.search);
  const fromHome=params.get('from')==='home';
  let requestedDay=params.get('date');
