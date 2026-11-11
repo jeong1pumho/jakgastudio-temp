@@ -37,3 +37,8 @@ body{padding-top:84px}#kv-hero.carousel-keyvisual{height:calc(100svh - 84px)}.pa
 .books-pagination [aria-current=page]{background:#26382c;border-color:#26382c;color:#faf8f3}
 .books-pagination a:hover{background:#ecefe7}.books-page-count{text-align:center;color:#70766d;font-size:13px;margin-top:16px}
 @media(max-width:520px){.books-pagination{gap:4px}.books-pagination a,.books-pagination span{padding:8px;min-width:36px}}
+
+/* Approved breathing room before the footer, only on the books listing. */
+#recommended-books:has(>.books-page-heading){padding-bottom:160px}
+#recommended-books>.books-page-count{margin-bottom:0}
+@media(max-width:760px){#recommended-books:has(>.books-page-heading){padding-bottom:100px}}
