@@ -1,4 +1,5 @@
 'use strict';
+const {nav}=require('../lib/home-content');
 const {root,key,ready,esc,selected}=require('../lib/core');
 const {origin,safeImage,jsonLd}=require('../lib/seo');
 const typeNames={reading:'독서',writing:'글쓰기',themed:'주제모임',special:'특별행사'};
@@ -74,8 +75,8 @@ module.exports=async(req,res)=>{
    '<meta name="robots" content="noindex,nofollow"><title>'+esc(pageTitle)+'</title>'+
    '<meta name="description" content="'+esc(intro)+'"><link rel="canonical" href="'+esc(self)+'">'+
    '<meta property="og:title" content="'+esc(pageTitle)+'"><meta property="og:description" content="'+esc(intro)+'">'+
-   '<script type="application/ld+json">'+jsonLd(schema)+'</script><style>'+style+'</style></head><body>'+
-   '<header><div class="header-inner"><a href="/#news">작가작업실 JEJU</a><a href="/#news">모임·행사</a></div></header>'+
+   '<script type="application/ld+json">'+jsonLd(schema)+'</script><style>'+style+'</style><link rel="stylesheet" href="/assets/home-approved.css"><style>body{background:#fff;color:#3d3834}.kv-sticky-header{padding:0;font-family:HomeKakao,sans-serif;line-height:1.55}</style></head><body>'+
+   '<header class="kv-sticky-header"><div class="kv-sticky-inner">'+nav('/news')+'</div></header>'+
    '<main><div class="section-title"><p class="eyebrow">02 — MEETINGS &amp; EVENTS</p><h1>'+(rental?'대관 사례':'모임·행사')+'</h1></div>'+
    '<p class="intro">'+esc(intro)+'</p>'+
    '<nav class="tabs" aria-label="지난 행사 분류"><a href="/news"'+(!rental?' class="current" aria-current="page"':'')+'>전체 모임·행사</a>'+
@@ -84,7 +85,7 @@ module.exports=async(req,res)=>{
    (items.length?'<div class="cards">'+items.map(card).join('')+'</div>':'<p class="empty">등록된 모임·행사가 없습니다.</p>')+
    pager(page,pages,rental)+
    (rental?'<a class="return" href="/programs">공간 대관 안내 보기 ↗</a>':'')+
-   '<a class="return" href="/#news">모임·행사로 돌아가기</a></main></body></html>';
+   '<a class="return" href="/#news">모임·행사로 돌아가기</a></main><script defer src="/assets/home-menu.js"></script></body></html>';
   res.setHeader('Content-Type','text/html; charset=utf-8');
   res.setHeader('Cache-Control','no-store');
   res.setHeader('X-Robots-Tag','noindex, nofollow, noarchive');
