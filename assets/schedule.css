@@ -98,3 +98,6 @@
 #schedule .sc-return .sc-back{display:inline-block;text-decoration:none}
 #schedule .sc-event-link{display:inline-block;margin-top:14px;color:#26382c;font-size:14px;text-underline-offset:4px}
 #schedule a.sc-day:focus-visible,#schedule .sc-back:focus-visible,#schedule .sc-event-link:focus-visible{outline:2px solid #26382c;outline-offset:2px}
+
+#schedule .sc-day.is-holiday .sc-date-num{color:#ad705b}
+#schedule .sc-closed-label{white-space:normal;line-height:1.6}
