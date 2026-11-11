@@ -21,3 +21,13 @@ body{padding-top:84px}#kv-hero.carousel-keyvisual{height:calc(100svh - 84px)}.pa
 .books-page-intro{font-family:HomeKakao,sans-serif;font-size:18px;font-weight:400;line-height:1.9;letter-spacing:-.3px;color:#7a8178;margin:38px 0 0;word-break:keep-all;overflow-wrap:break-word}
 .books-page-intro>span{white-space:normal}
 @media(max-width:520px){.books-page-heading{margin-bottom:38px}.books-page-eyebrow{font-size:12px;letter-spacing:.15px;margin-bottom:22px}#recommended-books .books-page-heading h1{letter-spacing:-1.2px}.books-page-intro{font-size:15px;margin-top:28px}}
+
+/* Shared approved title design for the other subpages. */
+.subpage-heading h1{font-family:HomeKakao,sans-serif!important;font-weight:400}
+.subpage-heading{container-type:inline-size;margin:0 0 50px}
+.subpage-eyebrow{font-family:HomeKakao,sans-serif;font-size:17px;font-weight:400;line-height:1.5;letter-spacing:.3px;color:#7a8178;margin:0 0 25px}
+.subpage-title-row{display:block}
+.subpage-heading h1{font-size:clamp(36px,9.4cqi,60px);line-height:1.2;letter-spacing:-2px;color:#26382c;margin:0;white-space:nowrap}
+.subpage-intro{font-family:HomeKakao,sans-serif;font-size:18px;font-weight:400;line-height:1.9;letter-spacing:-.3px;color:#7a8178;margin:38px 0 0;word-break:keep-all;overflow-wrap:break-word}
+.subpage-intro>span{white-space:normal}
+@media(max-width:520px){.subpage-heading{margin-bottom:38px}.subpage-eyebrow{font-size:12px;letter-spacing:.15px;margin-bottom:22px}.subpage-heading h1{letter-spacing:-1.2px}.subpage-intro{font-size:15px;margin-top:28px}}

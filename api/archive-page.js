@@ -1,5 +1,5 @@
 'use strict';
-const {nav}=require('../lib/home-content');
+const {nav,pageHeading}=require('../lib/home-content');
 const {root,key,ready,esc,selected}=require('../lib/core');
 const {origin,safeImage,jsonLd}=require('../lib/seo');
 const typeNames={reading:'독서',writing:'글쓰기',themed:'주제모임',special:'특별행사'};
@@ -77,8 +77,7 @@ module.exports=async(req,res)=>{
    '<meta property="og:title" content="'+esc(pageTitle)+'"><meta property="og:description" content="'+esc(intro)+'">'+
    '<script type="application/ld+json">'+jsonLd(schema)+'</script><style>'+style+'</style><link rel="stylesheet" href="/assets/home-approved.css"><style>body{background:#fff;color:#3d3834}.kv-sticky-header{padding:0;font-family:HomeKakao,sans-serif;line-height:1.55}</style></head><body>'+
    '<header class="kv-sticky-header"><div class="kv-sticky-inner">'+nav('/news')+'</div></header>'+
-   '<main><div class="section-title"><p class="eyebrow">02 — MEETINGS &amp; EVENTS</p><h1>'+(rental?'대관 사례':'모임·행사')+'</h1></div>'+
-   '<p class="intro">'+esc(intro)+'</p>'+
+   '<main>'+pageHeading('MEETINGS & EVENTS',rental?'대관 사례':'모임,행사',intro)+
    '<nav class="tabs" aria-label="지난 행사 분류"><a href="/news"'+(!rental?' class="current" aria-current="page"':'')+'>전체 모임·행사</a>'+
    '<a href="/news?operator=rental"'+(rental?' class="current" aria-current="page"':'')+'>대관 행사만 보기</a></nav>'+
    '<p class="count">총 '+total+'개 · 최신 게시순</p>'+
