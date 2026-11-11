@@ -75,7 +75,7 @@ module.exports=async(req,res)=>{
    '<meta name="robots" content="noindex,nofollow"><title>'+esc(pageTitle)+'</title>'+
    '<meta name="description" content="'+esc(intro)+'"><link rel="canonical" href="'+esc(self)+'">'+
    '<meta property="og:title" content="'+esc(pageTitle)+'"><meta property="og:description" content="'+esc(intro)+'">'+
-   '<script type="application/ld+json">'+jsonLd(schema)+'</script><style>'+style+'</style><link rel="stylesheet" href="/assets/home-approved.css"><style>body{background:#fff;color:#3d3834}.kv-sticky-header{padding:0;font-family:HomeKakao,sans-serif;line-height:1.55}</style></head><body>'+
+   '<script type="application/ld+json">'+jsonLd(schema)+'</script><style>'+style+'</style><link rel="stylesheet" href="/assets/home-approved.css"><style>body{background:#fff;color:#3d3834}.kv-sticky-header{padding:0;font-family:HomeKakao,sans-serif;font-size:15px;line-height:1.86;letter-spacing:-.025em;-webkit-font-smoothing:antialiased}.kv-sticky-inner{margin:auto}</style></head><body>'+
    '<header class="kv-sticky-header"><div class="kv-sticky-inner">'+nav('/news')+'</div></header>'+
    '<main>'+pageHeading('MEETINGS & EVENTS',rental?'대관 사례':'모임,행사',intro)+
    '<nav class="tabs" aria-label="지난 행사 분류"><a href="/news"'+(!rental?' class="current" aria-current="page"':'')+'>전체 모임·행사</a>'+
