@@ -15,9 +15,9 @@ body{padding-top:84px}#kv-hero.carousel-keyvisual{height:calc(100svh - 84px)}.pa
 /* Approved books listing heading; Home retains its existing layout and copy. */
 #recommended-books>h2,#recommended-books .books-page-heading h1{font-family:HomeKakao,sans-serif!important;font-weight:400}
 .books-page-heading{container-type:inline-size;margin:0 0 50px}
-.books-page-eyebrow{font-family:HomeKakao,sans-serif;font-size:14px;font-weight:400;line-height:1.5;letter-spacing:.3px;color:#7a8178;margin:0 0 30px}
-.books-page-title-row{display:grid;grid-template-columns:34% minmax(0,1fr);gap:24px;align-items:center}
-#recommended-books .books-page-heading h1{font-size:clamp(28px,4.45cqi,42px);line-height:1.2;letter-spacing:-1.4px;color:#26382c;margin:0;white-space:nowrap}
-.books-page-intro{font-family:HomeKakao,sans-serif;font-size:clamp(11px,1.48cqi,14px);font-weight:400;line-height:1.9;color:#7a8178;margin:0;word-break:keep-all}
-.books-page-intro>span{white-space:nowrap}
-@media(max-width:760px){.books-page-heading{margin-bottom:34px}.books-page-eyebrow{font-size:12px;margin-bottom:20px}.books-page-title-row{grid-template-columns:1fr;gap:24px}#recommended-books .books-page-heading h1{font-size:32px;letter-spacing:-1px}.books-page-intro{font-size:14px}.books-page-intro>span{white-space:normal}}
+.books-page-eyebrow{font-family:HomeKakao,sans-serif;font-size:17px;font-weight:400;line-height:1.5;letter-spacing:.3px;color:#7a8178;margin:0 0 25px}
+.books-page-title-row{display:block}
+#recommended-books .books-page-heading h1{font-size:clamp(36px,9.4cqi,60px);line-height:1.2;letter-spacing:-2px;color:#26382c;margin:0;white-space:nowrap}
+.books-page-intro{font-family:HomeKakao,sans-serif;font-size:18px;font-weight:400;line-height:1.9;letter-spacing:-.3px;color:#7a8178;margin:38px 0 0;word-break:keep-all;overflow-wrap:break-word}
+.books-page-intro>span{white-space:normal}
+@media(max-width:520px){.books-page-heading{margin-bottom:38px}.books-page-eyebrow{font-size:12px;letter-spacing:.15px;margin-bottom:22px}#recommended-books .books-page-heading h1{letter-spacing:-1.2px}.books-page-intro{font-size:15px;margin-top:28px}}
