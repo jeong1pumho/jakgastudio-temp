@@ -70,7 +70,8 @@
     const blank=text('div','sc-day is-other');blank.setAttribute('aria-hidden','true');grid.appendChild(blank);continue;
    }
    const key=keyFor(year,month,d),dow=new Date(Date.UTC(year,month-1,d)).getUTCDay(),data=getDay(year,month,d);
-   const button=text('button','sc-day');button.type='button';
+   const button=text(data.preOpen||data.opening?'div':'a','sc-day');
+   if(!data.preOpen&&!data.opening)button.href='/calendar?date='+key+'#schedule';
    if(dow===0)button.classList.add('is-sunday');
    if(data.closed)button.classList.add('is-closed');
    if(data.preOpen)button.classList.add('is-pre-open');
@@ -90,14 +91,14 @@
     }
     if(data.events.length>4)button.appendChild(text('span','sc-more','+'+(data.events.length-4)+'개 더보기'));
    }
-   if(data.preOpen||data.opening)button.disabled=true;
-   else button.addEventListener('click',()=>showDay(year,month,d));
+
    grid.appendChild(button);
   }
  }
  function showDay(y,m,d){
   const helper=host.querySelector('.sc-top small');if(helper)helper.hidden=true;
   $('sc-back').textContent='← 돌아가기';
+  $('sc-back').href=fromHome?'/#weekly-schedule':'/calendar?month='+keyFor(y,m,1).slice(0,7)+'#schedule';
   if(keyFor(y,m,d)<=OPEN_DATE)return;
   const dow=new Date(Date.UTC(y,m-1,d)).getUTCDay(),data=getDay(y,m,d);
   $('sc-month').hidden=true;$('sc-detail-view').hidden=false;
@@ -117,6 +118,7 @@
     const card=text('article','sc-detail '+classFor(e));
     card.append(text('div','sc-detail-kind',titleFor(e)),text('div','sc-detail-title',e.title),text('div','sc-detail-clock',rangeFor(e)));
     if(e.lunch_excluded)card.appendChild(text('div','sc-detail-lunch','(점심시간 12-13시)'));
+    if(['meeting','custom'].includes(e.category)&&/^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(e.id||'')){const link=text('a','sc-event-link','행사 상세 보기 →');link.href='/calendar/events/'+encodeURIComponent(e.id);card.appendChild(link);}
     list.appendChild(card);
   }
  }
@@ -147,9 +149,11 @@
  $('sc-prev').addEventListener('click',()=>changeMonth(-1));
  $('sc-next').addEventListener('click',()=>changeMonth(1));
  $('sc-current').addEventListener('click',()=>{year=readPart('year');month=readPart('month');load();});
- $('sc-back').addEventListener('click',()=>{if(fromHome){if(window.jejuGoBack)window.jejuGoBack('/#weekly-schedule');else location.assign('/#weekly-schedule');return;}$('sc-detail-view').hidden=true;$('sc-month').hidden=false;const helper=host.querySelector('.sc-top small');if(helper)helper.hidden=false;history.replaceState(null,'','/calendar#schedule');});
+ $('sc-back').addEventListener('click',event=>{if(fromHome&&window.jejuGoBack&&!event.ctrlKey&&!event.metaKey&&!event.shiftKey&&!event.altKey){event.preventDefault();window.jejuGoBack('/#weekly-schedule');}});
  const params=new URLSearchParams(location.search);
  const fromHome=params.get('from')==='home';
+ const requestedMonth=params.get('month');
+ if(/^\d{4}-(0[1-9]|1[0-2])$/.test(requestedMonth||'')&&requestedMonth>=OPEN_MONTH&&requestedMonth<='2100-12'){[year,month]=requestedMonth.split('-').map(Number);}
  let requestedDay=params.get('date');
  if(!/^\d{4}-\d{2}-\d{2}$/.test(requestedDay||'')||!Number.isFinite(Date.parse(requestedDay+'T00:00:00Z'))||new Date(requestedDay+'T00:00:00Z').toISOString().slice(0,10)!==requestedDay||requestedDay<=OPEN_DATE||requestedDay>'2100-12-31')requestedDay=null;
  if(requestedDay){const parts=requestedDay.split('-').map(Number);year=parts[0];month=parts[1];}

@@ -92,3 +92,9 @@
 #schedule .sc-hours strong{font-size:17px;font-weight:500}
 #schedule .sc-hours p{font-size:12px;color:#625950;line-height:1.7;margin:3px 0 0}
 @media(max-width:760px){#schedule .sc-summary{padding:16px 14px;gap:16px}#schedule .sc-hours{width:100%}#schedule .sc-hours strong{font-size:15px}}
+
+#schedule a.sc-day{text-decoration:none}
+#schedule .sc-return{margin-top:28px}
+#schedule .sc-return .sc-back{display:inline-block;text-decoration:none}
+#schedule .sc-event-link{display:inline-block;margin-top:14px;color:#26382c;font-size:14px;text-underline-offset:4px}
+#schedule a.sc-day:focus-visible,#schedule .sc-back:focus-visible,#schedule .sc-event-link:focus-visible{outline:2px solid #26382c;outline-offset:2px}
