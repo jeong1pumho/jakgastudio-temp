@@ -1,6 +1,7 @@
 'use strict';
 const {root, key, query, send, admin} = require('../lib/core');
 const initial = require('../lib/key-visual-initial.json');
+const optimized = require('../lib/key-visual-optimized.json');
 const endpoint = '/rest/v1/key_visual?id=eq.1';
 module.exports = async (req, res) => {
   try {
@@ -10,7 +11,16 @@ module.exports = async (req, res) => {
       const columns = token ? 'slides,revision,originals' : 'slides,revision';
       const [row] = await query(endpoint + '&select=' + columns,'GET',undefined,token);
       if (!row) return send(res, 200, {slides:initial,revision:0});
-      const slides = token ? row.slides.map((item,i)=>({...item,original:row.originals[i] || undefined})) : row.slides;
+      // Legacy PNGs already have lightweight Vercel WebP variants for admin previews.
+      // The preview property is transient and never persisted to published data.
+      const slides = token ? row.slides.map((item,i)=>({
+        ...item,
+        original:row.originals[i] || undefined,
+        preview:{
+          desktop:optimized[item.desktop]?.desktop || item.desktop,
+          mobile:optimized[item.mobile]?.mobile || item.mobile
+        }
+      })) : row.slides;
       return send(res, 200, {slides,revision:row.revision});
     }
     if (req.method !== 'PUT') return send(res, 405, {error:'지원하지 않는 요청입니다.'});
@@ -29,6 +39,9 @@ module.exports = async (req, res) => {
     if (!slides.every(item => item && isAsset(item.desktop) && isAsset(item.mobile))) {
       return send(res, 400, {error:'PC용 또는 모바일용 사진 주소가 올바르지 않습니다.'});
     }
+    if (!slides.every(item => item.thumbnail === undefined || isUpload(item.thumbnail))) {
+      return send(res, 400, {error:'관리자 썸네일 주소가 올바르지 않습니다.'});
+    }
     const isCrop = values => Array.isArray(values) && values.length === 3 &&
       values.every((value,i)=>Number.isFinite(value) && value >= (i===2?25:0) && value <= 100);
     const isOriginal = original => original && typeof original.name === 'string' &&
@@ -38,8 +51,10 @@ module.exports = async (req, res) => {
       return send(res, 400, {error:'비공개 원본 또는 크롭 정보가 올바르지 않습니다.'});
     }
     const originals = slides.map(({original})=>original ? {name:original.name,desktop:original.desktop,mobile:original.mobile} : null);
-    const payload = {originals,slides:slides.map(({desktop,mobile,alt})=>({desktop,mobile,alt:typeof alt === 'string' ? alt.trim().slice(0,150) : ''})),revision:revision+1};
-    const files = [...new Set(payload.slides.flatMap(item => [item.desktop,item.mobile]).filter(isUpload))];
+    const payload = {originals,slides:slides.map(({desktop,mobile,thumbnail,alt})=>({
+      desktop,mobile,thumbnail:thumbnail || undefined,alt:typeof alt === 'string' ? alt.trim().slice(0,150) : ''
+    })),revision:revision+1};
+    const files = [...new Set(payload.slides.flatMap(item => [item.desktop,item.mobile,item.thumbnail]).filter(isUpload))];
     const checks = await Promise.all(files.map(url => fetch(url,{method:'HEAD'})));
     if (checks.some(response => !response.ok)) return send(res, 400, {error:'등록한 사진 파일을 확인할 수 없습니다.'});
     const rows = revision === 0

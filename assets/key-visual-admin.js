@@ -11,6 +11,13 @@
   const previewDialog = $('previewDialog');
   const originalBucket = 'key-visual-originals';
   const originalTypes = {'image/jpeg':'jpg','image/png':'png','image/webp':'webp','image/avif':'avif'};
+  // Preserve originals/crop coordinates; optimize only published derivatives.
+  // Byte budgets are quality targets, not mandatory dimension reductions.
+  const outputProfiles = {
+    desktop: {maxWidth:2560,maxBytes:850*1024,qualities:[.84,.80,.76,.72,.68]},
+    mobile: {maxWidth:1080,maxBytes:550*1024,qualities:[.84,.80,.76,.72,.68]},
+    thumbnail: {maxWidth:360,maxBytes:50*1024,qualities:[.72,.64,.56,.50]}
+  };
   const ranges = ['cropX','cropY','cropSize'].map($);
   let slides = [], revision = 0, busy = false, editIndex = -1, crop, previewSlide, drag;
 
@@ -32,7 +39,10 @@
     Object.values(item.pending || {}).forEach(file => URL.revokeObjectURL(file.preview));
   }
   function photo(item, mode) {
-    return item.pending?.[mode]?.preview || item[mode];
+    return item.pending?.[mode]?.preview || item.preview?.[mode] || item[mode];
+  }
+  function thumbnailPhoto(item) {
+    return item.pending?.thumbnail?.preview || item.thumbnail || item.preview?.desktop || photo(item,'desktop');
   }
   function render() {
     $('add').disabled = busy || slides.length >= 10;
@@ -42,7 +52,8 @@
       const card = document.createElement('li');
       card.className = 'card';
       const img = document.createElement('img');
-      img.className = 'thumb'; img.src = photo(item,'desktop'); img.alt = '';
+      img.className = 'thumb'; img.src = thumbnailPhoto(item); img.alt = '';
+      img.loading = 'lazy'; img.decoding = 'async';
       const actions = document.createElement('div'); actions.className = 'actions';
       const move = direction => {
         [slides[i],slides[i+direction]] = [slides[i+direction],slides[i]]; render();
@@ -217,15 +228,31 @@
     try {
       const {x,y,width,height}=bounds();
       if (width<9 || height<9 || x<0 || y<0) throw Error('크롭할 수 있는 크기의 원본을 선택해 주세요.');
-      const scale=Math.min(1,(crop.mode==='desktop'?2560:1080)/width);
-      const output=document.createElement('canvas'); output.width=Math.round(width*scale); output.height=Math.round(height*scale);
-      const outputContext=output.getContext('2d');
-      outputContext.imageSmoothingEnabled=true;outputContext.imageSmoothingQuality='high';
-      outputContext.drawImage(crop.image,x,y,width,height,0,0,output.width,output.height);
-      const blob=await new Promise(resolve=>output.toBlob(resolve,'image/webp',.88));
-      if (!blob) throw Error('크롭 이미지를 만들지 못했습니다.');
+      // Encode WebP client-side so this workflow stays available on Supabase Free.
+      const createWebP = async profile => {
+        const settings=outputProfiles[profile];
+        const scale=Math.min(1,settings.maxWidth/width);
+        const output=document.createElement('canvas');
+        output.width=Math.max(1,Math.round(width*scale));
+        output.height=Math.max(1,Math.round(height*scale));
+        const outputContext=output.getContext('2d');
+        outputContext.imageSmoothingEnabled=true;outputContext.imageSmoothingQuality='high';
+        outputContext.drawImage(crop.image,x,y,width,height,0,0,output.width,output.height);
+        let blob;
+        for(const quality of settings.qualities) {
+          blob=await new Promise(resolve=>output.toBlob(resolve,'image/webp',quality));
+          if(!blob || blob.type!=='image/webp') throw Error('브라우저에서 WebP 이미지를 만들지 못했습니다.');
+          if(blob.size<=settings.maxBytes) break;
+        }
+        return blob;
+      };
+      const blob=await createWebP(crop.mode);
       if (blob.size > 50*1024*1024) throw Error('크롭 이미지가 50MB를 초과합니다. 선택 영역을 줄이거나 용량이 작은 원본을 사용해 주세요.');
       crop.pending[crop.mode]={blob,preview:URL.createObjectURL(blob)};
+      if(crop.mode==='desktop'){
+        const thumbnail=await createWebP('thumbnail');
+        crop.pending.thumbnail={blob:thumbnail,preview:URL.createObjectURL(thumbnail)};
+      }
       crop.settings[crop.mode]=ranges.map(range=>Number(range.value));
       if(crop.mode==='desktop'){setCropMode('mobile');return;}
       const item={pending:crop.pending,original:{...crop.original,...crop.settings}};
@@ -269,11 +296,15 @@
       for(const item of slides){
         const desktop=item.pending?await upload(item.pending.desktop,config):item.desktop;
         const mobile=item.pending?await upload(item.pending.mobile,config):item.mobile;
+        const thumbnail=item.pending?.thumbnail?await upload(item.pending.thumbnail,config):item.thumbnail;
         const original=await saveOriginal(item.original,config);
-        published.push({desktop,mobile,alt:item.alt,original});
+        published.push({desktop,mobile,thumbnail,alt:item.alt,original});
       }
       const saved=await api('/api/key-visual',{method:'PUT',body:JSON.stringify({slides:published,revision})});
-      slides.forEach(release);slides=published;revision=saved.revision;message('테스트 홈페이지에 반영했습니다.');
+      const previews=slides.map(item=>item.preview);
+      slides.forEach(release);
+      slides=published.map((item,i)=>({...item,preview:previews[i]}));
+      revision=saved.revision;render();message('테스트 홈페이지에 반영했습니다.');
     }catch(error){message('반영 실패 · '+error.message);}
     finally{busy=false;render();}
   });
