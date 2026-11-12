@@ -2,8 +2,8 @@
 .approved-space-gallery .space-gallery-item{display:block;overflow:hidden;aspect-ratio:3/2}
 .approved-space-gallery .space-gallery-item:first-child{grid-column:1/-1;aspect-ratio:2/1;margin-bottom:12px}
 .approved-space-gallery img{display:block;width:100%;height:100%;object-fit:cover}
-.approved-info.visit-page>.subpage-heading{margin-bottom:100px}
-.approved-info.visit-page>.subpage-heading>.subpage-intro{display:none}
+.approved-info.visit-page>.subpage-heading{margin-bottom:64px}
+.approved-info.visit-page>.subpage-heading>.subpage-intro{white-space:pre-line}
 .approved-visit{color:#26382c;font-weight:400}
 .approved-visit .visit-block{margin:0 0 100px}
 .approved-visit .visit-block h2{font-size:40px;line-height:1.4;margin:0 0 40px;letter-spacing:-1.3px}
@@ -32,3 +32,12 @@
 
 .approved-info.space-page{padding-bottom:160px}
 @media(max-width:760px){.approved-info.space-page{padding-bottom:100px}}
+
+/* Confirmed visit heading hierarchy and generous section separation. */
+.approved-visit .visit-block h2{display:flex;align-items:center;gap:16px;font-size:34px;font-weight:600}
+.visit-section-icon{width:32px;height:32px;flex:0 0 32px}
+.approved-visit .visit-block:first-child{margin-bottom:80px}
+.approved-visit .visit-block+.visit-block{border-top:1px solid #d0d6cb;padding-top:80px}
+.approved-visit .visit-parking-lead,.approved-visit .visit-parking-address{font-size:23px;color:#26382c;line-height:1.7}
+.approved-visit .visit-parking-lead{font-weight:500}
+@media(max-width:760px){.approved-visit .visit-block h2{font-size:28px;gap:12px}.visit-section-icon{width:27px;height:27px;flex-basis:27px}.approved-visit .visit-block:first-child{margin-bottom:56px}.approved-visit .visit-block+.visit-block{padding-top:56px}.approved-visit .visit-parking-lead,.approved-visit .visit-parking-address{font-size:21px}}
