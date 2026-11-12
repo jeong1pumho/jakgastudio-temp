@@ -217,9 +217,12 @@
     try {
       const {x,y,width,height}=bounds();
       if (width<9 || height<9 || x<0 || y<0) throw Error('크롭할 수 있는 크기의 원본을 선택해 주세요.');
-      const output=document.createElement('canvas'); output.width=width; output.height=height;
-      output.getContext('2d').drawImage(crop.image,x,y,width,height,0,0,width,height);
-      const blob=await new Promise(resolve=>output.toBlob(resolve,'image/png'));
+      const scale=Math.min(1,(crop.mode==='desktop'?2560:1080)/width);
+      const output=document.createElement('canvas'); output.width=Math.round(width*scale); output.height=Math.round(height*scale);
+      const outputContext=output.getContext('2d');
+      outputContext.imageSmoothingEnabled=true;outputContext.imageSmoothingQuality='high';
+      outputContext.drawImage(crop.image,x,y,width,height,0,0,output.width,output.height);
+      const blob=await new Promise(resolve=>output.toBlob(resolve,'image/webp',.88));
       if (!blob) throw Error('크롭 이미지를 만들지 못했습니다.');
       if (blob.size > 50*1024*1024) throw Error('크롭 이미지가 50MB를 초과합니다. 선택 영역을 줄이거나 용량이 작은 원본을 사용해 주세요.');
       crop.pending[crop.mode]={blob,preview:URL.createObjectURL(blob)};
@@ -234,10 +237,12 @@
   });
   async function upload(file, config) {
     if(file.url)return file.url;
-    const name=crypto.randomUUID()+'.png';
+    const type=file.blob.type;
+    if(!['image/webp','image/png'].includes(type))throw Error('지원하지 않는 출력 형식입니다.');
+    const name=crypto.randomUUID()+(type==='image/webp'?'.webp':'.png');
     const base=config.url+'/storage/v1/object/';
     const response=await fetch(base+'key-visual/'+name,{method:'POST',
-      headers:{apikey:config.key,Authorization:'Bearer '+token,'Content-Type':'image/png','x-upsert':'false'},body:file.blob});
+      headers:{apikey:config.key,Authorization:'Bearer '+token,'Content-Type':type,'x-upsert':'false'},body:file.blob});
     if(!response.ok)throw Error('사진 업로드에 실패했습니다. (HTTP '+response.status+')');
     file.url=base+'public/key-visual/'+name;
     return file.url;

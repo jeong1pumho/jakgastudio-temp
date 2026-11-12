@@ -1069,7 +1069,6 @@ strong,b{font-weight:700}
   #kv-hero .kv-arrow{transition:none!important}
 }
 </style>
-<link rel="preload" href="/assets/hero-01-mobile.webp" as="image" type="image/webp" media="(max-width:700px)" fetchpriority="high"/>
 <style id="kv-mobile-picture-performance-20261030">#kv-hero .kv-mobile-picture{display:block;width:100%;height:100%}</style>
 <link rel="stylesheet" href="/assets/schedule.css">
 
@@ -1210,6 +1209,7 @@ strong,b{font-weight:700}
   let buttons=[...dots.querySelectorAll('.kv-dot')];
   const prev=hero.querySelector('#kv-prev'),next=hero.querySelector('#kv-next');
   let total=buttons.length;
+  [prev,next,dots].forEach(el=>{el.hidden=total===1;if(total===1)el.style.display='none';});
   const status=hero.querySelector('#kv-carousel-status');
   const reduced=window.matchMedia('(prefers-reduced-motion: reduce)');
   let index=1,locked=false,startX=null;
@@ -1243,33 +1243,6 @@ strong,b{font-weight:700}
     const button=e.target.closest('.kv-dot');
     if(button)go(Number(button.dataset.slide));
   });
-  function renderPublished(items){
-    const makeSlide=(item,i,clone)=>{
-      const slide=document.createElement('div');
-      slide.className='kv-slide';slide.setAttribute('role','group');
-      slide.setAttribute('aria-roledescription','슬라이드');
-      slide.setAttribute('aria-label',(i+1)+' / '+total);
-      if(clone)slide.setAttribute('aria-hidden','true');
-      const picture=document.createElement('picture');
-      const mobile=document.createElement('source');
-      mobile.media='(max-width:700px) and (orientation:portrait)';mobile.srcset=item.mobile;
-      const img=document.createElement('img');
-      img.src=item.desktop;img.alt=clone?'':item.alt;img.draggable=false;
-      img.loading=i===0&&!clone?'eager':'lazy';img.decoding='async';
-      picture.append(mobile,img);slide.append(picture);return slide;
-    };
-    total=items.length;index=1;locked=false;
-    track.replaceChildren(makeSlide(items[total-1],total-1,true),
-      ...items.map((item,i)=>makeSlide(item,i,false)),makeSlide(items[0],0,true));
-    buttons=items.map((item,i)=>{
-      const button=document.createElement('button');
-      button.type='button';button.className='kv-dot';button.dataset.slide=i+1;
-      button.setAttribute('aria-label',(i+1)+'번 사진 보기');return button;
-    });
-    dots.replaceChildren(...buttons);
-    [prev,next,dots].forEach(el=>{el.style.display=total===1?'none':'';});
-    translate(false);
-  }
   viewport.addEventListener('pointerdown',e=>{if(e.pointerType!=='mouse'||e.button===0)startX=e.clientX;});
   viewport.addEventListener('pointerup',e=>{
     if(startX===null)return;
@@ -1285,9 +1258,7 @@ strong,b{font-weight:700}
   window.addEventListener('resize',()=>translate(false));
   if('ResizeObserver'in window)new ResizeObserver(()=>translate(false)).observe(viewport);
   translate(false);
-  fetch('/api/key-visual').then(response=>response.ok?response.json():null).then(data=>{
-    if(data?.revision>0 && Array.isArray(data.slides) && data.slides.length>=1 && data.slides.length<=10) renderPublished(data.slides);
-  }).catch(()=>{});
+
 })();
 </script>
 <!-- Approved introduction: brand image only; all copy is searchable HTML -->
