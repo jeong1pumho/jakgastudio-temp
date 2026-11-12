@@ -29,3 +29,6 @@
 .approved-space-gallery .space-gallery-item{width:100%;padding:0;border:0;background:transparent;cursor:zoom-in}
 
 .approved-info .lightbox{z-index:10000}
+
+.approved-info.space-page{padding-bottom:160px}
+@media(max-width:760px){.approved-info.space-page{padding-bottom:100px}}
