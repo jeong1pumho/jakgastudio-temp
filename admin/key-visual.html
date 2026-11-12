@@ -11,18 +11,8 @@
 .wordmark{font-size:20px;font-weight:600;letter-spacing:-.04em}.wordmark small{font-size:11px;color:var(--muted);font-weight:400;letter-spacing:0;margin-left:12px}
 .site-header{--edge:#e1d5ca;--muted:#817970;--paper:#f7f5f1}.site-header a{text-decoration:none}.wordmark{color:inherit;white-space:nowrap}.admin-logout{background:transparent;color:inherit}.admin-logout:hover{background:#eee7e0}
 @media(max-width:760px){.site-header{align-items:stretch;flex-direction:column;gap:8px;padding:12px 8px}.admin-nav-link{padding:7px 8px}}
-</style></head><body>
-<header class="site-header">
-  <a class="wordmark" href="/">작가작업실 JEJU <small>관리자</small></a>
-  <nav class="admin-global-nav" aria-label="관리자 메뉴"><a href="/admin/books.html" class="admin-nav-link">작가 추천 도서 관리</a>
-    <a href="/admin/" class="admin-nav-link">모임·행사 관리</a>
-    <a href="/admin/schedule.html" class="admin-nav-link">스케줄 관리</a>
-    <a href="/admin/space.html" class="admin-nav-link">공간소개 관리</a>
-    <a href="/admin/sms.html" class="admin-nav-link">문자 알림 관리</a>
-    <a href="/admin/key-visual.html" class="admin-nav-link is-active" aria-current="page">Key Visual 관리</a>
-    <button type="button" class="admin-nav-link admin-logout" id="key-visual-logout" hidden>로그아웃</button>
-  </nav>
-</header>
+</style><link rel="stylesheet" href="/assets/admin-topbar.css?v=20261112"><script defer src="/assets/admin-topbar.js?v=20261112"></script></head><body><header id="admin-topbar"><a class="admin-top-brand" href="/">작가작업실 JEJU <small>관리자</small></a><nav aria-label="관리자 메뉴"><a class="admin-top-link" href="/admin/key-visual.html" aria-current="page">Key Visual</a><a class="admin-top-link" href="/admin/books.html">작가 추천 도서</a><a class="admin-top-link" href="/admin/">모임행사</a><a class="admin-top-link" href="/admin/schedule.html">월간 캘린더</a><a class="admin-top-link" href="/admin/space.html">공간 소개</a><a class="admin-top-link" href="/admin/sms.html">문자 알림</a><button type="button" class="admin-top-link" id="key-visual-logout" hidden>로그아웃</button></nav></header>
+
 <main>
 <h1>Key Visual 관리</h1><p>사진을 최대 10장 등록할 수 있습니다. 사진 한 장마다 PC용과 모바일용으로 보일 영역을 지정하세요.</p>
 <p id="message" class="notice" role="status"></p>

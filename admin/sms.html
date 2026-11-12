@@ -43,12 +43,12 @@ table{border-collapse:collapse;width:100%;font-size:13px}th,td{border-bottom:1px
   .name-edit-area .form-actions{display:flex;gap:8px;margin-top:14px}
   .person-actions{display:flex;gap:7px;flex-wrap:wrap}
   @media(max-width:700px){.people-controls .state-control,.people-controls .search-control{max-width:none;flex:1 1 100%}}
-</style></head><body>
-<header><strong>작가작업실 JEJU</strong><nav><a href="/admin/">모임·행사</a><a class="active" href="/admin/sms.html" aria-current="page">문자 알림</a><a href="/admin/schedule.html">스케줄</a><a href="/admin/space.html">공간소개</a><a href="/admin/key-visual.html">Key Visual 관리</a></nav></header>
+</style><link rel="stylesheet" href="/assets/admin-topbar.css?v=20261112"><script defer src="/assets/admin-topbar.js?v=20261112"></script></head><body><header id="admin-topbar"><a class="admin-top-brand" href="/">작가작업실 JEJU <small>관리자</small></a><nav aria-label="관리자 메뉴"><a class="admin-top-link" href="/admin/key-visual.html">Key Visual</a><a class="admin-top-link" href="/admin/books.html">작가 추천 도서</a><a class="admin-top-link" href="/admin/">모임행사</a><a class="admin-top-link" href="/admin/schedule.html">월간 캘린더</a><a class="admin-top-link" href="/admin/space.html">공간 소개</a><a class="admin-top-link" href="/admin/sms.html" aria-current="page">문자 알림</a><button type="button" class="admin-top-link" id="logout" data-auth-panel="dashboard" hidden>로그아웃</button></nav></header>
+
 <main><h1>문자 알림 관리</h1><p class="muted">모임·행사 및 신규 프로그램 문자 알림 수신동의자 관리와 단체 SMS 발송</p>
 <section id="login-panel" class="card"><h2>관리자 로그인</h2><form id="login-form"><div class="row2"><div><label for="email">이메일</label><input class="field" type="email" id="email" autocomplete="username" required></div><div><label for="password">비밀번호</label><input class="field" type="password" id="password" autocomplete="current-password" required></div></div><p><button class="btn primary" type="submit">로그인</button></p></form></section>
 <section id="dashboard" hidden>
-<div class="flex" style="justify-content:space-between"><p id="connection" class="muted"></p><div class="flex"><button class="btn" type="button" id="check-solapi">솔라피 연결 상태 확인</button><button class="btn" type="button" id="logout">로그아웃</button></div></div>
+<div class="flex" style="justify-content:space-between"><p id="connection" class="muted"></p><div class="flex"><button class="btn" type="button" id="check-solapi">솔라피 연결 상태 확인</button></div></div>
 <div id="unconfigured" class="notice" hidden>솔라피 API가 아직 연결되지 않았습니다. API Key·Secret, 허용 IP 설정, 발신번호 승인 상태를 확인하세요. 연결 확인 전까지 관리자 단체문자 발송을 차단합니다.</div>
 <section id="signup-email-card" class="card" aria-labelledby="signup-email-title">
 <div class="flex" style="justify-content:space-between;gap:14px">
