@@ -48,15 +48,14 @@ body{padding-top:84px}#kv-hero.carousel-keyvisual{height:calc(100svh - 84px)}.pa
 .book-detail-return a:hover{background:#26382c;color:#faf8f3}
 @media(max-width:760px){.book-detail-return{margin-top:40px}.book-detail-return a{padding:14px 24px}}
 
-/* Keep the introduction link inside the existing key visual. */
-#kv-hero .kv-space-link {
+/* Place the introduction link below the brand signature. */
+#brand-story .kv-space-link {
   display:inline-flex; align-items:center; gap:14px; min-height:44px;
   margin-top:20px; padding:7px 16px; border:1px solid rgba(255,255,255,.75);
   background:rgba(24,18,13,.42); color:#fff; text-decoration:none; font-size:14px;
-  pointer-events:auto;
 }
-#kv-hero .kv-space-link:hover,
-#kv-hero .kv-space-link:focus-visible {background:#34261d}
+#brand-story .kv-space-link:hover,
+#brand-story .kv-space-link:focus-visible {background:#34261d}
 @media(max-width:740px) {
-  #kv-hero .kv-space-link {margin-top:14px}
+  #brand-story .kv-space-link {margin-top:14px}
 }
