@@ -101,3 +101,10 @@
 
 #schedule .sc-day.is-holiday .sc-date-num{color:#ad705b}
 #schedule .sc-closed-label{white-space:normal;line-height:1.6}
+
+.home-section .calendar-upcoming{margin-top:32px;color:#26382c}
+.home-section .calendar-upcoming h2{font-size:20px;letter-spacing:-.02em}
+.calendar-upcoming ul{list-style:none;padding:0;margin:12px 0 0}
+.calendar-upcoming li{border-top:1px solid #e5ded6;padding:12px 0;line-height:1.6;color:#625950}
+.calendar-upcoming li a{display:block;color:#26382c;text-underline-offset:3px;overflow-wrap:anywhere}
+.calendar-upcoming time,.calendar-upcoming p{font-size:14px;color:#625950}
