@@ -47,3 +47,16 @@ body{padding-top:84px}#kv-hero.carousel-keyvisual{height:calc(100svh - 84px)}.pa
 .book-detail-return a{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:16px 30px;border:1px solid #26382c;color:#26382c;background:#faf8f3;text-decoration:none;font-family:HomeKakao,sans-serif;font-size:15px;line-height:1.5}
 .book-detail-return a:hover{background:#26382c;color:#faf8f3}
 @media(max-width:760px){.book-detail-return{margin-top:40px}.book-detail-return a{padding:14px 24px}}
+
+/* Keep the introduction link inside the existing key visual. */
+#kv-hero .kv-space-link {
+  display:inline-flex; align-items:center; gap:14px; min-height:44px;
+  margin-top:20px; padding:7px 16px; border:1px solid rgba(255,255,255,.75);
+  background:rgba(24,18,13,.42); color:#fff; text-decoration:none; font-size:14px;
+  pointer-events:auto;
+}
+#kv-hero .kv-space-link:hover,
+#kv-hero .kv-space-link:focus-visible {background:#34261d}
+@media(max-width:740px) {
+  #kv-hero .kv-space-link {margin-top:14px}
+}

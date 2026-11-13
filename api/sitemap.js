@@ -1,6 +1,7 @@
 'use strict';
 const {query,ready}=require('../lib/core');
 const {origin,xmlEscape,isoDate}=require('../lib/seo');
+const {programs}=require('../lib/programs-page');
 const SLUG=/^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 module.exports=async(req,res)=>{
   if(req.method!=='GET')return res.status(405).end();
@@ -14,6 +15,7 @@ module.exports=async(req,res)=>{
       if(rows.length<500)break;
     }
     const urls=[{path:'/'},{path:'/news'},{path:'/calendar'},{path:'/books'},{path:'/space'},{path:'/programs'},{path:'/visit'}];
+    urls.push(...programs.map(program=>({path:'/programs/'+program.slug})));
     const books=await query('/rest/v1/recommended_books?select=id,updated_at&published=eq.true&limit=1000');
     for(const book of books)urls.push({path:'/books/'+book.id,lastmod:isoDate(book.updated_at)});
     const seen=new Set();

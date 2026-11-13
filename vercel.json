@@ -26,6 +26,10 @@
       "destination": "/api/news?_route=home&page=programs"
     },
     {
+      "source": "/programs/:program",
+      "destination": "/api/news?_route=home&page=program-detail&program=:program"
+    },
+    {
       "source": "/visit",
       "destination": "/api/news?_route=home&page=visit"
     },

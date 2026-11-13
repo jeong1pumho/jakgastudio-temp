@@ -41,3 +41,34 @@
 .approved-visit .visit-parking-lead,.approved-visit .visit-parking-address{font-size:23px;color:#26382c;line-height:1.7}
 .approved-visit .visit-parking-lead{font-weight:500}
 @media(max-width:760px){.approved-visit .visit-block h2{font-size:28px;gap:12px}.visit-section-icon{width:27px;height:27px;flex-basis:27px}.approved-visit .visit-block:first-child{margin-bottom:56px}.approved-visit .visit-block+.visit-block{padding-top:56px}.approved-visit .visit-parking-lead,.approved-visit .visit-parking-address{font-size:21px}}
+
+.space-page .author-profile {
+  display:grid; grid-template-columns:minmax(0,1fr) minmax(0,.83fr); align-items:start;
+  gap:clamp(28px,6vw,88px); padding:clamp(24px,4vw,60px); background:#eee7dc;
+  border-top:3px solid #725044; margin-bottom:clamp(42px,7vw,100px);
+}
+.space-page .author-portrait {margin:0; min-width:0}
+.space-page .author-portrait img {display:block;width:100%;height:auto;aspect-ratio:3/4;object-fit:cover}
+.space-page .author-copy h2,
+.space-page .author-section h2,
+.space-page .author-gallery h2 {
+  margin:0 0 20px; font-size:clamp(25px,3vw,42px); line-height:1.25;
+  letter-spacing:-.05em; font-weight:700; word-break:keep-all;
+}
+.space-page .author-copy p,
+.space-page .author-section p {margin:0 0 14px; font-size:clamp(15px,1.3vw,17px);line-height:1.85;word-break:keep-all}
+.space-page .author-copy .author-lead {font-size:clamp(19px,2.2vw,27px);font-weight:650;color:#684737;line-height:1.6}
+.space-page .author-section {
+  display:grid;grid-template-columns:minmax(0,.7fr) minmax(0,1fr);
+  gap:clamp(20px,6vw,80px);padding:clamp(30px,5vw,64px) 0;border-top:1px solid #ded6c9;
+}
+.space-page .author-books {display:grid;gap:10px;list-style:none;padding:0;margin:22px 0 0}
+.space-page .author-books li {padding:13px 16px;background:#eee7dc;color:#52392c}
+.space-page .author-books cite {font-style:normal}
+.space-page .author-gallery {padding:clamp(32px,5vw,64px) 0;scroll-margin-top:110px;border-top:1px solid #ded6c9}
+.space-page .author-link {display:inline-flex;gap:16px;align-items:center;min-height:44px;color:#50372a;text-underline-offset:5px}
+@media(max-width:720px) {
+  .space-page .author-profile,.space-page .author-section {grid-template-columns:minmax(0,1fr)}
+  .space-page .author-portrait {grid-row:1;max-width:430px}
+  .space-page .author-section h2 {margin-bottom:0}
+}
