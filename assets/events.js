@@ -4,7 +4,7 @@
  const $=id=>document.getElementById(id);
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const typeLabel={reading:'독서',writing:'글쓰기',themed:'주제모임',special:'특별행사'};
- const opLabel={studio:'작가작업실 JEJU 운영',rental:'대관 행사'};
+ const opLabel={studio:'작가작업실 제주 운영',rental:'대관 행사'};
  const formatDate=value=>{
   const s=String(value||'');if(!/^\d{4}-\d{2}-\d{2}$/.test(s))return '';
   const weekday=['일','월','화','수','목','금','토'][new Date(s+'T00:00:00Z').getUTCDay()];
@@ -15,10 +15,10 @@
   const type=typeLabel[p.event_type],operator=opLabel[p.operator_type];
   const tags=(operator?'<span class="operator-label">'+esc(operator)+'</span>':'')+
    (type?'<span>'+esc(type)+'</span>':'');
-  const image=p.cover?'<img loading="lazy" decoding="async" src="'+esc(p.cover)+'" alt="'+esc(p.title)+'">':
+  const image=p.cover?'<img loading="lazy" decoding="async" src="'+esc(p.cover)+'" alt="'+esc(String(p.title??'').replaceAll('작가작업실 JEJU','작가작업실 제주'))+'">':
    '<div class="news-blank" style="aspect-ratio:1;background:#f4f1eb"></div>';
   const text=(tags?'<div class="news-tagline">'+tags+'</div>':'')+
-   '<h3>'+esc(p.title)+'</h3>'+
+   '<h3>'+esc(String(p.title??'').replaceAll('작가작업실 JEJU','작가작업실 제주'))+'</h3>'+
    (date?'<p class="news-date">'+esc(date)+(end?' ~ '+esc(end):'')+'</p>':'');
   return '<a class="news-card" href="/news/'+encodeURIComponent(p.slug||'')+'">'+
    image+(compact?'<div class="rental-card-copy">'+text+'</div>':text)+'</a>';

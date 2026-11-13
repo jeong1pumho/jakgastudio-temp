@@ -18,6 +18,7 @@
  const timeToMin=s=>Number(s.slice(0,2))*60+Number(s.slice(3,5));
  const toTime=n=>pad(Math.floor(n/60))+':'+pad(n%60);
  const text=(tag,className,value)=>{const e=document.createElement(tag);if(className)e.className=className;if(value!==undefined)e.textContent=value;return e;};
+ const eventTitle=e=>String(e.title??'').replaceAll('작가작업실 JEJU','작가작업실 제주');
  const titleFor=e=>e.category==='custom'?e.category_label||'기타':names[e.category]||'기타';
  const classFor=e=>Object.prototype.hasOwnProperty.call(names,e.category)?e.category:'custom';
  const rangeFor=e=>e.category==='closure'?'종일 휴무':e.start_time.slice(0,5)+'–'+e.end_time.slice(0,5);
@@ -80,13 +81,13 @@
    if(data.preOpen)button.classList.add('is-pre-open');
    if(data.opening)button.classList.add('is-opening');
    if(key===koreanNow)button.classList.add('is-today');
-   button.setAttribute('aria-label',data.opening?'10월 22일 작가작업실 JEJU OPEN':data.preOpen?month+'월 '+d+'일 오픈 전':month+'월 '+d+'일 '+weekdays[dow]+'요일 일정 보기');
+   button.setAttribute('aria-label',data.opening?'10월 22일 작가작업실 제주 OPEN':data.preOpen?month+'월 '+d+'일 오픈 전':month+'월 '+d+'일 '+weekdays[dow]+'요일 일정 보기');
    button.appendChild(text('span','sc-date-num',String(d)));
    if(data.closed)button.appendChild(text('span','sc-closed-label',data.temporaryClosed?'임시휴무':data.holiday?data.holiday+' · 휴무':'휴무'));
    else {
     for(const e of data.events.slice(0,4)){
      const chip=text('span','sc-entry '+classFor(e));
-     const name=text('strong','sc-kind',e.category==='opening'?e.title:titleFor(e));name.title=e.category==='opening'?e.title:titleFor(e);
+     const name=text('strong','sc-kind',e.category==='opening'?eventTitle(e):titleFor(e));name.title=e.category==='opening'?eventTitle(e):titleFor(e);
      chip.appendChild(name);
      if(e.category!=='opening')chip.appendChild(text('span','sc-clock',rangeFor(e)));
      if(e.lunch_excluded)chip.appendChild(text('span','sc-lunch','(점심시간 12-13시)'));
@@ -111,7 +112,7 @@
     const event=data.events[0],card=text('article','sc-detail closure');
     card.append(
       text('div','sc-detail-kind','임시 휴무'),
-      text('div','sc-detail-title',event.title),
+      text('div','sc-detail-title',eventTitle(event)),
       text('div','sc-detail-clock','종일 휴무')
     );
     list.appendChild(card);return;
@@ -119,7 +120,7 @@
   if(data.closed){list.appendChild(text('div','sc-closed-detail',data.holiday?data.holiday+' · 휴무입니다.':'정기휴무 · 일요일과 월요일은 쉽니다.'));return;}
   for(const e of data.events){
     const card=text('article','sc-detail '+classFor(e));
-    card.append(text('div','sc-detail-kind',titleFor(e)),text('div','sc-detail-title',e.title),text('div','sc-detail-clock',rangeFor(e)));
+    card.append(text('div','sc-detail-kind',titleFor(e)),text('div','sc-detail-title',eventTitle(e)),text('div','sc-detail-clock',rangeFor(e)));
     if(e.lunch_excluded)card.appendChild(text('div','sc-detail-lunch','(점심시간 12-13시)'));
     if(['meeting','custom'].includes(e.category)&&/^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(e.id||'')){const link=text('a','sc-event-link','행사 상세 보기 →');link.href='/calendar/events/'+encodeURIComponent(e.id);card.appendChild(link);}
     list.appendChild(card);

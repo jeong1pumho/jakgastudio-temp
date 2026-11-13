@@ -1,3 +1,4 @@
+const {displayBrand}=require('../lib/seo');
 'use strict';
 /*
  * Public, server-rendered calendar discovery pages.
@@ -9,7 +10,7 @@ const {origin,isProduction,jsonLd}=require('../lib/seo');
 const idPattern=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const COLS='id,event_date,category,category_label,title,start_time,end_time,updated_at';
 const visibleCategories='meeting,custom';
-const webName='작가작업실 JEJU';
+const webName='작가작업실 제주';
 const place={name:webName,address:'제주특별자치도 제주시 이호일동 375-3 1층'};
 function dateNow(){
  const parts=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Seoul',year:'numeric',month:'numeric',day:'numeric'}).formatToParts(new Date());
@@ -22,7 +23,7 @@ const onlyTime=v=>String(v||'').slice(0,5);
 const categoryName=e=>e.category==='meeting'?'작가작업실 모임':e.category_label||'특별일정';
 const weekday=date=>['일','월','화','수','목','금','토'][new Date(date+'T00:00:00Z').getUTCDay()];
 function prettyDate(d){return d.replace(/-/g,'.')+' ('+weekday(d)+')';}
-function safeTitle(v){return String(v||'').trim().slice(0,150);}
+function safeTitle(v){return displayBrand(v).trim().slice(0,150);}
 function output(req,res,status,title,description,body,meta={}){
  const base=origin(req),url=base+(meta.path||'/calendar');
  const headSchema=meta.schema||{'@context':'https://schema.org','@type':'WebPage',name:title,url,inLanguage:'ko-KR'};
@@ -42,7 +43,7 @@ function output(req,res,status,title,description,body,meta={}){
  // Retain test-domain deindexing; Vercel blanket header also applies.
  if(!isProduction(req)||status!==200)res.setHeader('X-Robots-Tag','noindex, nofollow');
  const robots=isProduction(req)&&status===200?'index,follow':'noindex,nofollow';
- res.end('<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="'+robots+'">'+seo+'<style>'+css+'</style></head><body><header class="bar"><div class="bar-inner"><a class="brand" href="/">작가작업실 JEJU</a><a class="back" data-page-return href="/calendar">이전 페이지로 돌아가기</a></div></header><main class="container">'+body+'</main><script defer src="/assets/page-return.js"></script></body></html>');
+ res.end('<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="'+robots+'">'+seo+'<style>'+css+'</style></head><body><header class="bar"><div class="bar-inner"><a class="brand" href="/">작가작업실 제주</a><a class="back" data-page-return href="/calendar">이전 페이지로 돌아가기</a></div></header><main class="container">'+body+'</main><script defer src="/assets/page-return.js"></script></body></html>');
 }
 function monthSpan(){
  const now=dateNow(),first=now.year+'-'+pad(now.month)+'-01';
@@ -93,21 +94,21 @@ module.exports=async(req,res)=>{
    '&category=in.('+visibleCategories+')&order=event_date.asc,start_time.asc&limit=300';
   const rows=await query(url);
   const visible=rows.filter(e=>onlyDate(e.event_date)>=today&&['meeting','custom'].includes(e.category));
-  const description='제주 이호테우 작가작업실 JEJU에서 공개한 독서모임, 글쓰기 모임과 특별행사의 날짜·시간·장소를 확인하세요.';
+  const description='제주 이호테우 작가작업실 제주에서 공개한 독서모임, 글쓰기 모임과 특별행사의 날짜·시간·장소를 확인하세요.';
   const cards=visible.map(e=>{
    const date=onlyDate(e.event_date),href='/calendar/events/'+encodeURIComponent(e.id);
    return '<a class="card" href="'+href+'"><span class="cat">'+esc(categoryName(e))+'</span>'+
     '<strong>'+esc(safeTitle(e.title))+'</strong>'+
     '<time datetime="'+esc(date)+'">'+esc(prettyDate(date))+' · '+esc(onlyTime(e.start_time))+'–'+esc(onlyTime(e.end_time))+'</time></a>';
   }).join('');
-  const body='<p class="eyebrow">JEJU / CALENDAR</p><h1>작가작업실 JEJU 모임·행사 일정</h1>'+
+  const body='<p class="eyebrow">JEJU / CALENDAR</p><h1>작가작업실 제주 모임·행사 일정</h1>'+
    '<p class="lead">'+esc(description)+'</p>'+
    '<p class="hint">기본 운영시간은 화~토 09:00–17:00이며 점심시간은 12–13시입니다. 일·월은 정기휴무입니다. 자유방문 가능 시간과 임시휴무·대관 현황은 <a href="/calendar">월간 캘린더</a>에서 확인해 주세요.</p>'+
    '<h2>예정된 공개 모임·행사</h2>'+
    (cards?'<div class="cards">'+cards+'</div>':'<p class="empty">현재 등록된 공개 모임·행사가 없습니다. 새로운 일정은 월간 캘린더에서 확인해 주세요.</p>')+
    '<div class="links"><a data-page-return href="/calendar">이전 페이지로 돌아가기</a><a href="/news">운영 소식 전체 보기</a></div>';
   const schema={'@context':'https://schema.org','@type':'CollectionPage',
-    name:'작가작업실 JEJU 모임·행사 일정',description,url:base+'/calendar',inLanguage:'ko-KR',
+    name:'작가작업실 제주 모임·행사 일정',description,url:base+'/calendar',inLanguage:'ko-KR',
     mainEntity:{'@type':'ItemList',itemListElement:visible.map((e,i)=>({
      '@type':'ListItem',position:i+1,name:safeTitle(e.title),
      url:base+'/calendar/events/'+encodeURIComponent(e.id)
