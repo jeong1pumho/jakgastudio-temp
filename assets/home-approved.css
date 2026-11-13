@@ -65,3 +65,13 @@ body{padding-top:84px}#kv-hero.carousel-keyvisual{height:calc(100svh - 84px)}.pa
 .book-detail .book-detail-review-label{font-family:HomeKakao,sans-serif;font-size:17px;line-height:1.6;margin:24px 0 4px;text-decoration:underline}
 .book-detail .book-detail-label + .book-detail-review-label{margin-top:clamp(44px,5vw,60px)}
 .book-detail .book-detail-copy{font-family:HomeKakao,sans-serif;font-size:18px;margin-top:0;overflow-wrap:anywhere}
+
+/* Recommended books listing */
+#recommended-books:has(>.books-page-heading)>.home-three{grid-template-columns:repeat(2,minmax(0,1fr));gap:30px 16px}
+#recommended-books:has(>.books-page-heading) .home-book h3{font-size:18px;margin:14px 0 7px;overflow-wrap:anywhere}
+#recommended-books:has(>.books-page-heading) .home-recommendation{font-size:15px}
+#recommended-books:has(>.books-page-heading) .home-empty{grid-column:1/-1}
+@media(min-width:960px){
+  #recommended-books:has(>.books-page-heading)>.home-three{grid-template-columns:repeat(4,minmax(0,1fr));gap:40px 24px}
+  #recommended-books:has(>.books-page-heading) .home-book h3{font-size:20px;margin:17px 0 8px}
+}
