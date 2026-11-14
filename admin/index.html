@@ -287,7 +287,7 @@ tbody tr:last-child td{border-bottom:0}
   <div id="previewContent" class="editor-preview-body"></div>
   <div class="dialog-actions"><button type="button" class="btn secondary" id="previewClose">닫기</button></div>
 </dialog>
-<script src="/assets/admin-session.js"></script>
+<script src="/assets/admin-session.js?v=refresh"></script>
 <script src="/assets/rich-editor.js"></script>
 <script>
 (function () {
@@ -337,7 +337,7 @@ tbody tr:last-child td{border-bottom:0}
   async function api(path, opt) {
     const o = opt || {};
     const headers = { 'Content-Type':'application/json' };
-    if(token) headers.Authorization = 'Bearer ' + token;
+    if(token&&(opt?.body?JSON.parse(opt.body).action!=='login':true)) headers.Authorization = 'Bearer '+await sharedSession.token();
     let r;
     try { r = await fetch(path, { ...o, headers }); }
     catch { throw Error('서버에 연결할 수 없습니다. 인터넷 연결을 확인해 주세요.'); }
@@ -559,7 +559,7 @@ tbody tr:last-child td{border-bottom:0}
     try {
       const r = await api('/api/admin',{method:'POST',body:JSON.stringify({action:'login',email:$('email').value.trim(),password:$('password').value})});
       token = r.token;
-      sharedSession?.save(r.token,r.expires_in);
+      sharedSession?.save(r.token,r.expires_in,r.refresh_token);
       $('password').value='';
       show('listView');message('');
       await loadPosts();
@@ -593,7 +593,7 @@ tbody tr:last-child td{border-bottom:0}
         const ext={'image/jpeg':'jpg','image/png':'png','image/webp':'webp','image/avif':'avif'}[file.type];
         const name='posts/'+Date.now()+'-'+crypto.randomUUID()+'.'+ext;
         const url=cfg.url+'/storage/v1/object/news-media/'+name;
-        const resp=await fetch(url,{method:'POST',headers:{apikey:cfg.key,Authorization:'Bearer '+token,'Content-Type':file.type,'x-upsert':'false'},body:file});
+        const resp=await fetch(url,{method:'POST',headers:{apikey:cfg.key,Authorization:'Bearer '+await sharedSession.token(),'Content-Type':file.type,'x-upsert':'false'},body:file});
         if(!resp.ok)throw Error('사진 업로드 실패 (HTTP '+resp.status+')');
         imgs.push(cfg.url+'/storage/v1/object/public/news-media/'+name);
         renderPhotos();

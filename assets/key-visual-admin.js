@@ -23,7 +23,7 @@
 
   async function api(path, options = {}) {
     const response = await fetch(path, {...options, headers:{
-      Authorization:'Bearer '+token, 'Content-Type':'application/json'
+      Authorization:'Bearer '+await session.token(), 'Content-Type':'application/json'
     }});
     const data = await response.json();
     if (!response.ok) throw Error(data.error || '요청에 실패했습니다.');
@@ -114,7 +114,7 @@
         message('비공개 원본을 불러오는 중입니다…');
         const config=await storageConfig();
         const response=await fetch(config.url+'/storage/v1/object/authenticated/'+originalBucket+'/'+encodeURIComponent(original.name),
-          {headers:{apikey:config.key,Authorization:'Bearer '+token},cache:'no-store'});
+          {headers:{apikey:config.key,Authorization:'Bearer '+await session.token()},cache:'no-store'});
         if(!response.ok)throw Error('비공개 원본을 불러오지 못했습니다. (HTTP '+response.status+')');
         file=await response.blob();
       }
@@ -269,7 +269,7 @@
     const name=crypto.randomUUID()+(type==='image/webp'?'.webp':'.png');
     const base=config.url+'/storage/v1/object/';
     const response=await fetch(base+'key-visual/'+name,{method:'POST',
-      headers:{apikey:config.key,Authorization:'Bearer '+token,'Content-Type':type,'x-upsert':'false'},body:file.blob});
+      headers:{apikey:config.key,Authorization:'Bearer '+await session.token(),'Content-Type':type,'x-upsert':'false'},body:file.blob});
     if(!response.ok)throw Error('사진 업로드에 실패했습니다. (HTTP '+response.status+')');
     file.url=base+'public/key-visual/'+name;
     return file.url;
@@ -280,7 +280,7 @@
       const {blob}=original;
       const name=crypto.randomUUID()+'.'+originalTypes[blob.type];
       const response=await fetch(config.url+'/storage/v1/object/'+originalBucket+'/'+name,{method:'POST',
-        headers:{apikey:config.key,Authorization:'Bearer '+token,'Content-Type':blob.type,'x-upsert':'false'},body:blob});
+        headers:{apikey:config.key,Authorization:'Bearer '+await session.token(),'Content-Type':blob.type,'x-upsert':'false'},body:blob});
       if(!response.ok)throw Error('비공개 원본 저장에 실패했습니다. (HTTP '+response.status+')');
       original.name=name;
     }

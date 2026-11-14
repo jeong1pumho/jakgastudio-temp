@@ -57,7 +57,7 @@ label{display:block;font-weight:600;font-size:13px;margin:17px 0 7px}.field{bord
 <div id="gallery" class="gallery" aria-live="polite"></div></div>
 <div class="footer"><span id="dirtyLabel" class="note">저장된 사진 목록</span><button id="save" type="button" class="btn">변경사항 저장</button></div>
 </section></div>
-<script src="/assets/admin-session.js"></script>
+<script src="/assets/admin-session.js?v=refresh"></script>
 <script>
 (function(){
 'use strict';
@@ -69,7 +69,7 @@ function notice(msg,error){$('status').textContent=msg||'';$('status').className
 function mode(authenticated){$('loginView').hidden=authenticated;$('manageView').hidden=!authenticated;$('logout').hidden=!authenticated;}
 async function api(path,options={}){
  const headers={'Content-Type':'application/json'};
- if(token)headers.Authorization='Bearer '+token;
+ if(token&&(options?.body?JSON.parse(options.body).action!=='login':true))headers.Authorization='Bearer '+await session.token();
  let resp;
  try{resp=await fetch(path,{...options,headers,cache:'no-store'});}
  catch{throw Error('서버 연결에 실패했습니다. 인터넷 연결을 확인해 주세요.');}
@@ -118,7 +118,7 @@ $('loginForm').addEventListener('submit',async e=>{
  e.preventDefault();$('loginBtn').disabled=true;notice('로그인 중…');
  try{
   const a=await api('/api/admin',{method:'POST',body:JSON.stringify({action:'login',email:$('email').value.trim(),password:$('password').value})});
-  token=a.token;session?.save(token,a.expires_in);await load();notice('로그인했습니다.');
+  token=a.token;session?.save(token,a.expires_in,a.refresh_token);await load();notice('로그인했습니다.');
  }catch(e){if(e.status===401||e.status===403){token='';session?.clear();mode(false);}notice('로그인 실패: '+e.message,true);}
  finally{$('loginBtn').disabled=false;}
 });
@@ -135,7 +135,7 @@ async function upload(files){
   for(const file of files){
    notice('사진 업로드 중… '+(done+1)+' / '+files.length);
    const name='photos/'+crypto.randomUUID()+'.'+mime[file.type];
-   const response=await fetch(config.url+'/storage/v1/object/space-media/'+name,{method:'POST',headers:{apikey:config.key,Authorization:'Bearer '+token,'Content-Type':file.type,'x-upsert':'false'},body:file});
+   const response=await fetch(config.url+'/storage/v1/object/space-media/'+name,{method:'POST',headers:{apikey:config.key,Authorization:'Bearer '+await session.token(),'Content-Type':file.type,'x-upsert':'false'},body:file});
    if(!response.ok){const data=await response.json().catch(()=>({}));throw Error(data.message||'Storage 업로드 오류 ('+response.status+')');}
    images.push({src:config.url+'/storage/v1/object/public/space-media/'+name,alt:file.name.replace(/\.[^.]+$/,'').slice(0,160)||'작가작업실 JEJU 공간'});done++;
   }

@@ -9,10 +9,26 @@ function validCalendarDate(value){
 }
 module.exports=async(req,res)=>{try{
  if(req.method==='GET'&&req.query.action==='config')return send(res,200,{configured:ready(),url:root(),key:key(),maxPhotos:MAX_PHOTOS});
+ if(req.method==='POST'&&req.body?.action==='refresh'){
+  const refreshToken=req.body.refresh_token;
+  if(typeof refreshToken!=='string'||!refreshToken||refreshToken.length>4096)
+   return send(res,400,{error:'유효한 로그인 세션이 필요합니다.'});
+  let data;
+  try{
+   data=await query('/auth/v1/token?grant_type=refresh_token','POST',{refresh_token:refreshToken});
+  }catch(error){
+   if([400,401,403].includes(error.status))return send(res,401,{error:'다시 로그인해 주세요.'});
+   throw error;
+  }
+  if(!data?.access_token||!data.refresh_token)
+   return send(res,502,{error:'로그인 세션을 갱신하지 못했습니다.'});
+  await admin({headers:{authorization:'Bearer '+data.access_token}});
+  return send(res,200,{token:data.access_token,expires_in:data.expires_in,refresh_token:data.refresh_token});
+ }
  if(req.method==='POST'&&req.body?.action==='login'){
   const data=await query('/auth/v1/token?grant_type=password','POST',{email:req.body.email,password:req.body.password});
   const token=data?.access_token;await admin({headers:{authorization:'Bearer '+token}});
-  return send(res,200,{token,expires_in:data.expires_in});
+  return send(res,200,{token,expires_in:data.expires_in,refresh_token:data.refresh_token});
  }
  const token=await admin(req);
  if(req.method==='GET'){

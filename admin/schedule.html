@@ -197,7 +197,7 @@ td.actions{white-space:nowrap}
 
 </section>
 </div>
-<script src="/assets/admin-session.js"></script>
+<script src="/assets/admin-session.js?v=refresh"></script>
 <script>
 (()=>{'use strict';
  const $=id=>document.getElementById(id);
@@ -223,7 +223,7 @@ td.actions{white-space:nowrap}
  function toggleForm(visible){$('scheduleFormPanel').hidden=!visible;if(visible)$('scheduleFormPanel').scrollIntoView({behavior:'smooth',block:'start'});}
  async function api(url,opts={}){
   const headers={'Content-Type':'application/json'};
-  if(token)headers.Authorization='Bearer '+token;
+  if(token&&(opts?.body?JSON.parse(opts.body).action!=='login':true))headers.Authorization='Bearer '+await sharedSession.token();
   let response;
   try{response=await fetch(url,{...opts,headers,cache:'no-store'});}
   catch{throw Error('서버 연결에 실패했습니다. 네트워크를 확인해 주세요.');}
@@ -446,7 +446,7 @@ td.actions{white-space:nowrap}
   e.preventDefault();$('loginBtn').disabled=true;notice('로그인 확인 중…');
   try{
    const data=await api('/api/admin',{method:'POST',body:JSON.stringify({action:'login',email:$('email').value.trim(),password:$('password').value})});
-   token=data.token;sharedSession?.save(data.token,data.expires_in);$('password').value='';$('loginView').hidden=true;$('adminView').hidden=false;$('logout').hidden=false;await load();
+   token=data.token;sharedSession?.save(data.token,data.expires_in,data.refresh_token);$('password').value='';$('loginView').hidden=true;$('adminView').hidden=false;$('logout').hidden=false;await load();
   }catch(err){notice('로그인 실패: '+err.message,true);}
   finally{$('loginBtn').disabled=false;}
  });
