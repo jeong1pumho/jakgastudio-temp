@@ -1,5 +1,6 @@
 'use strict';
 const {admin,query,send}=require('../lib/core');
+const {holidaysForYear,MIN_YEAR,MAX_YEAR}=require('../lib/holidays');
 const {cleanHtml}=require('../lib/rich');
 const columns='id,event_date,category,category_label,title,start_time,end_time,created_at,updated_at';
 const embed=columns+',schedule_event_memos(memo)';
@@ -26,7 +27,9 @@ module.exports=async(req,res)=>{
    const items=await query('/rest/v1/schedule_events?select='+embed+
      '&event_date=gte.'+range.start+'&event_date=lt.'+range.end+
      '&order=event_date.asc,start_time.asc&limit=500','GET',undefined,token);
-   return send(res,200,{items:normalize(items),month:req.query.month});
+   const year=Number(req.query.month.slice(0,4));
+   const holidays=year>=MIN_YEAR&&year<=MAX_YEAR?holidaysForYear(year):{};
+   return send(res,200,{items:normalize(items),month:req.query.month,holidays});
   }
   if(req.method==='DELETE'){
    const id=req.query?.id;
