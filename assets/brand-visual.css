@@ -2,7 +2,7 @@
 @font-face{font-family:BrandKakao;src:url('/assets/fonts/KakaoRegular.ttf') format('truetype');font-weight:400;font-style:normal;font-display:swap}
 @font-face{font-family:BrandKakao;src:url('/assets/fonts/KakaoLight.ttf') format('truetype');font-weight:300;font-style:normal;font-display:swap}
 #brand-story.intro-section{position:relative;isolation:isolate;display:block;width:100%;height:auto;min-height:0;padding:0;overflow:hidden;background:#e9e9e6;color:#262626}
-#brand-story .brand-visual{position:relative;min-height:56.22vw;background:url('/assets/brand-working.jpg') center 39%/cover no-repeat;font-family:BrandKakao,'KakaoSite',sans-serif}
+#brand-story .brand-visual{position:relative;min-height:56.22vw;background:url('/assets/brand-working-desktop.webp') center 39%/cover no-repeat;font-family:BrandKakao,'KakaoSite',sans-serif}
 #brand-story .brand-visual::before,#brand-story .brand-visual::after{content:'';position:absolute;inset:0;pointer-events:none}
 #brand-story .brand-visual::before{background:rgba(255,255,255,.4)}
 #brand-story .brand-visual::after{background:linear-gradient(90deg,rgba(255,255,255,.69),rgba(255,255,255,.37) 37%,transparent 66%)}
@@ -38,3 +38,5 @@
  #brand-story.brand-motion-ready .brand-type-char:not(.is-typed){visibility:hidden}
  #brand-story .brand-type-char.is-current::after{content:'';position:absolute;right:-2px;top:.12em;height:.9em;border-right:1px solid currentColor}
 }
+
+@media(max-width:760px){#brand-story .brand-visual{background-image:url('/assets/brand-working-mobile.webp')}}
