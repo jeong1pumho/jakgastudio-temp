@@ -42,7 +42,7 @@ function output(req,res,status,title,description,body,meta={}){
  // Retain test-domain deindexing; Vercel blanket header also applies.
  res.setHeader('X-Robots-Tag',status===200?robots(req):'noindex, follow');
  const directive=status===200?robots(req):'noindex, follow';
- res.end('<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="'+directive+'">'+seo+'<style>'+css+'</style></head><body><header class="bar"><div class="bar-inner"><a class="brand" href="/">작가작업실 제주</a><a class="back" data-page-return href="/calendar">이전 페이지로 돌아가기</a></div></header><main class="container">'+body+'</main><script defer src="/assets/page-return.js"></script></body></html>');
+ res.end('<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="'+directive+'">'+seo+'<style>'+css+'</style></head><body><header class="bar"><div class="bar-inner"><a class="brand" href="/">작가작업실 제주</a><a class="back" data-page-return href="/calendar">이전 페이지로 돌아가기</a></div></header><main class="container">'+body+'</main><script defer src="/assets/page-return.js"></script><script defer src="/assets/site-analytics.js"></script></body></html>');
 }
 function monthSpan(){
  const now=dateNow(),first=now.year+'-'+pad(now.month)+'-01';

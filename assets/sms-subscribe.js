@@ -62,6 +62,7 @@
   busy(buttons[1],true);feedback("");
   try{
    const r=await post({action:"verify_otp",challengeId,code});
+   if(r.purpose==="subscribe")window.JakAnalytics?.track("sms_signup_complete");
    $("sms-done-title").textContent=r.purpose==="unsubscribe"?"문자 알림 해지 완료":"소식 받기 신청 완료!";
    $("sms-done-copy").textContent=r.message;
    challengeId=null;show(2);
