@@ -2,7 +2,7 @@ const {displayBrand}=require('../lib/seo');
 'use strict';
 const {nav,pageHeading}=require('../lib/home-content');
 const {root,key,ready,esc,selected}=require('../lib/core');
-const {origin,robots}=require('../lib/seo');
+const {origin,robots,safeImage}=require('../lib/seo');
 const typeNames={reading:'독서',writing:'글쓰기',themed:'주제모임',special:'특별행사'};
 const opNames={studio:'작가작업실 제주 운영',rental:'대관 행사'};
 function formatDate(s){
