@@ -6,7 +6,7 @@ const {displayBrand}=require('../lib/seo');
  * Do not query schedule_event_memos or publish private notes.
  */
 const {query,ready,esc}=require('../lib/core');
-const {origin,isProduction,jsonLd}=require('../lib/seo');
+const {origin,robots,jsonLd}=require('../lib/seo');
 const idPattern=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const COLS='id,event_date,category,category_label,title,start_time,end_time,updated_at';
 const visibleCategories='meeting,custom';
@@ -30,20 +30,18 @@ function output(req,res,status,title,description,body,meta={}){
  const seo='<title>'+esc(title)+'</title>'+
   '<meta name="description" content="'+esc(description)+'">'+
   '<link rel="canonical" href="'+esc(url)+'">'+
-  '<meta property="og:locale" content="ko_KR">'+
-  '<meta property="og:type" content="website">'+
   '<meta property="og:url" content="'+esc(url)+'">'+
   '<meta property="og:title" content="'+esc(title)+'">'+
   '<meta property="og:description" content="'+esc(description)+'">'+
-  '<script type="application/ld+json">'+jsonLd(headSchema)+'</script>'+require('../lib/search-info').sharing(base,title,description);
+  '<script type="application/ld+json">'+jsonLd(meta.schema?{'@context':'https://schema.org','@graph':[headSchema,require('../lib/search-info').breadcrumb(base,[['월간 캘린더','/calendar'],[headSchema.name,meta.path]])]}:headSchema)+'</script>'+require('../lib/search-info').sharing(base,title,description);
  const css='*{box-sizing:border-box}body{margin:0;font-family:"Apple SD Gothic Neo","Malgun Gothic",sans-serif;background:#fffdfa;color:#38332e;line-height:1.75}a{color:inherit}a:focus-visible{outline:2px solid #a37d67;outline-offset:3px}.bar{background:#302d2a;color:white;padding:19px 24px}.bar-inner{max-width:1000px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}.bar a{text-decoration:none}.brand{font-size:18px;font-weight:600}.bar .back{font-size:13px}.container{max-width:1000px;margin:0 auto;padding:42px 22px 85px}.eyebrow{font-size:12px;letter-spacing:.19em;font-weight:600;color:#aa8674;margin:0 0 18px}h1{font-size:32px;font-weight:500;letter-spacing:-.045em;line-height:1.4;margin:0 0 18px}h2{font-size:21px;font-weight:600;margin:28px 0 14px}p{margin:0 0 16px}.lead{color:#75695e;font-size:15px}.hint{font-size:13px;color:#796e64;background:#f4efe9;padding:15px 19px;border-radius:5px}.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin:24px 0 34px}.card{display:block;background:#fff;border:1px solid #e4ddd6;border-left:4px solid #ad705b;border-radius:5px;padding:20px 22px;text-decoration:none}.card:hover{background:#faf5f0}.card .cat{display:block;color:#8e6954;font-size:12px;margin-bottom:5px}.card strong{display:block;font-size:18px;line-height:1.55}.card time{display:block;color:#6f665e;margin-top:10px;font-size:14px}.details{border-top:1px solid #ded6ce;border-bottom:1px solid #ded6ce;margin:28px 0;padding:20px 0}.details dt{font-weight:600;color:#8f705c;font-size:13px;margin:14px 0 2px}.details dd{margin:0 0 10px}.muted{color:#82776d;font-size:13px}.links{margin-top:28px;display:flex;gap:18px;flex-wrap:wrap}.links a{font-size:14px;color:#7d5542}.empty{padding:50px 0;color:#81756b;text-align:center}@media(max-width:660px){.container{padding:28px 17px 60px}.cards{grid-template-columns:1fr}h1{font-size:26px}.brand{font-size:15px}.bar{padding:15px}.card strong{font-size:16px}}';
  res.statusCode=status;
  res.setHeader('Content-Type','text/html; charset=utf-8');
  res.setHeader('Cache-Control','public, max-age=0, s-maxage=180');
  // Retain test-domain deindexing; Vercel blanket header also applies.
- if(!isProduction(req)||status!==200)res.setHeader('X-Robots-Tag','noindex, nofollow');
- const robots=isProduction(req)&&status===200?'index,follow':'noindex,nofollow';
- res.end('<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="'+robots+'">'+seo+'<style>'+css+'</style></head><body><header class="bar"><div class="bar-inner"><a class="brand" href="/">작가작업실 제주</a><a class="back" data-page-return href="/calendar">이전 페이지로 돌아가기</a></div></header><main class="container">'+body+'</main><script defer src="/assets/page-return.js"></script></body></html>');
+ res.setHeader('X-Robots-Tag',status===200?robots(req):'noindex, follow');
+ const directive=status===200?robots(req):'noindex, follow';
+ res.end('<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="'+directive+'">'+seo+'<style>'+css+'</style></head><body><header class="bar"><div class="bar-inner"><a class="brand" href="/">작가작업실 제주</a><a class="back" data-page-return href="/calendar">이전 페이지로 돌아가기</a></div></header><main class="container">'+body+'</main><script defer src="/assets/page-return.js"></script></body></html>');
 }
 function monthSpan(){
  const now=dateNow(),first=now.year+'-'+pad(now.month)+'-01';
@@ -81,7 +79,7 @@ module.exports=async(req,res)=>{
     '<p class="hint">이 페이지는 월간 캘린더에 공개된 일정 정보입니다. 참가·예약 가능 여부와 신청 방법은 별도로 확인해 주세요.</p>'+
     '<div class="links"><a href="/calendar">월간 캘린더 확인</a><a href="/programs">프로그램 안내</a><a href="/news">운영 소식 확인</a></div>';
    return output(req,res,200,title+' | 제주 '+categoryName(e)+' · '+webName,eventDesc,body,{
-    path:urlPath,schema:{'@context':'https://schema.org','@type':'Event',url:base+urlPath,startDate:date+'T'+onlyTime(e.start_time)+':00+09:00',endDate:date+'T'+onlyTime(e.end_time)+':00+09:00',eventAttendanceMode:'https://schema.org/OfflineEventAttendanceMode',location:{'@type':'Place',name:place.name,address:{'@type':'PostalAddress',streetAddress:'이호일동 375-3 1층',addressLocality:'제주시',addressRegion:'제주특별자치도',addressCountry:'KR'}},
+    path:urlPath,schema:{'@type':'Event',url:base+urlPath,startDate:date+'T'+onlyTime(e.start_time)+':00+09:00',endDate:date+'T'+onlyTime(e.end_time)+':00+09:00',eventAttendanceMode:'https://schema.org/OfflineEventAttendanceMode',location:{'@type':'Place',name:place.name,address:{'@type':'PostalAddress',streetAddress:'이호일동 375-3 1층',addressLocality:'제주시',addressRegion:'제주특별자치도',addressCountry:'KR'}},
       name:title,description:eventDesc,inLanguage:'ko-KR',
       dateModified:e.updated_at||undefined,
       about:{'@type':'Place',name:place.name,address:place.address}}

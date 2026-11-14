@@ -2,7 +2,7 @@ const {displayBrand}=require('../lib/seo');
 'use strict';
 const {nav,pageHeading}=require('../lib/home-content');
 const {root,key,ready,esc,selected}=require('../lib/core');
-const {origin,safeImage,jsonLd}=require('../lib/seo');
+const {origin,robots}=require('../lib/seo');
 const typeNames={reading:'독서',writing:'글쓰기',themed:'주제모임',special:'특별행사'};
 const opNames={studio:'작가작업실 제주 운영',rental:'대관 행사'};
 function formatDate(s){
@@ -26,7 +26,7 @@ const intro='제주 독서모임, 글쓰기 클래스, 북토크 등 작가작�
 function pageNumber(raw){if(raw===undefined)return 1;if(typeof raw!=='string'||! /^[1-9][0-9]{0,5}$/.test(raw))throw Object.assign(Error('Invalid page'),{status:400});return Number(raw);}
 function urlFor(ongoing,ended,rental,anchor=''){const q=new URLSearchParams();if(ongoing>1)q.set('ongoing',ongoing);if(ended>1)q.set('ended',ended);if(rental)q.set('operator','rental');return '/news'+(q.size?'?'+q:'')+(anchor?'#'+anchor:'');}
 async function load(status,page,rental){
- const response=await fetch(root()+'/rest/v1/news_posts?select='+selected+'&status=eq.'+status+(rental?'&operator_type=eq.rental':'')+'&order=published_at.desc.nullslast,created_at.desc,id.desc&limit=6&offset='+((page-1)*6),{headers:{apikey:key(),Accept:'application/json',Prefer:'count=exact'}});
+ const response=await fetch(root()+'/rest/v1/news_posts?select='+selected+'&published_at=not.is.null&status=eq.'+status+(rental?'&operator_type=eq.rental':'')+'&order=published_at.desc.nullslast,created_at.desc,id.desc&limit=6&offset='+((page-1)*6),{headers:{apikey:key(),Accept:'application/json',Prefer:'count=exact'}});
  if(response.status===416)throw Object.assign(Error('Missing page'),{status:404});
  if(!response.ok)throw Error('List unavailable');
  const total=Number((response.headers.get('content-range')||'').split('/')[1]);if(!Number.isSafeInteger(total)||total<0)throw Error('Invalid count');
@@ -44,6 +44,6 @@ module.exports=async(req,res)=>{try{
  const [current,past]=await Promise.all([load('ongoing',ongoing,rental),load('ended',ended,rental)]);
  const title='모임·행사 | 작가작업실 제주',self=origin(req)+urlFor(ongoing,ended,rental);
  const pageTitle=ongoing===1&&ended===1&&!rental?'제주 독서모임·글쓰기 클래스·북토크 일정 | 작가작업실 제주':title;
- const body='<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>'+esc(pageTitle)+'</title><meta name="description" content="'+intro+'"><link rel="canonical" href="'+esc(self)+'"><link rel="stylesheet" href="/assets/home-approved.css"><link rel="stylesheet" href="/assets/news-list.css"></head><body><header class="kv-sticky-header"><div class="kv-sticky-inner">'+nav('/news')+'</div></header><main class="news-list">'+pageHeading('MEETINGS & EVENTS',rental?'대관 사례':'모임·행사',intro)+section(current,'ongoing',ended,rental)+'<section class="news-subscribe"><div><h2>빠르게 소식받기</h2><p>새로운 모임, 행사가 등록되면 문자로 알려드립니다.</p></div><button type="button" id="sms-subscribe-open">빠르게 소식받기 ↗</button></section>'+section(past,'ended',ongoing,rental)+'</main>'+subscribe+'<script defer src="/assets/home-menu.js"></script><script defer src="/assets/page-return.js"></script></body></html>';
- res.setHeader('Content-Type','text/html; charset=utf-8');res.setHeader('Cache-Control','no-store');res.setHeader('X-Robots-Tag','noindex, nofollow, noarchive');return res.status(200).send(body.replace('</head>',require('../lib/search-info').archive(origin(req),title,intro,self,[...current.items,...past.items])+'</head>'));
+ const body='<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="'+robots(req)+'"><title>'+esc(pageTitle)+'</title><meta name="description" content="'+intro+'"><link rel="canonical" href="'+esc(self)+'"><link rel="stylesheet" href="/assets/home-approved.css"><link rel="stylesheet" href="/assets/news-list.css"></head><body><header class="kv-sticky-header"><div class="kv-sticky-inner">'+nav('/news')+'</div></header><main class="news-list">'+pageHeading('MEETINGS & EVENTS',rental?'대관 사례':'모임·행사',intro)+section(current,'ongoing',ended,rental)+'<section class="news-subscribe"><div><h2>빠르게 소식받기</h2><p>새로운 모임, 행사가 등록되면 문자로 알려드립니다.</p></div><button type="button" id="sms-subscribe-open">빠르게 소식받기 ↗</button></section>'+section(past,'ended',ongoing,rental)+'</main>'+subscribe+'<script defer src="/assets/home-menu.js"></script><script defer src="/assets/page-return.js"></script></body></html>';
+ res.setHeader('Content-Type','text/html; charset=utf-8');res.setHeader('Cache-Control','no-store');res.setHeader('X-Robots-Tag',robots(req));return res.status(200).send(body.replace('</head>',require('../lib/search-info').archive(origin(req),pageTitle,intro,self,[...current.items,...past.items])+'</head>'));
 }catch(e){return res.status(e.status||500).send(e.status===400?'올바르지 않은 페이지 번호입니다.':e.status===404?'해당 페이지에 모임·행사가 없습니다.':'모임·행사를 불러오지 못했습니다.');}};

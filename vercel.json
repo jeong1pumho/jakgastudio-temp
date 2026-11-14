@@ -68,7 +68,13 @@
       "headers": [
         {
           "key": "X-Robots-Tag",
-          "value": "noindex, nofollow, noarchive"
+          "value": "noindex, follow"
+        }
+      ],
+      "has": [
+        {
+          "type": "host",
+          "value": "(?<testHost>jakgastudio-temp(?:-[a-z0-9-]+)?\\.vercel\\.app)"
         }
       ]
     }
