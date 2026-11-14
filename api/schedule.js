@@ -2,6 +2,7 @@
 const {query,ready,send}=require('../lib/core');
 const {holidaysForYear,MAX_YEAR}=require('../lib/holidays');
 const columns='id,event_date,category,category_label,title,start_time,end_time';
+const {publicCalendarEnd}=require('../lib/public-calendar-range');
 function monthRange(value){
   if(typeof value!=='string'||!/^\d{4}-(0[1-9]|1[0-2])$/.test(value))return null;
   const [y,m]=value.split('-').map(Number);
@@ -13,6 +14,7 @@ module.exports=async(req,res)=>{
   try{
     if(req.method!=='GET')return send(res,405,{error:'허용되지 않은 요청입니다.'});
     if(!ready())return send(res,503,{error:'일정 데이터베이스가 연결되지 않았습니다.'});
+    if(typeof req.query?.month==='string'&&/^\d{4}-(0[1-9]|1[0-2])$/.test(req.query.month)&&req.query.month>=publicCalendarEnd().slice(0,7))return send(res,400,{error:'공개 일정은 다음 달까지만 조회할 수 있습니다.'});
     const range=monthRange(req.query?.month);
     if(!range)return send(res,400,{error:'조회할 월을 YYYY-MM 형식으로 입력해 주세요.'});
     const url='/rest/v1/schedule_events?select='+columns+

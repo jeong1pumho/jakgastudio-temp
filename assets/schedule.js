@@ -14,6 +14,8 @@
  let year=readPart('year'),month=readPart('month'),records=new Map(),holidays={},currentRequest=0;
  const pad=n=>String(n).padStart(2,'0');
  const keyFor=(y,m,d)=>y+'-'+pad(m)+'-'+pad(d);
+ const nextMonth=new Date(Date.UTC(readPart('year'),readPart('month'),1));
+ const lastMonth=keyFor(nextMonth.getUTCFullYear(),nextMonth.getUTCMonth()+1,1).slice(0,7);
  const isClosed=(y,m,d)=>[0,1].includes(new Date(Date.UTC(y,m-1,d)).getUTCDay());
  const timeToMin=s=>Number(s.slice(0,2))*60+Number(s.slice(3,5));
  const toTime=n=>pad(Math.floor(n/60))+':'+pad(n%60);
@@ -61,7 +63,7 @@
  }
  function drawMonth(){
   $('sc-month-title').textContent=year+'년 '+month+'월';
-  $('sc-next').disabled=keyFor(year,month,1).slice(0,7)>='2050-12';
+  $('sc-next').disabled=keyFor(year,month,1).slice(0,7)>=lastMonth;
   $('sc-prev').disabled=keyFor(year,month,1).slice(0,7)<=OPEN_MONTH;
   const grid=$('sc-days');grid.replaceChildren();
   const first=new Date(Date.UTC(year,month-1,1)).getUTCDay();
@@ -150,7 +152,7 @@
    $('sc-days').replaceChildren();setState('일정 조회 오류: '+e.message,true);
   }
  }
- function changeMonth(delta){const n=new Date(Date.UTC(year,month-1+delta,1));const target=keyFor(n.getUTCFullYear(),n.getUTCMonth()+1,1).slice(0,7);if(target<OPEN_MONTH||target>'2050-12')return;year=n.getUTCFullYear();month=n.getUTCMonth()+1;load();}
+ function changeMonth(delta){const n=new Date(Date.UTC(year,month-1+delta,1));const target=keyFor(n.getUTCFullYear(),n.getUTCMonth()+1,1).slice(0,7);if(target<OPEN_MONTH||target>lastMonth)return;year=n.getUTCFullYear();month=n.getUTCMonth()+1;load();}
  $('sc-prev').addEventListener('click',()=>changeMonth(-1));
  $('sc-next').addEventListener('click',()=>changeMonth(1));
  $('sc-current').addEventListener('click',()=>{year=readPart('year');month=readPart('month');load();});
@@ -158,9 +160,9 @@
  const params=new URLSearchParams(location.search);
  const fromHome=params.get('from')==='home';
  const requestedMonth=params.get('month');
- if(/^\d{4}-(0[1-9]|1[0-2])$/.test(requestedMonth||'')&&requestedMonth>=OPEN_MONTH&&requestedMonth<='2050-12'){[year,month]=requestedMonth.split('-').map(Number);}
+ if(/^\d{4}-(0[1-9]|1[0-2])$/.test(requestedMonth||'')&&requestedMonth>=OPEN_MONTH&&requestedMonth<=lastMonth){[year,month]=requestedMonth.split('-').map(Number);}
  let requestedDay=params.get('date');
- if(!/^\d{4}-\d{2}-\d{2}$/.test(requestedDay||'')||!Number.isFinite(Date.parse(requestedDay+'T00:00:00Z'))||new Date(requestedDay+'T00:00:00Z').toISOString().slice(0,10)!==requestedDay||requestedDay<=OPEN_DATE||requestedDay>'2050-12-31')requestedDay=null;
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(requestedDay||'')||!Number.isFinite(Date.parse(requestedDay+'T00:00:00Z'))||new Date(requestedDay+'T00:00:00Z').toISOString().slice(0,10)!==requestedDay||requestedDay<=OPEN_DATE||requestedDay.slice(0,7)>lastMonth)requestedDay=null;
  if(requestedDay){const parts=requestedDay.split('-').map(Number);year=parts[0];month=parts[1];}
  load();
 })();

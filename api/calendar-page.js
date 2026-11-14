@@ -7,6 +7,7 @@ const {displayBrand}=require('../lib/seo');
  */
 const {query,ready,esc}=require('../lib/core');
 const {origin,robots,jsonLd}=require('../lib/seo');
+const {publicCalendarEnd}=require('../lib/public-calendar-range');
 const idPattern=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const COLS='id,event_date,category,category_label,title,start_time,end_time,updated_at';
 const visibleCategories='meeting,custom';
@@ -45,7 +46,7 @@ function output(req,res,status,title,description,body,meta={}){
 }
 function monthSpan(){
  const now=dateNow(),first=now.year+'-'+pad(now.month)+'-01';
- const until=new Date(Date.UTC(now.year,now.month+3,1)).toISOString().slice(0,10);
+ const until=publicCalendarEnd();
  const today=now.year+'-'+pad(now.month)+'-'+pad(now.day);
  return {today,first,until};
 }
@@ -63,7 +64,7 @@ module.exports=async(req,res)=>{
   if(inputId){
    if(!idPattern.test(inputId))return errorHtml(req,res,404,'일정을 찾을 수 없습니다.');
    const url='/rest/v1/schedule_events?select='+COLS+'&id=eq.'+encodeURIComponent(inputId)+
-      '&category=in.('+visibleCategories+')&limit=1';
+      '&event_date=gte.2026-10-22&event_date=lt.'+publicCalendarEnd()+'&category=in.('+visibleCategories+')&limit=1';
    const rows=await query(url);
    if(!rows.length)return errorHtml(req,res,404,'일정을 찾을 수 없습니다.');
    const e=rows[0],date=onlyDate(e.event_date),title=safeTitle(e.title);
