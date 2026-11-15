@@ -465,9 +465,7 @@ tbody tr:last-child td{border-bottom:0}
   }
   function resetForm() {
     $('editForm').reset();
-    $('content').innerHTML='';
-    selectedRange=null;
-    $('editorFormatHint').textContent='글자를 선택한 뒤 글꼴·크기·색상을 바꾸면 즉시 적용됩니다. 저장 후 상세페이지에서도 유지됩니다.';
+    richEditor.setContent('', false);
     $('postId').value = '';
     $('sort').value = 0;
     $('status').value='ongoing';
@@ -569,7 +567,7 @@ tbody tr:last-child td{border-bottom:0}
     } finally { $('loginBtn').disabled=false; }
   });
 
-  window.initRichEditor($('content'), message);
+  const richEditor=window.initRichEditor($('content'), message);
   const drop=$('dropzone');
   drop.addEventListener('click',()=>$('files').click());
   drop.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('files').click();}});
