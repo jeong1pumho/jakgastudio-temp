@@ -3,51 +3,82 @@ const {query,ready}=require('../lib/core');
 const {origin,xmlEscape,isoDate}=require('../lib/seo');
 const {programs}=require('../lib/programs-page');
 const {publicCalendarEnd}=require('../lib/public-calendar-range');
+
+// Only indexable canonical routes. /programs redirects to /programs/bookstore.
+const STATIC_PATHS=['/','/news','/calendar','/books','/space','/visit'];
 const SLUG=/^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const UUID=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
+const PAGE_SIZE=500;
+const MAX_URLS=50000;
+async function allRows(baseQuery){
+  const rows=[];
+  for(let offset=0;offset<MAX_URLS;offset+=PAGE_SIZE){
+    const batch=await query(baseQuery+'&limit='+PAGE_SIZE+'&offset='+offset);
+    if(!Array.isArray(batch))throw Error('Unexpected sitemap data');
+    rows.push(...batch);
+    if(batch.length<PAGE_SIZE)return rows;
+  }
+  // Never return silently truncated sitemaps. Split into a sitemap index first.
+  throw Error('Sitemap requires splitting: exceeds safe pagination bound');
+}
+function koreaToday(now=new Date()){
+  const p=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(now);
+  const v=k=>p.find(item=>item.type===k)?.value||'';
+  return v('year')+'-'+v('month')+'-'+v('day');
+}
+function toXml(base,entries){
+  if(entries.length>MAX_URLS)throw Error('Sitemap exceeds XML URL limit');
+  const seen=new Set();
+  const lines=[];
+  for(const item of entries){
+    if(!item?.path || seen.has(item.path))continue;
+    seen.add(item.path);
+    lines.push('  <url><loc>'+xmlEscape(base+item.path)+'</loc>'+
+      (item.lastmod?'<lastmod>'+xmlEscape(item.lastmod)+'</lastmod>':'')+'</url>');
+  }
+  return '<?xml version="1.0" encoding="UTF-8"?>\n'+
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+
+    lines.join('\n')+'\n</urlset>';
+}
+async function build(now=new Date()){
+  const urls=STATIC_PATHS.map(path=>({path}));
+  urls.push(...programs.map(program=>({path:'/programs/'+program.slug})));
+
+  const [books,posts,events]=await Promise.all([
+    allRows('/rest/v1/recommended_books?select=id,updated_at&published=eq.true&order=id.asc'),
+    allRows('/rest/v1/news_posts?select=slug,status,published_at,updated_at&status=in.(ongoing,ended)&published_at=not.is.null&order=published_at.desc,id.desc'),
+    allRows('/rest/v1/schedule_events?select=id,event_date,category,updated_at'+
+      '&event_date=gte.'+koreaToday(now)+'&event_date=lt.'+publicCalendarEnd(now)+
+      '&category=in.(meeting,custom)&order=event_date.asc,start_time.asc,id.asc')
+  ]);
+
+  for(const book of books){
+    if(!UUID.test(String(book.id||'')))continue;
+    urls.push({path:'/books/'+book.id,lastmod:isoDate(book.updated_at)});
+  }
+  for(const post of posts){
+    if(!SLUG.test(String(post.slug||''))||!['ongoing','ended'].includes(post.status)||!post.published_at)continue;
+    urls.push({path:'/news/'+post.slug,lastmod:isoDate(post.updated_at||post.published_at)});
+  }
+  for(const event of events){
+    if(!UUID.test(String(event.id||''))||!['meeting','custom'].includes(event.category))continue;
+    urls.push({path:'/calendar/events/'+event.id,lastmod:isoDate(event.updated_at)});
+  }
+  return toXml(origin(),urls);
+}
 module.exports=async(req,res)=>{
   if(req.method!=='GET')return res.status(405).end();
-  if(!ready())return res.status(503).send('Database not configured');
+  if(!ready())return res.status(503).send('Sitemap temporarily unavailable');
   try{
-    const base=origin(req);
-    const posts=[];
-    for(let offset=0;offset<10000;offset+=500){
-      const rows=await query('/rest/v1/news_posts?select=slug,status,published_at,updated_at,created_at&status=in.(ongoing,ended)&published_at=not.is.null&order=published_at.desc&limit=500&offset='+offset);
-      posts.push(...rows);
-      if(rows.length<500)break;
-    }
-    const urls=[{path:'/'},{path:'/news'},{path:'/calendar'},{path:'/books'},{path:'/space'},{path:'/programs'},{path:'/visit'}];
-    urls.push(...programs.map(program=>({path:'/programs/'+program.slug})));
-    const books=await query('/rest/v1/recommended_books?select=id,updated_at&published=eq.true&limit=1000');
-    for(const book of books)urls.push({path:'/books/'+book.id,lastmod:isoDate(book.updated_at)});
-    const seen=new Set();
-    for(const p of posts){
-      if(!['ongoing','ended'].includes(p.status)||!p.published_at||!SLUG.test(String(p.slug||''))||seen.has(p.slug))continue;
-      seen.add(p.slug);
-      urls.push({path:'/news/'+encodeURIComponent(p.slug),lastmod:isoDate(p.updated_at||p.published_at)});
-    }
-    // Only genuinely listed, public-facing meetings and special events get
-    // individual SEO URLs; private rentals, closures and auto free slots do not.
-    const now=new Date();
-    const todayParts=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Seoul',year:'numeric',month:'numeric',day:'numeric'}).formatToParts(now);
-    const todayValue=k=>Number(todayParts.find(p=>p.type===k)?.value||0);
-    const y=todayValue('year'),m=todayValue('month'),d=todayValue('day');
-    const today=y+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0');
-    const future=publicCalendarEnd(now);
-    const events=await query('/rest/v1/schedule_events?select=id,event_date,category,updated_at'+
-      '&event_date=gte.'+today+'&event_date=lt.'+future+
-      '&category=in.(meeting,custom)&order=event_date.asc,start_time.asc&limit=300');
-    for(const event of events){
-      if(!/^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(String(event.id||'')))continue;
-      urls.push({path:'/calendar/events/'+event.id,lastmod:isoDate(event.updated_at)});
-    }
-    const xml='<?xml version="1.0" encoding="UTF-8"?>\n'+
-      '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+
-      urls.map(({path,lastmod})=>'  <url><loc>'+xmlEscape(base+path)+'</loc>'+(lastmod?'<lastmod>'+xmlEscape(lastmod)+'</lastmod>':'')+'</url>').join('\n')+
-      '\n</urlset>';
+    const xml=await build();
     res.setHeader('Content-Type','application/xml; charset=utf-8');
     res.setHeader('Cache-Control','public, max-age=0, s-maxage=300');
     return res.status(200).send(xml);
   }catch(error){
-    return res.status(error.status||500).send('Sitemap temporarily unavailable');
+    console.error('Sitemap generation failed:',error.status||500);
+    return res.status(503).send('Sitemap temporarily unavailable');
   }
 };
+module.exports.build=build;
+module.exports.toXml=toXml;
+module.exports.koreaToday=koreaToday;
