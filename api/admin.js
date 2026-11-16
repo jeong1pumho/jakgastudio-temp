@@ -1,5 +1,6 @@
 const {root,key,ready,query,send,admin,selected}=require('../lib/core');
 const {cleanHtml}=require('../lib/rich');
+const {notify}=require('../lib/indexnow');
 const MAX_PHOTOS=20;
 // Calendar-only NEWS display dates. These fields are not linked to room schedules.
 function validCalendarDate(value){
@@ -73,19 +74,27 @@ module.exports=async(req,res)=>{try{
   const post={slug,title,content,images,cover_index,status,sort_order:Number(b.sort_order)||0,event_date_start,event_date_end,event_type,operator_type,external_organizer};
   if(req.method==='PATCH'){
    if(!/^[a-f0-9-]{36}$/i.test(b.id||''))return send(res,400,{error:'ID 오류'});
-   const rows=await query('/rest/v1/news_posts?select=id,published_at&id=eq.'+encodeURIComponent(b.id),'GET',undefined,token);
+   const rows=await query('/rest/v1/news_posts?select=id,published_at,slug&id=eq.'+encodeURIComponent(b.id),'GET',undefined,token);
    if(!rows?.length)return send(res,404,{error:'게시물을 찾을 수 없음'});
    if(status==='ongoing'&&!rows[0].published_at)post.published_at=new Date().toISOString();
    const updated=await query('/rest/v1/news_posts?id=eq.'+encodeURIComponent(b.id)+'&select=*','PATCH',post,token);
+   if(updated[0]?.published_at){
+    const changed=['/','/news','/news/'+updated[0].slug];
+    if(rows[0]?.published_at&&rows[0].slug&&rows[0].slug!==updated[0].slug)changed.push('/news/'+rows[0].slug);
+    await notify(req,changed);
+   }
    return send(res,200,{item:updated[0]});
   }
   post.published_at=new Date().toISOString();
   const added=await query('/rest/v1/news_posts?select=*','POST',post,token);
+  if(added[0]?.published_at)await notify(req,['/','/news','/news/'+added[0].slug]);
   return send(res,201,{item:added[0]});
  }
  if(req.method==='DELETE'){
   const id=req.query.id;if(!/^[a-f0-9-]{36}$/i.test(id||''))return send(res,400,{error:'ID 오류'});
+  const removed=await query('/rest/v1/news_posts?select=slug,published_at&id=eq.'+encodeURIComponent(id),'GET',undefined,token);
   await query('/rest/v1/news_posts?id=eq.'+encodeURIComponent(id),'DELETE',undefined,token);
+  if(removed[0]?.published_at&&removed[0]?.slug)await notify(req,['/','/news','/news/'+removed[0].slug]);
   return send(res,200,{ok:true});
  }
  return send(res,405,{error:'Method not allowed'});
