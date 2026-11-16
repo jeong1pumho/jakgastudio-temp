@@ -69,6 +69,47 @@ async function main(){
  assert(feed.includes('<title>제주 &amp; 책</title>'));
  assert(feed.includes('<![CDATA[<p>공개 전체 본문</p>]]>'));
  assert(!feed.includes('secret'));
+ // Structured data regression checks; do not include unverified Event prices.
+ const base='https://www.jakgastudio.com';
+ const graph=require('./lib/search-info').graph(base,{'@type':'WebPage',url:base+'/'});
+ const shop=graph['@graph'].find(node=>node['@type']==='BookStore');
+ assert(shop);
+ assert.deepEqual(shop.openingHoursSpecification.dayOfWeek,['Tuesday','Wednesday','Thursday','Friday','Saturday']);
+ assert.equal(shop.openingHoursSpecification.opens,'09:00');
+ assert.equal(shop.openingHoursSpecification.closes,'17:00');
+ const programData=require('./lib/programs-page');
+ for(const program of programData.programs){
+  const page=programData.schema(base,program,program.title);
+  const steps=page.breadcrumb.itemListElement;
+  assert.equal(steps[0].item,base+'/');
+  assert.equal(steps[1].item,base+'/programs/'+program.slug);
+  assert(steps.every(item=>item.item!==base+'/programs'));
+  if(program.slug!=='bookstore'){
+   assert.equal(page.mainEntity['@type'],'Service');
+   assert.equal(page.mainEntity.serviceType,program.title);
+   assert.equal(page.mainEntity.provider['@id'],shop['@id']);
+   assert.equal(page.mainEntity.areaServed.name,'제주특별자치도');
+  }
+ }
+ const about=require('./lib/author-page').schema(base,'작가 소개','소개');
+ assert.equal(about.mainEntity['@type'],'Person');
+ assert.equal(about.mainEntity.subjectOf,undefined);
+ assert.equal(about.mentions.length,2);
+ for(const book of about.mentions){
+  assert.equal(book['@type'],'Book');
+  assert.equal(book.author['@id'],about.mainEntity['@id']);
+  assert(book.sameAs.startsWith('https://www.yes24.com/product/goods/'));
+ }
+ const eventBuilder=require('./api/calendar-page').eventSchema;
+ const sample={id:eventUuid,category:'meeting',title:'독서모임',start_time:'10:00:00',end_time:'12:00:00',updated_at:'2026-11-15T00:00:00Z'};
+ const event=eventBuilder(base,sample,'2026-11-18','독서모임','제주 독서모임');
+ assert.equal(event['@type'],'Event');
+ assert.equal(event.startDate,'2026-11-18T10:00:00+09:00');
+ assert.equal(event.endDate,'2026-11-18T12:00:00+09:00');
+ assert.equal(event.organizer['@id'],shop['@id']);
+ assert.equal(event.location.address.addressCountry,'KR');
+ assert(!event.offers && !event.image);
+ assert.equal(eventBuilder(base,{...sample,category:'custom'},'2026-11-18','공개 행사','특별행사').organizer,undefined);
  const indexnow=require('./lib/indexnow');
  const bypass=await indexnow.notify({headers:{host:'jakgastudio-temp.vercel.app'}},['/news']);
  assert.equal(bypass.skipped,'non-production');
