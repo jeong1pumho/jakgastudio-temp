@@ -131,8 +131,13 @@
  async function load(){
   const id=++currentRequest;
   $('sc-month').hidden=false;$('sc-detail-view').hidden=true;
-  $('sc-month-title').textContent=year+'년 '+month+'월';
-  $('sc-days').replaceChildren();setState('일정을 불러오는 중입니다.');
+  // Preserve first-response server HTML until the current month refresh succeeds.
+  const grid=$('sc-days');
+  const expectedMonth=year+'년 '+month+'월';
+  const retainSSR=id===1 && grid.childElementCount>0 && $('sc-month-title').textContent.trim()===expectedMonth;
+  $('sc-month-title').textContent=expectedMonth;
+  if(!retainSSR)grid.replaceChildren();
+  setState(retainSSR?'':'일정을 불러오는 중입니다.');
   try{
    const response=await fetch('/api/schedule?month='+keyFor(year,month,1).slice(0,7),{cache:'no-store'});
    const data=await response.json().catch(()=>({}));
@@ -149,7 +154,8 @@
    if(requestedDay){const [y,m,d]=requestedDay.split('-').map(Number);showDay(y,m,d);setState('');requestedDay=null;}
   }catch(e){
    if(id!==currentRequest)return;
-   $('sc-days').replaceChildren();setState('일정 조회 오류: '+e.message,true);
+   if(!retainSSR)$('sc-days').replaceChildren();
+   setState('일정 조회 오류: '+e.message,true);
   }
  }
  function changeMonth(delta){const n=new Date(Date.UTC(year,month-1+delta,1));const target=keyFor(n.getUTCFullYear(),n.getUTCMonth()+1,1).slice(0,7);if(target<OPEN_MONTH||target>lastMonth)return;year=n.getUTCFullYear();month=n.getUTCMonth()+1;load();}
