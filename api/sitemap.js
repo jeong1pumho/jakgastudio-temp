@@ -68,6 +68,7 @@ async function build(now=new Date()){
 }
 module.exports=async(req,res)=>{
   if(req.method!=='GET')return res.status(405).end();
+  if(req.query?._format==='rss')return require('../lib/rss')(req,res);
   if(!ready())return res.status(503).send('Sitemap temporarily unavailable');
   try{
     const xml=await build();
