@@ -2,6 +2,7 @@
 const {admin,query,send}=require('../lib/core');
 const {holidaysForYear,MIN_YEAR,MAX_YEAR}=require('../lib/holidays');
 const {cleanHtml}=require('../lib/rich');
+const {notify}=require('../lib/indexnow');
 const columns='id,event_date,category,category_label,title,start_time,end_time,created_at,updated_at';
 const embed=columns+',schedule_event_memos(memo)';
 const normalize=items=>items.map(({schedule_event_memos:note,...item})=>({...item,memo:cleanHtml(Array.isArray(note)?note[0]?.memo||'':note?.memo||'')}));
@@ -38,6 +39,7 @@ module.exports=async(req,res)=>{
    if(!rows.length)return send(res,404,{error:'일정을 찾을 수 없습니다.'});
    if(rows[0].category==='opening')return send(res,403,{error:'오픈일 기록은 삭제할 수 없습니다.'});
    await query('/rest/v1/schedule_events?id=eq.'+id,'DELETE',undefined,token);
+   await notify(req,['/','/calendar',...(['meeting','custom'].includes(rows[0].category)?['/calendar/events/'+id]:[])]);
    return send(res,200,{ok:true});
   }
   if(req.method!=='POST'&&req.method!=='PATCH')return send(res,405,{error:'허용되지 않은 요청입니다.'});
@@ -58,11 +60,13 @@ module.exports=async(req,res)=>{
   const memo=cleanHtml(memoInput);
   if(memo.length>30000)return send(res,400,{error:'메모가 너무 깁니다. 서식을 줄여주세요.'});
   const id=req.method==='PATCH'?b.id:null;
+  let previousCategory=null;
   if(req.method==='PATCH'){
    if(!validId(id))return send(res,400,{error:'잘못된 일정 ID입니다.'});
    const rows=await query('/rest/v1/schedule_events?select=id,category&id=eq.'+id,'GET',undefined,token);
    if(!rows.length)return send(res,404,{error:'수정할 일정을 찾을 수 없습니다.'});
    if(rows[0].category==='opening')return send(res,403,{error:'오픈일 기록은 수정할 수 없습니다.'});
+   previousCategory=rows[0].category;
   }
   // Atomic insert/update of event + protected memo. DB exclusion guard remains active.
   const payload={
@@ -73,6 +77,7 @@ module.exports=async(req,res)=>{
    p_memo:memo
   };
   const savedId=await query('/rest/v1/rpc/save_schedule_event','POST',payload,token);
+  await notify(req,['/','/calendar',...(['meeting','custom'].includes(b.category)||['meeting','custom'].includes(previousCategory)?['/calendar/events/'+savedId]:[])]);
   return send(res,req.method==='POST'?201:200,{item:{id:savedId,event_date:b.event_date,category:b.category,category_label,title,start_time:payload.p_start_time,end_time:payload.p_end_time,memo}});
 
  }catch(e){
