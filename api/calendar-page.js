@@ -25,6 +25,21 @@ const categoryName=e=>e.category==='meeting'?'작가작업실 모임':e.category
 const weekday=date=>['일','월','화','수','목','금','토'][new Date(date+'T00:00:00Z').getUTCDay()];
 function prettyDate(d){return d.replace(/-/g,'.')+' ('+weekday(d)+')';}
 function safeTitle(v){return displayBrand(v).trim().slice(0,150);}
+// Structured data for real, public calendar meetings and special sessions only.
+// Marketing posts and private rentals are never passed to this handler.
+function eventSchema(base,e,date,title,description){
+ const url=base+'/calendar/events/'+e.id;
+ return {'@type':'Event','@id':url+'#event',url,name:title,description,
+  startDate:date+'T'+onlyTime(e.start_time)+':00+09:00',
+  endDate:date+'T'+onlyTime(e.end_time)+':00+09:00',
+  eventAttendanceMode:'https://schema.org/OfflineEventAttendanceMode',
+  eventStatus:'https://schema.org/EventScheduled',
+  location:{'@type':'Place',name:place.name,address:{'@type':'PostalAddress',
+    streetAddress:'이호일동 375-3 1층',addressLocality:'제주시',
+    addressRegion:'제주특별자치도',addressCountry:'KR'}},
+  ...(e.category==='meeting'?{organizer:{'@id':base+'/#bookstore','@type':'BookStore',name:webName,url:base+'/'}}:{}),
+  ...(e.updated_at?{dateModified:e.updated_at}:{})};
+}
 function output(req,res,status,title,description,body,meta={}){
  const base=origin(req),url=base+(meta.path||'/calendar');
  const headSchema=meta.schema||{'@context':'https://schema.org','@type':'WebPage',name:title,url,inLanguage:'ko-KR'};
@@ -80,10 +95,7 @@ module.exports=async(req,res)=>{
     '<p class="hint">이 페이지는 월간 캘린더에 공개된 일정 정보입니다. 참가·예약 가능 여부와 신청 방법은 별도로 확인해 주세요.</p>'+
     '<div class="links"><a href="/calendar">월간 캘린더 확인</a><a href="/programs">프로그램 안내</a><a href="/news">운영 소식 확인</a></div>';
    return output(req,res,200,title+' | 제주 '+categoryName(e)+' · '+webName,eventDesc,body,{
-    path:urlPath,schema:{'@type':'Event',url:base+urlPath,startDate:date+'T'+onlyTime(e.start_time)+':00+09:00',endDate:date+'T'+onlyTime(e.end_time)+':00+09:00',eventAttendanceMode:'https://schema.org/OfflineEventAttendanceMode',location:{'@type':'Place',name:place.name,address:{'@type':'PostalAddress',streetAddress:'이호일동 375-3 1층',addressLocality:'제주시',addressRegion:'제주특별자치도',addressCountry:'KR'}},
-      name:title,description:eventDesc,inLanguage:'ko-KR',
-      dateModified:e.updated_at||undefined,
-      about:{'@type':'Place',name:place.name,address:place.address}}
+    path:urlPath,schema:eventSchema(base,e,date,title,eventDesc)
    });
   }
   // Avoid endless /calendar?year=... crawling: one bounded rolling list of events.
@@ -117,3 +129,4 @@ module.exports=async(req,res)=>{
   return errorHtml(req,res,error.status||500,'일정을 불러오는 중 문제가 발생했습니다.');
  }
 };
+module.exports.eventSchema=eventSchema;
