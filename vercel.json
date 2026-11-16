@@ -43,7 +43,7 @@
     },
     {
       "source": "/rss.xml",
-      "destination": "/api/rss"
+      "destination": "/api/sitemap?_format=rss"
     },
     {
       "source": "/news",
