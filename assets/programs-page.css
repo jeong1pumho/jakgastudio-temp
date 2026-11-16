@@ -30,3 +30,33 @@
 @media(max-width:720px) {
   .program-detail-grid {grid-template-columns:minmax(0,1fr)}
 }
+
+
+/* The five program URLs share one editorial template. Each has its own actual
+   server-rendered H1, content and internal links. */
+.program-detail-page .program-editorial-header{padding:0 0 clamp(38px,5vw,62px);margin:0 0 clamp(34px,4vw,52px);border-bottom:1px solid #bec6bb}
+.program-detail-page .program-editorial-header h2{font-family:KakaoSite,"Noto Sans CJK KR",sans-serif;color:#153c2c;font-size:clamp(38px,4.1vw,56px);font-weight:700;line-height:1.35;letter-spacing:-.045em;margin:14px 0 30px}
+.program-detail-page .program-editorial-header .subpage-intro{font-size:17px;color:#71766e;line-height:1.95;font-weight:400}
+.program-editorial-grid{display:grid;grid-template-columns:minmax(185px,220px) minmax(0,1fr) minmax(175px,220px);column-gap:clamp(30px,3.8vw,54px);align-items:start}
+.program-editorial-sidebar{display:flex;flex-direction:column;gap:2px;min-width:0;padding-top:5px}
+.program-editorial-nav-link{display:flex;align-items:center;gap:15px;padding:14px 18px;min-height:53px;color:#35403a;font-size:16px;line-height:1.5;border-bottom:1px solid #e6e7e2;font-weight:400;word-break:keep-all}
+.program-editorial-nav-link.is-active{background:#e8ede3;color:#233b2e;border-bottom-color:transparent;border-radius:3px;font-weight:700}
+.program-editorial-nav-link:hover{background:#f1f3ed}
+.program-editorial-nav-link:focus-visible,.program-editorial-button:focus-visible{outline:2px solid #315c44;outline-offset:3px}
+.program-editorial-index{color:#72946b;font-weight:400;flex:none}
+.program-editorial-article{min-width:0;color:#262c29;font-family:KakaoSite,"Noto Sans CJK KR",sans-serif}
+.program-editorial-article h1{margin:0 0 10px;font-size:clamp(27px,2.5vw,36px);line-height:1.45;letter-spacing:-.045em;font-weight:700;color:#143d2b;word-break:keep-all}
+.program-editorial-subtitle{color:#608258;font-size:clamp(17px,1.8vw,24px);line-height:1.55;margin:0;font-weight:400}
+.program-editorial-body{margin-top:clamp(33px,4.5vw,58px);font-size:17px;line-height:1.92;letter-spacing:-.025em;font-weight:400;word-break:keep-all;overflow-wrap:break-word}
+.program-editorial-body p{margin:0 0 26px}
+.program-editorial-body p:last-child{margin-bottom:0}
+.program-editorial-contact{margin:30px 0 0;font-size:16px;line-height:1.8}
+.program-editorial-contact a{text-decoration:none;white-space:nowrap}
+.program-editorial-actions{display:flex;align-items:center;flex-wrap:wrap;gap:20px;margin-top:clamp(36px,5.8vw,70px)}
+.program-editorial-button{min-height:50px;display:inline-flex;align-items:center;justify-content:center;gap:22px;border:1px solid #92ad98;padding:9px 22px;font-size:16px;font-weight:700;color:#204934;white-space:nowrap;line-height:1.55}
+.program-editorial-button:hover{background:#eaf0e7}
+.program-editorial-photos{display:grid;gap:10px}
+.program-editorial-photos img{width:100%;height:auto;aspect-ratio:1.4/1;object-fit:cover;object-position:center;background:#eeeae4;display:block}
+@media(max-width:1100px){.program-editorial-grid{grid-template-columns:190px minmax(0,1fr) 175px;column-gap:26px}.program-editorial-body{font-size:16px}}
+@media(max-width:850px){.program-editorial-grid{grid-template-columns:190px minmax(0,1fr);row-gap:34px}.program-editorial-photos{grid-column:2;grid-row:2;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.program-editorial-photos img{aspect-ratio:1/1}}
+@media(max-width:650px){.program-detail-page .program-editorial-header{padding-bottom:32px;margin-bottom:28px}.program-detail-page .program-editorial-header h2{font-size:36px;margin-bottom:20px}.program-editorial-grid{display:block}.program-editorial-sidebar{display:flex;flex-direction:row;overflow-x:auto;gap:7px;margin:0 0 32px;padding:0 0 10px;scrollbar-width:thin;scroll-snap-type:x proximity}.program-editorial-nav-link{min-height:44px;white-space:nowrap;flex:none;border-bottom:0;background:#f5f5f0;border-radius:3px;scroll-snap-align:start;padding:10px 15px;font-size:14px}.program-editorial-article h1{font-size:29px}.program-editorial-body{font-size:16px;line-height:1.92;margin-top:34px}.program-editorial-actions{gap:10px}.program-editorial-button{font-size:14px;padding:9px 14px;gap:10px}.program-editorial-photos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:45px}.program-editorial-photos img{aspect-ratio:3/4}}
