@@ -9,6 +9,32 @@
  };
  const smsStatus='https://qrbavxempotptnmflqoq.supabase.co/functions/v1/studio-sms-news';
  let generation=0;
+ const EXCLUDE_KEY='jakgastudio.analytics-excluded.v1';
+ function renderPreference(){
+  try{
+   const excluded=localStorage.getItem(EXCLUDE_KEY)==='1';
+   $('traffic-exclude').textContent=excluded?'방문 집계 다시 허용':'이 브라우저 방문 집계 제외';
+   $('traffic-exclude').setAttribute('aria-pressed',String(excluded));
+   $('traffic-preference-status').textContent=excluded?'이 브라우저: 방문 집계 제외 중':'이 브라우저: 방문 집계 허용 중';
+  }catch{
+   $('traffic-preference-status').textContent='브라우저 저장소에 접근할 수 없어 설정을 확인할 수 없습니다.';
+   $('traffic-exclude').disabled=true;
+  }
+ }
+ $('traffic-exclude').addEventListener('click',()=>{
+  try{
+   const next=localStorage.getItem(EXCLUDE_KEY)!=='1'?'1':'0';
+   localStorage.setItem(EXCLUDE_KEY,next);
+   if(localStorage.getItem(EXCLUDE_KEY)!==next)throw Error('저장 실패');
+   renderPreference();
+  }catch{
+   $('traffic-preference-status').textContent='설정을 저장하지 못했습니다. 브라우저의 사이트 데이터 허용 설정을 확인해 주세요.';
+  }
+ });
+ window.addEventListener('storage',event=>{
+  if(event.key===EXCLUDE_KEY||event.key===null)renderPreference();
+ });
+ renderPreference();
 
  async function request(url,token,body){
   const headers={};

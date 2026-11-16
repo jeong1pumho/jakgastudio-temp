@@ -1,11 +1,24 @@
 (() => {
  'use strict';
  if(location.hostname!=='jakgastudio-temp.vercel.app'||/^\/(?:admin|api)(?:\/|$)/.test(location.pathname))return;
+ const EXCLUDE_KEY='jakgastudio.analytics-excluded.v1';
+ const excluded=()=>{try{return localStorage.getItem(EXCLUDE_KEY)==='1';}catch{return false;}};
+ let measurementId;
+ const syncExclusion=()=>{
+  if(measurementId)window['ga-disable-'+measurementId]=excluded();
+  if(excluded())pending.length=0;
+ };
+ window.addEventListener('storage',event=>{
+  if(event.key===EXCLUDE_KEY||event.key===null){
+   syncExclusion();
+   if(!excluded())location.reload();
+  }
+ });
  const events=new Set(['directions_click','phone_click','contact_click','sms_signup_open','sms_signup_complete','calendar_day_select','event_detail_open','program_detail_open','book_detail_open']);
  const pending=[];
- let measurementId;
  const track=(name)=>{
-  if(!events.has(name))return;
+  syncExclusion();
+  if(excluded()||!events.has(name))return;
   if(measurementId)window.gtag('event',name,{send_to:measurementId});
   else if(pending.length<30)pending.push(name);
  };
@@ -27,9 +40,12 @@
   else if(/^\/books\/[^/]+\/?$/.test(url.pathname))track('book_detail_open');
  });
 
+ if(excluded())return;
  fetch('/api/admin?action=analytics',{cache:'no-store'}).then(response=>response.ok?response.json():null).then(config=>{
+  if(excluded())return;
   if(!/^G-[A-Z0-9]+$/.test(config?.measurementId||''))return;
   measurementId=config.measurementId;
+  syncExclusion();
   window.dataLayer=window.dataLayer||[];
   window.gtag=function(){window.dataLayer.push(arguments);};
   const page=new URL(location.pathname,location.origin);
