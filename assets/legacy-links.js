@@ -1,0 +1,1 @@
+(()=>{const paths={space:'/space',program:'/programs',hours:'/visit',location:'/visit',books:'/books',news:'/news',calendar:'/calendar'};const go=()=>{if(location.pathname==='/'){const p=paths[location.hash.slice(1)];if(p)location.replace(p);}};go();addEventListener('hashchange',go);})();

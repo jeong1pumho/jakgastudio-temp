@@ -1,7 +1,7 @@
 /* Admin credentials are scoped to this browser tab session. */
 (function(){
  'use strict';
- const KEY='jakgastudio-temp.admin-auth.v1';
+ const KEY='jakgastudio.admin-auth.v1';
  const headroom=45000;
  let pending=null;
 

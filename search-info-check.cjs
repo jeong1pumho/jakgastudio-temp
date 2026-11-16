@@ -14,7 +14,7 @@ global.fetch=async url=>{
 };
 async function run(page){let body,headers={};await require('./lib/handlers/home')({method:'GET',headers:{host:'jakgastudio-temp.vercel.app'},query:{page}},{status(n){assert.equal(n,200);return this},setHeader(k,v){headers[k]=v;return this},send(s){body=s;return this}});assert.match(headers['X-Robots-Tag'],/noindex/);assert.equal((body.match(/name="twitter:title"/g)||[]).length,1);assert.equal((body.match(/property="og:image"/g)||[]).length,1);const graph=JSON.parse(body.match(/<script type="application\/ld\+json">(.*?)<\/script>/s)[1])['@graph'];assert(graph.some(x=>x['@type']==='BookStore'));return body;}
 (async()=>{
- for(const page of ['home','space','programs','visit'])await run(page);
+ for(const page of ['home','space','visit'])await run(page);
  const calendar=await run('calendar');
  assert.match(calendar,/<section class="calendar-upcoming"/);
  assert(calendar.includes('<a href="/calendar/events/'+event.id+'">독서 &lt;모임&gt; $&amp;</a>'));

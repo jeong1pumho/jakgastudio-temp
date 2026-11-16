@@ -46,7 +46,7 @@
    const cards={
     traffic:async()=>{
      const data=await request('/api/admin?action=analytics&report=1',token);
-     if(data.status==='unconfigured')return ['GA4 연결 대기',['테스트 측정 ID와 관리자 보고서 설정이 필요합니다.']];
+     if(data.status==='unconfigured')return ['GA4 연결 대기',['운영 측정 ID와 관리자 보고서 설정이 필요합니다.']];
      if(data.status==='report_unconfigured')return ['수집 설정됨 · 보고서 연결 대기',['GA4 보고서 조회 권한을 설정해 주세요.']];
      const number=new Intl.NumberFormat('ko-KR');
      return ['방문 '+number.format(data.sessions)+'회 · 조회 '+number.format(data.views)+'회',[

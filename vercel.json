@@ -72,13 +72,25 @@
       "headers": [
         {
           "key": "X-Robots-Tag",
-          "value": "noindex, follow"
+          "value": "noindex, nofollow"
         }
-      ],
-      "has": [
+      ]
+    },
+    {
+      "source": "/admin",
+      "headers": [
         {
-          "type": "host",
-          "value": "(?<testHost>jakgastudio-temp(?:-[a-z0-9-]+)?\\.vercel\\.app)"
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    },
+    {
+      "source": "/admin/(.*)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
         }
       ]
     }
@@ -87,5 +99,12 @@
     "api/news.js": {
       "includeFiles": "lib/*.html"
     }
-  }
+  },
+  "redirects": [
+    {
+      "source": "/index.html",
+      "destination": "/",
+      "permanent": true
+    }
+  ]
 }
