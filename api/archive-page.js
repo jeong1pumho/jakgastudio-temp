@@ -29,7 +29,8 @@ const intro='제주 독서모임, 글쓰기 클래스, 북토크 등 작가작�
 function pageNumber(raw){if(raw===undefined)return 1;if(typeof raw!=='string'||! /^[1-9][0-9]{0,5}$/.test(raw))throw Object.assign(Error('Invalid page'),{status:400});return Number(raw);}
 function urlFor(ongoing,ended,rental,anchor=''){const q=new URLSearchParams();if(ongoing>1)q.set('ongoing',ongoing);if(ended>1)q.set('ended',ended);if(rental)q.set('operator','rental');return '/news'+(q.size?'?'+q:'')+(anchor?'#'+anchor:'');}
 async function load(status,page,rental){
- const response=await fetch(root()+'/rest/v1/news_posts?select='+selected+'&published_at=not.is.null&status=eq.'+status+(rental?'&operator_type=eq.rental':'')+'&order=published_at.desc.nullslast,created_at.desc,id.desc&limit=6&offset='+((page-1)*6),{headers:{apikey:key(),Accept:'application/json',Prefer:'count=exact'}});
+ if(status==='ended')return require('../lib/news-order').loadEnded(page,6,rental);
+ const response=await fetch(root()+'/rest/v1/news_posts?select='+selected+'&published_at=not.is.null&status=eq.'+status+(rental?'&operator_type=eq.rental':'')+'&order=sort_order.desc,published_at.desc.nullslast,created_at.desc,id.desc&limit=6&offset='+((page-1)*6),{headers:{apikey:key(),Accept:'application/json',Prefer:'count=exact'}});
  if(response.status===416)throw Object.assign(Error('Missing page'),{status:404});
  if(!response.ok)throw Error('List unavailable');
  const total=Number((response.headers.get('content-range')||'').split('/')[1]);if(!Number.isSafeInteger(total)||total<0)throw Error('Invalid count');
@@ -39,7 +40,7 @@ function section(data,kind,other,rental){
  const title=kind==='ongoing'?'진행 중인 모임·행사':'종료된 모임·행사';
  const link=n=>kind==='ongoing'?urlFor(n,other,rental,kind):urlFor(other,n,rental,kind);
  let pagination='';if(data.pages>1){const start=Math.max(1,Math.min(data.page-2,data.pages-4)),end=Math.min(data.pages,start+4);pagination='<nav class="books-pagination" aria-label="'+title+' 페이지">';if(data.page>1)pagination+='<a href="'+link(data.page-1)+'">이전</a>';for(let n=start;n<=end;n++)pagination+=n===data.page?'<span aria-current="page">'+n+'</span>':'<a href="'+link(n)+'">'+n+'</a>';if(data.page<data.pages)pagination+='<a href="'+link(data.page+1)+'">다음</a>';pagination+='</nav><p class="books-page-count">전체 '+data.total+'개 · '+data.page+' / '+data.pages+' 페이지</p>';}
- return '<section id="'+kind+'" class="event-section"><div class="section-head"><h2>'+title+'</h2><small>최신 게시순</small></div>'+(data.items.length?'<div class="cards">'+data.items.map(card).join('')+'</div>':'<p class="empty">등록된 '+title+'가 없습니다.</p>')+pagination+'</section>';
+ return '<section id="'+kind+'" class="event-section"><div class="section-head"><h2>'+title+'</h2><small>'+(kind==='ended'?'게시 순서 우선 · 최신 종료일순':'게시 순서 우선 · 최신 게시순')+'</small></div>'+(data.items.length?'<div class="cards">'+data.items.map(card).join('')+'</div>':'<p class="empty">등록된 '+title+'가 없습니다.</p>')+pagination+'</section>';
 }
 module.exports=async(req,res)=>{try{
  if(req.method!=='GET')return res.status(405).end();if(!ready())return res.status(503).send('DB not configured');

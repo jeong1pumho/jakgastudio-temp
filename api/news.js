@@ -2,7 +2,7 @@
 const {query,ready,send,selected}=require('../lib/core');
 const base='/rest/v1/news_posts?select='+selected;
 const ongoingOrder='&order=sort_order.desc,published_at.desc.nullslast,created_at.desc';
-const endedOrder='&order=published_at.desc.nullslast,created_at.desc';
+const {loadEnded}=require('../lib/news-order');
 const withCover=item=>({...item,cover:item.images?.[item.cover_index]||item.images?.[0]||''});
 async function allOngoing(){
  const items=[];
@@ -23,8 +23,8 @@ module.exports=async(req,res)=>{
   }
   const [current,ended,rentals]=await Promise.all([
    query(base+'&status=eq.ongoing'+ongoingOrder+'&limit=7'),
-   query(base+'&status=eq.ended'+endedOrder+'&limit=6'),
-   query(base+'&status=eq.ended&operator_type=eq.rental'+endedOrder+'&limit=3')
+   loadEnded(1,6).then(result=>result.items),
+   loadEnded(1,3,true).then(result=>result.items)
   ]);
   return send(res,200,{
    ongoing:current.slice(0,6).map(withCover),
