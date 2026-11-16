@@ -26,7 +26,7 @@ core.query=async path=>{
  throw Error('Unexpected query: '+path);
 };
 const sitemap=require('./api/sitemap');
-const rss=require('./api/rss');
+const rss=require('./lib/rss');
 const robots=require('./api/robots');
 function capture(host) {
  const result={};
