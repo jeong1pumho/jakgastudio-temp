@@ -76,3 +76,58 @@ body{padding-top:84px}#kv-hero.carousel-keyvisual{height:calc(100svh - 84px)}.pa
   #recommended-books:has(>.books-page-heading)>.home-three{grid-template-columns:repeat(4,minmax(0,1fr));gap:40px 24px}
   #recommended-books:has(>.books-page-heading) .home-book h3{font-size:20px;margin:17px 0 8px}
 }
+
+/* Home footer refresh: approved five-program cards and 50:50 info links only. */
+.home-programs{padding-top:130px;padding-bottom:60px}
+.home-programs-heading{position:relative;text-align:center;margin:0 0 40px}
+.home-programs-heading::before,.home-programs-heading::after{content:"";position:absolute;top:31px;width:32%;height:1px;background:#9ea99c}
+.home-programs-heading::before{left:0}.home-programs-heading::after{right:0}
+.home-programs-heading .home-eyebrow{margin-bottom:4px;color:#737c73}
+.home-programs-heading h2{font-size:36px;color:#263e30;font-weight:500;line-height:1.45;letter-spacing:-1.3px}
+.home-programs-intro{font-size:15px;color:#6c746c;margin:16px 0 0;line-height:1.85;font-weight:300}
+.home-program-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px}
+.home-program-card{min-width:0;display:flex;flex-direction:column;border:1px solid #ded5c6;border-radius:13px;overflow:hidden;background:#fcfaf6;color:#263e30;text-decoration:none;transition:border-color .2s,transform .2s,box-shadow .2s}
+.home-program-card:hover{border-color:#aab5a8;transform:translateY(-3px);box-shadow:0 6px 20px rgba(36,54,41,.06)}
+.home-program-card:focus-visible{outline:3px solid #5f826b;outline-offset:3px}
+.home-program-card>img{width:100%;height:auto;aspect-ratio:2.18/1;object-fit:cover;display:block;background:#eae7df}
+.home-program-icon{width:55px;height:55px;margin:-27px auto 8px;border:1px solid #e5dac7;border-radius:50%;background:#faf4e8;display:grid;place-items:center;position:relative;z-index:1;color:#385647;flex-shrink:0}
+.home-program-icon svg{width:26px;height:26px}
+.home-program-card-content{padding:0 12px 17px;display:flex;flex-direction:column;align-items:center;text-align:center;flex:1}
+.home-program-card-content h3{margin:0 0 9px;font-size:19px;line-height:1.45;letter-spacing:-.65px;font-weight:700;word-break:keep-all;color:#263e30}
+.home-program-card-content p{margin:0 0 15px;font-size:14px;line-height:1.65;letter-spacing:-.35px;color:#626b63;font-weight:300;word-break:keep-all;flex:1}
+.home-program-cta{margin-top:auto;font-size:13px;font-weight:700;line-height:1.6;color:#284a38}
+.home-program-cta span{margin-left:8px;font-size:17px}
+.home-links.home-section{padding-top:65px;padding-bottom:92px}
+.home-links-two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:76px}
+.home-links-two article{min-width:0}
+@media(max-width:1000px){
+ .home-program-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+ .home-programs-heading::before,.home-programs-heading::after{width:24%}
+ .home-programs{padding-top:100px}
+ .home-links-two{gap:40px}
+}
+@media(max-width:760px){
+ .home-programs{padding-top:90px;padding-bottom:38px}
+ .home-programs-heading{margin-bottom:34px}
+ .home-programs-heading::before,.home-programs-heading::after{width:16%;top:29px}
+ .home-programs-heading h2{font-size:29px}
+ .home-programs-intro{font-size:14px;max-width:380px;margin:13px auto 0}
+ .home-program-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+ .home-program-card-content{padding:0 10px 16px}
+ .home-program-card-content h3{font-size:17px}
+ .home-program-card-content p{font-size:13px}
+ .home-links.home-section{padding-top:65px;padding-bottom:75px}
+ .home-links-two{grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
+ .home-links-two article{min-height:230px}
+ .home-links-two h2{font-size:23px}
+ .home-links-two article>p:not(.home-eyebrow){font-size:13px}
+}
+@media(max-width:480px){
+ .home-programs-heading::before,.home-programs-heading::after{display:none}
+ .home-program-grid{grid-template-columns:1fr;gap:22px;max-width:370px;margin-inline:auto}
+ .home-program-card-content{padding:0 22px 24px}
+ .home-program-card-content h3{font-size:21px}
+ .home-program-card-content p{font-size:15px}
+ .home-links-two{grid-template-columns:1fr;gap:32px}
+ .home-links-two article{min-height:190px}
+}
