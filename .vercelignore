@@ -1,0 +1,6 @@
+# Development-only files are kept in Git, not deployed.
+/docs/
+/supabase/
+/*-check.cjs
+/README.md
+/assets/fonts/README.txt
