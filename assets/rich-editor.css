@@ -82,3 +82,8 @@
 .rich-reading h3{margin:14px 0 7px;font-size:19px}
 .rich-reading ul,.rich-reading ol{padding-left:25px}
 .rich-reading a{text-decoration:underline}
+
+/* Recommended books: one consistent line height, with intentional blank lines preserved. */
+#editor #recommendation.rich-editor{line-height:1.9}
+#editor #recommendation.rich-editor p,.book-detail .book-detail-copy.rich-reading p{margin:0}
+
