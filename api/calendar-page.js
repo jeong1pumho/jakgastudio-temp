@@ -90,7 +90,8 @@ module.exports=async(req,res)=>{
    const body='<p class="eyebrow">CALENDAR / 일정 상세</p>'+
     '<h1>'+esc(title)+'</h1><p class="lead">'+esc(eventDesc)+'</p>'+
     (memo?.trim()?'<div class="details event-memo">'+renderContent(memo)+'</div>':'')+
-    '<p class="hint">이 페이지는 월간 캘린더에 공개된 일정 정보입니다. 참가·예약 가능 여부와 신청 방법은 별도로 확인해 주세요.</p>';
+    '<p class="hint">이 페이지는 월간 캘린더에 공개된 일정 정보입니다. 참가·예약 가능 여부와 신청 방법은 별도로 확인해 주세요.</p>'+
+    '<div class="links"><a href="/news">모임·행사 확인</a></div>';
    return output(req,res,200,title+' | 제주 '+categoryName(e)+' · '+webName,eventDesc,body,{
     path:urlPath,schema:eventSchema(base,e,date,title,eventDesc)
    });
