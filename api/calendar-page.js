@@ -1,4 +1,3 @@
-const {displayBrand}=require('../lib/seo');
 'use strict';
 /*
  * Public, server-rendered calendar discovery pages.
@@ -24,7 +23,7 @@ const onlyTime=v=>String(v||'').slice(0,5);
 const categoryName=e=>e.category==='meeting'?'작가작업실 모임':e.category_label||'특별일정';
 const weekday=date=>['일','월','화','수','목','금','토'][new Date(date+'T00:00:00Z').getUTCDay()];
 function prettyDate(d){return d.replace(/-/g,'.')+' ('+weekday(d)+')';}
-function safeTitle(v){return displayBrand(v).trim().slice(0,150);}
+function safeTitle(v){return String(v??'').trim().slice(0,150);}
 // Structured data for real, public calendar meetings and special sessions only.
 // Marketing posts and private rentals are never passed to this handler.
 function eventSchema(base,e,date,title,description){

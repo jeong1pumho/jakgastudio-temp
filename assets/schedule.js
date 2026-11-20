@@ -20,7 +20,7 @@
  const timeToMin=s=>Number(s.slice(0,2))*60+Number(s.slice(3,5));
  const toTime=n=>pad(Math.floor(n/60))+':'+pad(n%60);
  const text=(tag,className,value)=>{const e=document.createElement(tag);if(className)e.className=className;if(value!==undefined)e.textContent=value;return e;};
- const eventTitle=e=>String(e.title??'').replaceAll('작가작업실 JEJU','작가작업실 제주');
+ const eventTitle=e=>String(e.title??'');
  const titleFor=e=>e.category==='custom'?e.category_label||'기타':names[e.category]||'기타';
  const classFor=e=>Object.prototype.hasOwnProperty.call(names,e.category)?e.category:'custom';
  const rangeFor=e=>e.category==='closure'?'종일 휴무':e.start_time.slice(0,5)+'–'+e.end_time.slice(0,5);
