@@ -78,7 +78,7 @@ module.exports=async(req,res)=>{
   const base=origin(req);
   if(inputId){
    if(!idPattern.test(inputId))return errorHtml(req,res,404,'일정을 찾을 수 없습니다.');
-   const url='/rest/v1/schedule_events?select='+COLS+',schedule_event_memos(memo)&id=eq.'+encodeURIComponent(inputId)+
+   const url='/rest/v1/schedule_events?select='+COLS+'&id=eq.'+encodeURIComponent(inputId)+
       '&event_date=gte.2026-10-22&event_date=lt.'+publicCalendarEnd()+'&category=in.('+visibleCategories+')&limit=1';
    const rows=await query(url);
    if(!rows.length)return errorHtml(req,res,404,'일정을 찾을 수 없습니다.');
@@ -86,8 +86,7 @@ module.exports=async(req,res)=>{
    const urlPath='/calendar/events/'+e.id;
    const eventDesc=prettyDate(date)+' '+onlyTime(e.start_time)+'–'+onlyTime(e.end_time)+' · '+categoryName(e)+
      ' · '+place.address;
-   const notes=e.schedule_event_memos;
-   const memo=(Array.isArray(notes)?notes[0]:notes)?.memo;
+   const memo=await query('/rest/v1/rpc/public_calendar_event_memo?p_event_id='+encodeURIComponent(e.id));
    const body='<p class="eyebrow">CALENDAR / 일정 상세</p>'+
     '<h1>'+esc(title)+'</h1><p class="lead">'+esc(eventDesc)+'</p>'+
     (memo?.trim()?'<div class="details event-memo">'+renderContent(memo)+'</div>':'')+
