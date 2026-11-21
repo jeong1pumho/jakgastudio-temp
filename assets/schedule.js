@@ -89,7 +89,7 @@
    else {
     for(const e of data.events.slice(0,4)){
      const chip=text('span','sc-entry '+classFor(e));
-     const shownTitle=e.category==='free'?titleFor(e):(eventTitle(e)||titleFor(e));
+     const shownTitle=(e.category==='free'||e.category==='rental')?titleFor(e):(eventTitle(e)||titleFor(e));
      const name=text('strong','sc-kind',shownTitle);name.title=shownTitle;
      chip.appendChild(name);
      if(e.category!=='opening')chip.appendChild(text('span','sc-clock',rangeFor(e)));
