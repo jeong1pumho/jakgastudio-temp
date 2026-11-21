@@ -4,9 +4,10 @@
  * The existing interactive calendar at /calendar remains unchanged.
  * Load the memo only for an eligible individual event detail.
  */
+const {nav}=require('../lib/home-content');
 const {query,ready,esc}=require('../lib/core');
 const {renderContent}=require('../lib/rich');
-const {origin,robots,jsonLd}=require('../lib/seo');
+const {origin,robots,jsonLd,faviconLinks}=require('../lib/seo');
 const {publicCalendarEnd}=require('../lib/public-calendar-range');
 const idPattern=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const COLS='id,event_date,category,category_label,title,start_time,end_time,updated_at';
@@ -57,7 +58,8 @@ function output(req,res,status,title,description,body,meta={}){
  // Retain test-domain deindexing; Vercel blanket header also applies.
  res.setHeader('X-Robots-Tag',status===200?robots(req):'noindex, follow');
  const directive=status===200?robots(req):'noindex, follow';
- res.end('<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="'+directive+'">'+seo+'<style>'+css+'</style></head><body><header class="bar"><div class="bar-inner"><a class="brand" href="/">작가작업실 제주</a><a class="back" data-page-return href="/calendar">이전 페이지로 돌아가기</a></div></header><main class="container">'+body+'</main><script defer src="/assets/page-return.js"></script><script defer src="/assets/site-analytics.js?v=owner-exclude-20261121"></script><script defer src="/assets/site-visitor.js?v=owner-exclude-20261121"></script></body></html>');
+ const back=meta.path?.startsWith('/calendar/events/')?'<div class="calendar-detail-return"><a data-page-return href="/calendar">← 월간 캘린더로 돌아가기</a></div>':'';
+ res.end('<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="'+directive+'">'+seo+faviconLinks()+'<style>'+css+'</style><link rel="stylesheet" href="/assets/home-approved.css"><style>body{background:#fffdfa;color:#38332e}.kv-sticky-header{padding:0;font-family:HomeKakao,sans-serif;font-size:15px;line-height:1.86;letter-spacing:-.025em;-webkit-font-smoothing:antialiased}.kv-sticky-inner{margin:auto}.calendar-detail-return{margin-top:36px}.calendar-detail-return a{display:inline-flex;border:1px solid #ded6ce;border-radius:4px;padding:10px 16px;text-decoration:none;font-size:14px}</style></head><body><header class="kv-sticky-header"><div class="kv-sticky-inner">'+nav('/calendar')+'</div></header><main class="container">'+body+back+'</main><script defer src="/assets/home-menu.js"></script><script defer src="/assets/page-return.js"></script><script defer src="/assets/site-analytics.js?v=owner-exclude-20261121"></script><script defer src="/assets/site-visitor.js?v=owner-exclude-20261121"></script></body></html>');
 }
 function monthSpan(){
  const now=dateNow(),first=now.year+'-'+pad(now.month)+'-01';
