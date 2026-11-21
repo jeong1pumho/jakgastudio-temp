@@ -2,13 +2,19 @@
 'use strict';
 if(location.hostname!=='jakgastudio-temp.vercel.app'||/^\/(?:admin|api)(?:\/|$)/.test(location.pathname))return;
 const ck='jakgastudio.visitor-insights-consent.v1',ex='jakgastudio.analytics-excluded.v1',last='jakgastudio.visit-last-path.v1';
+const exclusionCookie='jakgastudio_analytics_excluded_v1';
+const excluded=()=>{
+ const value=document.cookie.split(';').map(x=>x.trim()).find(x=>x.startsWith(exclusionCookie+'='))?.slice(exclusionCookie.length+1);
+ if(value==='1'||value==='0')return value==='1';
+ return get(ex)==='1';
+};
 const valid=/^\/(?:$|news(?:\/[a-z0-9-]{1,90})?|books(?:\/[a-z0-9-]{1,90})?|calendar(?:\/events\/[a-f0-9-]{36})?|programs(?:\/[a-z0-9-]{1,90})?|space|visit)$/i;
 const page=valid.test(location.pathname)?location.pathname:null;
 function get(k,s=localStorage){try{return s.getItem(k)}catch{return null}}
 function put(k,v,s=localStorage){try{s.setItem(k,v)}catch{}}
-if(get(ex)==='1')return;
+if(excluded())return;
 function emit(kind,path,detail){
- if(get(ck)!=='yes'||get(ex)==='1'||!path||!valid.test(path))return;
+ if(get(ck)!=='yes'||excluded()||!path||!valid.test(path))return;
  fetch('/api/visit-analytics',{method:'POST',headers:{'Content-Type':'application/json'},
  body:JSON.stringify({kind,path,detail}),keepalive:true,credentials:'omit'}).catch(()=>{});
 }
@@ -23,21 +29,21 @@ function source(){
  }catch{return '출처 미확인'}
 }
 function clarity(id){
- if(!/^[a-z0-9]{5,24}$/i.test(id||'')||window.clarity)return;
+ if(!/^[a-z0-9]{5,24}$/i.test(id||'')||excluded()||window.clarity)return;
  (function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
  t=l.createElement(r);t.async=1;t.src='https://www.clarity.ms/tag/'+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
  })(window,document,'clarity','script',id);
 }
 function start(){
- if(!page||get(ck)!=='yes')return;
+ if(!page||get(ck)!=='yes'||excluded())return;
  emit('page_view',page,source());
  const before=get(last,sessionStorage);
  if(before&&before!==page&&valid.test(before))emit('transition',before,page);
  put(last,page,sessionStorage);
- fetch('/api/visit-analytics?config=1',{cache:'no-store'}).then(x=>x.ok?x.json():null).then(x=>{if(get(ck)==='yes'&&get(ex)!=='1')clarity(x?.projectId)}).catch(()=>{});
+ fetch('/api/visit-analytics?config=1',{cache:'no-store'}).then(x=>x.ok?x.json():null).then(x=>{if(get(ck)==='yes'&&!excluded())clarity(x?.projectId)}).catch(()=>{});
 }
 document.addEventListener('click',e=>{
- if(!page||get(ck)!=='yes'||!(e.target instanceof Element))return;
+ if(!page||get(ck)!=='yes'||excluded()||!(e.target instanceof Element))return;
  const a=e.target.closest('a[href],button');if(!a)return;
  let detail='';
  if(a.matches('a[href]')){

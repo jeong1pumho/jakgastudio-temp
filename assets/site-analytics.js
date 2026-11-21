@@ -2,7 +2,12 @@
  'use strict';
  if(location.hostname!=='jakgastudio-temp.vercel.app'||/^\/(?:admin|api)(?:\/|$)/.test(location.pathname))return;
  const EXCLUDE_KEY='jakgastudio.analytics-excluded.v1';
- const excluded=()=>{try{return localStorage.getItem(EXCLUDE_KEY)==='1';}catch{return false;}};
+ const COOKIE_KEY='jakgastudio_analytics_excluded_v1';
+ const excluded=()=>{
+  const value=document.cookie.split(';').map(x=>x.trim()).find(x=>x.startsWith(COOKIE_KEY+'='))?.slice(COOKIE_KEY.length+1);
+  if(value==='1'||value==='0')return value==='1';
+  try{return localStorage.getItem(EXCLUDE_KEY)==='1';}catch{return false;}
+ };
  let measurementId;
  const syncExclusion=()=>{
   if(measurementId)window['ga-disable-'+measurementId]=excluded();

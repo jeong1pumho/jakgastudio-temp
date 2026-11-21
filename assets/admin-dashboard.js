@@ -10,9 +10,36 @@
  const smsStatus='https://qrbavxempotptnmflqoq.supabase.co/functions/v1/studio-sms-news';
  let generation=0;
  const EXCLUDE_KEY='jakgastudio.analytics-excluded.v1';
+ const EXCLUSION_COOKIE='jakgastudio_analytics_excluded_v1';
+ function cookieState(){
+  const match=document.cookie.split(';').map(x=>x.trim()).find(x=>x.startsWith(EXCLUSION_COOKIE+'='));
+  const value=match?.slice(EXCLUSION_COOKIE.length+1);
+  return value==='1'||value==='0'?value:null;
+ }
+ function setExclusionCookie(value){
+  const shared=location.hostname==='jakgastudio.com'||location.hostname==='www.jakgastudio.com';
+  document.cookie=EXCLUSION_COOKIE+'='+value+'; Path=/; Max-Age=31536000; SameSite=Lax; Secure'+(shared?'; Domain=jakgastudio.com':'');
+  return cookieState()===value;
+ }
+ function isExcluded(){
+  const cookie=cookieState();
+  if(cookie!==null)return cookie==='1';
+  const local=localStorage.getItem(EXCLUDE_KEY);
+  if(local==='1')setExclusionCookie('1');
+  return local==='1';
+ }
+ function enforceAdminExclusion(){
+  try{
+   localStorage.setItem(EXCLUDE_KEY,'1');
+   if(!setExclusionCookie('1'))throw Error('cookie blocked');
+   renderPreference();
+  }catch{
+   $('traffic-preference-status').textContent='관리자 자동 제외 설정을 저장하지 못했습니다. 브라우저 쿠키·사이트 데이터 허용 설정을 확인해 주세요.';
+  }
+ }
  function renderPreference(){
   try{
-   const excluded=localStorage.getItem(EXCLUDE_KEY)==='1';
+   const excluded=isExcluded();
    $('traffic-exclude').textContent=excluded?'방문 집계 다시 허용':'이 브라우저 방문 집계 제외';
    $('traffic-exclude').setAttribute('aria-pressed',String(excluded));
    $('traffic-preference-status').textContent=excluded?'이 브라우저: 방문 집계 제외 중':'이 브라우저: 방문 집계 허용 중';
@@ -23,9 +50,9 @@
  }
  $('traffic-exclude').addEventListener('click',()=>{
   try{
-   const next=localStorage.getItem(EXCLUDE_KEY)!=='1'?'1':'0';
+   const next=isExcluded()?'0':'1';
    localStorage.setItem(EXCLUDE_KEY,next);
-   if(localStorage.getItem(EXCLUDE_KEY)!==next)throw Error('저장 실패');
+   if(localStorage.getItem(EXCLUDE_KEY)!==next||!setExclusionCookie(next))throw Error('저장 실패');
    renderPreference();
   }catch{
    $('traffic-preference-status').textContent='설정을 저장하지 못했습니다. 브라우저의 사이트 데이터 허용 설정을 확인해 주세요.';
@@ -72,6 +99,7 @@
    const cards={
     traffic:async()=>{
      const data=await request('/api/visit-analytics',token);
+     if(run===generation)enforceAdminExclusion();
      const clarity=data.clarity||{};
      if(!clarity.projectConfigured||!clarity.apiConfigured)
       return ['Clarity 연동 설정 대기',['Microsoft Clarity 연결 상태를 확인해 주세요.']];
@@ -161,6 +189,7 @@
   try{
    const data=await request('/api/admin',null,{action:'login',email:fields.get('email').trim(),password:fields.get('password')});
    if(!session.save(data.token,data.expires_in,data.refresh_token))throw Error('로그인 정보를 저장하지 못했습니다.');
+   enforceAdminExclusion();
    form.reset();
    await load();
   }catch(error){$('message').textContent=error.message;}
