@@ -97,7 +97,7 @@ td.actions{white-space:nowrap}
 .sc-entry.opening .sc-kind{white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:break-word;word-break:keep-all;font-size:12px;line-height:1.4}
 .sc-control:disabled{cursor:not-allowed;opacity:.55;background:#f4f1ee}
 </style>
-<link rel="stylesheet" href="/assets/schedule.css">
+<link rel="stylesheet" href="/assets/schedule.css?v=calendar-title-20261121">
 <link rel="stylesheet" href="/assets/admin-topbar.css?v=20261112"><script defer src="/assets/admin-topbar.js?v=20261112"></script></head>
 <body><header id="admin-topbar"><a class="admin-top-brand" href="/admin/">작가작업실 JEJU <small>관리자</small></a><nav aria-label="관리자 메뉴"><a class="admin-top-link" href="/admin/">Home</a><a class="admin-top-link" href="/admin/analytics.html">방문 분석</a><a class="admin-top-link" href="/admin/key-visual.html">Key Visual</a><a class="admin-top-link" href="/admin/books.html">작가 추천 도서</a><a class="admin-top-link" href="/admin/news.html">모임·행사</a><a class="admin-top-link" href="/admin/schedule.html" aria-current="page">월간 캘린더</a><a class="admin-top-link" href="/admin/space.html">공간 소개</a><a class="admin-top-link" href="/admin/sms.html">문자 알림</a><button type="button" class="admin-top-link" id="logout" hidden>로그아웃</button></nav></header>
 <div class="container">
@@ -112,7 +112,7 @@ td.actions{white-space:nowrap}
  </form>
 </section>
 <section id="adminView" hidden>
- <div class="page-head"><div><h1>스케줄 관리</h1><p class="note">모임·대관·추가 구분을 등록합니다. 자유방문은 자동 계산됩니다.</p></div><button id="newBtn" class="btn" type="button">+ 일정 등록</button></div>
+ <div class="page-head"><div><h1>스케줄 관리</h1><p class="note">작가작업실 JEJU 운영 일정·대관·추가 구분을 등록합니다. 자유방문은 자동 계산됩니다.</p></div><button id="newBtn" class="btn" type="button">+ 일정 등록</button></div>
  <section id="scheduleFormPanel" class="card" hidden>
   <div class="edit-head"><h2 id="formHeading">일정 등록</h2><button type="button" id="cancelTop" class="btn secondary small">닫기</button></div>
   <form id="eventForm">
@@ -121,13 +121,13 @@ td.actions{white-space:nowrap}
     <div class="field-row"><label for="eventDate">날짜</label><div class="date-with-weekday"><input class="field" id="eventDate" type="date" min="2026-10-22" required><span id="eventWeekday" class="weekday-value" aria-live="polite"></span></div></div>
     <div class="field-row"><label for="eventType">캘린더 구분</label>
      <select class="field" id="eventType" required>
-      <option value="meeting">모임</option><option value="rental">대관</option><option value="closure">임시 휴무</option>
+      <option value="meeting">작가작업실 JEJU</option><option value="rental">대관</option><option value="closure">임시 휴무</option>
       <option value="free" disabled>자유방문 (자동 계산)</option>
       <option value="custom">+ 구분 직접 입력</option>
      </select>
     </div>
    </div>
-   <div class="field-row" id="customRow" hidden><label for="customLabel">추가 구분 이름</label><input class="field" id="customLabel" maxlength="50" placeholder="예: 북토크, 촬영, 특별행사"><p class="form-help">월간 캘린더에서는 한 줄로만 표시되고 길면 …으로 생략됩니다.</p></div>
+   <div class="field-row" id="customRow" hidden><label for="customLabel">추가 구분 이름</label><input class="field" id="customLabel" maxlength="50" placeholder="예: 북토크, 촬영, 특별행사"><p class="form-help">월간 캘린더에서는 행사 제목을 최대 두 줄로 표시하며 길면 …으로 생략됩니다.</p></div>
    <div class="field-row"><label for="eventTitle">모임·일정 타이틀</label><input class="field" id="eventTitle" maxlength="150" required placeholder="예: 에세이 글쓰기 모임"></div>
    <div class="field-row">
     <label for="memoEditor">메모 (선택)</label>
@@ -161,7 +161,7 @@ td.actions{white-space:nowrap}
     <div style="text-align:right"><strong style="font-size:16px">09:00 – 17:00</strong><small>일/월 정기휴무</small></div>
    </div>
    <div class="sc-legend" aria-label="스케줄 표시 구분">
-    <span class="sc-legend-item"><i class="sc-dot meeting"></i> 모임</span>
+    <span class="sc-legend-item"><i class="sc-dot meeting"></i> 작가작업실 JEJU</span>
     <span class="sc-legend-item"><i class="sc-dot rental"></i> 대관</span>
     <span class="sc-legend-item"><i class="sc-dot free"></i> 자유방문</span>
     <span class="sc-legend-item"><i class="sc-dot custom"></i> 특별일정</span>
@@ -210,7 +210,7 @@ td.actions{white-space:nowrap}
  const pad=n=>String(n).padStart(2,'0');
  const monthKey=()=>year+'-'+pad(month);
  const todayKey=()=>part('year')+'-'+pad(part('month'))+'-'+pad(part('day'));
- const label=x=>x.category==='meeting'?'모임':x.category==='rental'?'대관':x.category==='closure'?'임시 휴무':x.category==='opening'?'OPEN':x.category_label||'기타';
+ const label=x=>x.category==='meeting'?'작가작업실 JEJU':x.category==='rental'?'대관':x.category==='closure'?'임시 휴무':x.category==='opening'?'OPEN':x.category_label||'기타';
  const weekNames=['일','월','화','수','목','금','토'];
  function syncWeekday(){
   const value=$('eventDate').value;
@@ -254,7 +254,7 @@ td.actions{white-space:nowrap}
  }
  function text(tag,cls,value){const e=document.createElement(tag);if(cls)e.className=cls;if(value!==undefined)e.textContent=value;return e;}
  const weekdays=['일','월','화','수','목','금','토'];
- const categories={meeting:'모임',rental:'대관',free:'자유방문',closure:'임시 휴무',opening:'OPEN'};
+ const categories={meeting:'작가작업실 JEJU',rental:'대관',free:'자유방문',closure:'임시 휴무',opening:'OPEN'};
  const dayKey=(y,m,d)=>y+'-'+pad(m)+'-'+pad(d);
  const dayOf=(y,m,d)=>new Date(Date.UTC(y,m-1,d)).getUTCDay();
  const minutes=s=>Number(s.slice(0,2))*60+Number(s.slice(3,5));

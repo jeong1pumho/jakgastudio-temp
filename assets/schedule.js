@@ -3,7 +3,7 @@
  if(!host)return;
  const $=id=>host.querySelector('#'+id);
  const weekdays=['일','월','화','수','목','금','토'];
- const names={meeting:'모임',rental:'대관',free:'자유방문',closure:'임시 휴무',opening:'OPEN'};
+ const names={meeting:'작가작업실 JEJU',rental:'대관',free:'자유방문',closure:'임시 휴무',opening:'OPEN'};
  const OPEN_DATE='2026-10-22',OPEN_MONTH='2026-10';
  const now=new Date();
  // Calendar date is interpreted in Korea, independently of the client's local timezone.
@@ -89,7 +89,8 @@
    else {
     for(const e of data.events.slice(0,4)){
      const chip=text('span','sc-entry '+classFor(e));
-     const name=text('strong','sc-kind',e.category==='opening'?eventTitle(e):titleFor(e));name.title=e.category==='opening'?eventTitle(e):titleFor(e);
+     const shownTitle=e.category==='free'?titleFor(e):(eventTitle(e)||titleFor(e));
+     const name=text('strong','sc-kind',shownTitle);name.title=shownTitle;
      chip.appendChild(name);
      if(e.category!=='opening')chip.appendChild(text('span','sc-clock',rangeFor(e)));
      if(e.lunch_excluded)chip.appendChild(text('span','sc-lunch','(점심시간 12-13시)'));
