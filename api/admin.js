@@ -10,6 +10,8 @@ function validCalendarDate(value){
 }
 module.exports=async(req,res)=>{try{
  if(req.query?.action==='analytics')return require('../lib/site-analytics')(req,res);
+ if(req.query?.action==='visit-analytics')return require('../lib/visit-analytics')(req,res);
+ if(req.query?.action==='clarity-collect')return require('../lib/clarity-collect')(req,res);
  if(req.method==='GET'&&req.query.action==='config')return send(res,200,{configured:ready(),url:root(),key:key(),maxPhotos:MAX_PHOTOS});
  if(req.method==='POST'&&req.body?.action==='refresh'){
   const refreshToken=req.body.refresh_token;
