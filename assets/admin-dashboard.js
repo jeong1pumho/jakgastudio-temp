@@ -71,16 +71,38 @@
    const month=today.slice(0,7);
    const cards={
     traffic:async()=>{
-     const data=await request('/api/admin?action=analytics&report=1',token);
-     if(data.status==='unconfigured')return ['GA4 연결 대기',['운영 측정 ID와 관리자 보고서 설정이 필요합니다.']];
-     if(data.status==='report_unconfigured')return ['수집 설정됨 · 보고서 연결 대기',['GA4 보고서 조회 권한을 설정해 주세요.']];
-     const number=new Intl.NumberFormat('ko-KR');
-     return ['방문 '+number.format(data.sessions)+'회 · 조회 '+number.format(data.views)+'회',[
-      '방문당 평균 참여 '+number.format(data.averageSeconds)+'초',
-      ...data.sources.map(row=>'유입 · '+row.label+' '+number.format(row.count)+'회'),
-      ...data.landings.map(row=>'첫 페이지 · '+row.label+' '+number.format(row.count)+'회'),
-      ...data.actions.map(row=>row.label+' '+number.format(row.count)+'회')
+     const data=await request('/api/visit-analytics',token);
+     const clarity=data.clarity||{};
+     if(!clarity.projectConfigured||!clarity.apiConfigured)
+      return ['Clarity 연동 설정 대기',['Microsoft Clarity 연결 상태를 확인해 주세요.']];
+     const snapshots=clarity.latest||{};
+     const overall=snapshots.Overall;
+     if(!overall)return ['Clarity 집계 대기',[
+      'Clarity 연결 완료 · 첫 정기 수집 결과가 아직 없습니다.',
+      '수집된 통계가 들어오면 방문 세션·방문자·유입 출처를 표시합니다.'
      ]];
+     const number=new Intl.NumberFormat('ko-KR');
+     const metric=(record,name)=>{
+      const rows=Array.isArray(record?.payload)?record.payload:[];
+      const information=rows.find(row=>row.metricName===name)?.information;
+      return Array.isArray(information)?information:[];
+     };
+     const numeric=value=>value!==undefined&&value!==null&&value!==''&&Number.isFinite(Number(value))
+      ?number.format(Number(value)):null;
+     const total=metric(overall,'Traffic')[0]||{};
+     const sessions=numeric(total.totalSessionCount);
+     const visitors=numeric(total.distinctUserCount??total.distantUserCount??total.totalDistinctUserCount);
+     const lines=[];
+     if(Number.isFinite(Date.parse(overall.collected_at)))
+      lines.push('최근 수집 · '+new Date(overall.collected_at).toLocaleString('ko-KR',{timeZone:'Asia/Seoul'}));
+     lines.push('집계 기준 · 최근 24시간 이동 구간(UTC)');
+     for(const [dimension,title] of [['Channel','유입 채널'],['Source','유입 출처']]){
+      for(const row of metric(snapshots[dimension],'Traffic').filter(item=>typeof item?.[dimension]==='string').slice(0,3)){
+       const count=numeric(row.totalSessionCount);
+       if(count!==null)lines.push(title+' · '+row[dimension]+' '+count+'회');
+      }
+     }
+     return ['방문 세션 '+(sessions??'—')+'회 · 방문자 '+(visitors??'—')+'명',lines];
     },
     calendar:async()=>{
      const {items}=await request('/api/schedule?month='+month);
