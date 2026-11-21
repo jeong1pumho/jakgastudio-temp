@@ -13,6 +13,12 @@ const page=valid.test(location.pathname)?location.pathname:null;
 function get(k,s=localStorage){try{return s.getItem(k)}catch{return null}}
 function put(k,v,s=localStorage){try{s.setItem(k,v)}catch{}}
 if(excluded())return;
+// A previously open public tab must stop tracking when the admin excludes this browser.
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&excluded())location.reload();});
+window.addEventListener('pageshow',()=>{if(excluded())location.reload();});
+window.addEventListener('storage',event=>{
+ if((event.key===ex||event.key===null)&&excluded())location.reload();
+});
 function emit(kind,path,detail){
  if(get(ck)!=='yes'||excluded()||!path||!valid.test(path))return;
  fetch('/api/visit-analytics',{method:'POST',headers:{'Content-Type':'application/json'},
