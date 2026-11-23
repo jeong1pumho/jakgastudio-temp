@@ -7,7 +7,7 @@
 const {nav}=require('../lib/home-content');
 const {query,ready,esc}=require('../lib/core');
 const {renderContent}=require('../lib/rich');
-const {origin,robots,jsonLd,faviconLinks}=require('../lib/seo');
+const {origin,robots,jsonLd,faviconLinks,safeImage,plainDescription}=require('../lib/seo');
 const {publicCalendarEnd}=require('../lib/public-calendar-range');
 const idPattern=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const COLS='id,event_date,category,category_label,title,start_time,end_time,updated_at';
@@ -28,8 +28,9 @@ function prettyDate(d){return d.replace(/-/g,'.')+' ('+weekday(d)+')';}
 function safeTitle(v){return String(v??'').trim().slice(0,150);}
 // Structured data for real, public calendar meetings and special sessions only.
 // Marketing posts and private rentals are never passed to this handler.
-function eventSchema(base,e,date,title,description){
+function eventSchema(base,e,date,title,description,linked=null){
  const url=base+'/calendar/events/'+e.id;
+ const newsUrl=linked?.slug?base+'/news/'+encodeURIComponent(linked.slug):url;
  return {'@type':'Event','@id':url+'#event',url,name:title,description,
   startDate:date+'T'+onlyTime(e.start_time)+':00+09:00',
   endDate:date+'T'+onlyTime(e.end_time)+':00+09:00',
@@ -38,6 +39,8 @@ function eventSchema(base,e,date,title,description){
   location:{'@type':'Place',name:place.name,address:{'@type':'PostalAddress',
     streetAddress:'이호일동 375-3 1층',addressLocality:'제주시',
     addressRegion:'제주특별자치도',addressCountry:'KR'}},
+  ...(linked?.cover?{image:linked.cover}:{}),
+  ...(linked&&Number.isInteger(linked.price_krw)?{offers:{'@type':'Offer',price:linked.price_krw,priceCurrency:'KRW',url:newsUrl}}:{}),
   ...(e.category==='meeting'?{organizer:{'@id':base+'/#bookstore','@type':'BookStore',name:webName,url:base+'/'}}:{}),
   ...(e.updated_at?{dateModified:e.updated_at}:{})};
 }
@@ -51,7 +54,7 @@ function output(req,res,status,title,description,body,meta={}){
   '<meta property="og:title" content="'+esc(title)+'">'+
   '<meta property="og:description" content="'+esc(description)+'">'+
   '<script type="application/ld+json">'+jsonLd(meta.schema?{'@context':'https://schema.org','@graph':[headSchema,require('../lib/search-info').breadcrumb(base,[['월간 캘린더','/calendar'],[headSchema.name,meta.path]])]}:headSchema)+'</script>'+require('../lib/search-info').sharing(base,title,description);
- const css='*{box-sizing:border-box}body{margin:0;font-family:"Apple SD Gothic Neo","Malgun Gothic",sans-serif;background:#fffdfa;color:#38332e;line-height:1.75}a{color:inherit}a:focus-visible{outline:2px solid #a37d67;outline-offset:3px}.bar{background:#302d2a;color:white;padding:19px 24px}.bar-inner{max-width:1000px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}.bar a{text-decoration:none}.brand{font-size:18px;font-weight:600}.bar .back{font-size:13px}.container{max-width:1000px;margin:0 auto;padding:42px 22px 85px}.eyebrow{font-size:12px;letter-spacing:.19em;font-weight:600;color:#aa8674;margin:0 0 18px}h1{font-size:32px;font-weight:500;letter-spacing:-.045em;line-height:1.4;margin:0 0 18px}h2{font-size:21px;font-weight:600;margin:28px 0 14px}p{margin:0 0 16px}.lead{color:#75695e;font-size:15px}.hint{font-size:13px;color:#796e64;background:#f4efe9;padding:15px 19px;border-radius:5px}.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin:24px 0 34px}.card{display:block;background:#fff;border:1px solid #e4ddd6;border-left:4px solid #ad705b;border-radius:5px;padding:20px 22px;text-decoration:none}.card:hover{background:#faf5f0}.card .cat{display:block;color:#8e6954;font-size:12px;margin-bottom:5px}.card strong{display:block;font-size:18px;line-height:1.55}.card time{display:block;color:#6f665e;margin-top:10px;font-size:14px}.details{border-top:1px solid #ded6ce;border-bottom:1px solid #ded6ce;margin:28px 0;padding:20px 0}.event-memo{overflow-wrap:anywhere}.event-memo p{margin:0}.event-memo .legacy-text{white-space:pre-wrap}.muted{color:#82776d;font-size:13px}.links{margin-top:28px;display:flex;gap:18px;flex-wrap:wrap}.links a{font-size:14px;color:#7d5542}.empty{padding:50px 0;color:#81756b;text-align:center}@media(max-width:660px){.container{padding:28px 17px 60px}.cards{grid-template-columns:1fr}h1{font-size:26px}.brand{font-size:15px}.bar{padding:15px}.card strong{font-size:16px}}';
+ const css='*{box-sizing:border-box}body{margin:0;font-family:"Apple SD Gothic Neo","Malgun Gothic",sans-serif;background:#fffdfa;color:#38332e;line-height:1.75}a{color:inherit}a:focus-visible{outline:2px solid #a37d67;outline-offset:3px}.bar{background:#302d2a;color:white;padding:19px 24px}.bar-inner{max-width:1000px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}.bar a{text-decoration:none}.brand{font-size:18px;font-weight:600}.bar .back{font-size:13px}.container{max-width:1000px;margin:0 auto;padding:42px 22px 85px}.eyebrow{font-size:12px;letter-spacing:.19em;font-weight:600;color:#aa8674;margin:0 0 18px}h1{font-size:32px;font-weight:500;letter-spacing:-.045em;line-height:1.4;margin:0 0 18px}h2{font-size:21px;font-weight:600;margin:28px 0 14px}p{margin:0 0 16px}.lead{color:#75695e;font-size:15px}.hint{font-size:13px;color:#796e64;background:#f4efe9;padding:15px 19px;border-radius:5px}.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin:24px 0 34px}.card{display:block;background:#fff;border:1px solid #e4ddd6;border-left:4px solid #ad705b;border-radius:5px;padding:20px 22px;text-decoration:none}.card:hover{background:#faf5f0}.card .cat{display:block;color:#8e6954;font-size:12px;margin-bottom:5px}.card strong{display:block;font-size:18px;line-height:1.55}.card time{display:block;color:#6f665e;margin-top:10px;font-size:14px}.details{border-top:1px solid #ded6ce;border-bottom:1px solid #ded6ce;margin:28px 0;padding:20px 0}.event-memo{overflow-wrap:anywhere}.related-event{border-top:1px solid #e2d9d0;margin:24px 0;padding:20px 0}.related-event img{display:block;width:100%;max-width:580px;height:auto;border-radius:4px;margin-bottom:16px}.related-event a{color:#7d5542}.related-event p{margin:0 0 11px}.related-price{font-weight:650}.event-memo p{margin:0}.event-memo .legacy-text{white-space:pre-wrap}.muted{color:#82776d;font-size:13px}.links{margin-top:28px;display:flex;gap:18px;flex-wrap:wrap}.links a{font-size:14px;color:#7d5542}.empty{padding:50px 0;color:#81756b;text-align:center}@media(max-width:660px){.container{padding:28px 17px 60px}.cards{grid-template-columns:1fr}h1{font-size:26px}.brand{font-size:15px}.bar{padding:15px}.card strong{font-size:16px}}';
  res.statusCode=status;
  res.setHeader('Content-Type','text/html; charset=utf-8');
  res.setHeader('Cache-Control','public, max-age=0, s-maxage=180');
@@ -89,13 +92,28 @@ module.exports=async(req,res)=>{
    const eventDesc=prettyDate(date)+' '+onlyTime(e.start_time)+'–'+onlyTime(e.end_time)+' · '+categoryName(e)+
      ' · '+place.address;
    const memo=await query('/rest/v1/rpc/public_calendar_event_memo?p_event_id='+encodeURIComponent(e.id));
+   const links=await query('/rest/v1/calendar_event_news?select=price_krw,news_posts(slug,title,content,images,cover_index)&event_id=eq.'+
+    encodeURIComponent(e.id)+'&limit=1');
+   const link=links[0],post=Array.isArray(link?.news_posts)?link.news_posts[0]:link?.news_posts;
+   const images=Array.isArray(post?.images)?post.images:[];
+   const cover=safeImage(images[post?.cover_index]||images[0]);
+   const linked=post?.slug?{slug:post.slug,title:String(post.title||'').slice(0,150),
+    description:plainDescription(post.content,240),cover,
+    price_krw:Number.isInteger(link?.price_krw)?link.price_krw:null}:null;
+   const newsHref=linked?'/news/'+encodeURIComponent(linked.slug):'';
+   const structuredDesc=eventDesc+(linked?.description?' · '+linked.description:'');
    const body='<p class="eyebrow">CALENDAR / 일정 상세</p>'+
     '<h1>'+esc(title)+'</h1><p class="lead">'+esc(eventDesc)+'</p>'+
     (memo?.trim()?'<div class="details event-memo">'+renderContent(memo)+'</div>':'')+
+    (linked?'<section class="related-event" aria-label="연결된 모임·행사">'+
+     (linked.cover?'<a href="'+esc(newsHref)+'"><img src="'+esc(linked.cover)+'" alt="'+esc(linked.title)+' 대표 이미지" loading="lazy"></a>':'')+
+     (linked.price_krw!==null?'<p class="related-price">참가비: 1인 '+linked.price_krw.toLocaleString('ko-KR')+'원</p>':'')+
+     (linked.description?'<p>'+esc(linked.description)+'</p>':'')+
+     '<p><a href="'+esc(newsHref)+'">모임·행사 소개 및 신청 안내 보기</a></p></section>':'')+
     '<p class="hint">이 페이지는 월간 캘린더에 공개된 일정 정보입니다. 참가·예약 가능 여부와 신청 방법은 별도로 확인해 주세요.</p>'+
     '<div class="links"><a href="/news">모임·행사 확인</a></div>';
    return output(req,res,200,title+' | 제주 '+categoryName(e)+' · '+webName,eventDesc,body,{
-    path:urlPath,schema:eventSchema(base,e,date,title,eventDesc)
+    path:urlPath,schema:eventSchema(base,e,date,title,structuredDesc,linked)
    });
   }
   // Avoid endless /calendar?year=... crawling: one bounded rolling list of events.

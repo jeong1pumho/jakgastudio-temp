@@ -131,6 +131,16 @@ td.actions{white-space:nowrap}
    </div>
    <div class="field-row" id="customRow" hidden><label for="customLabel">추가 구분 이름</label><input class="field" id="customLabel" maxlength="50" placeholder="예: 북토크, 촬영, 특별행사"><p class="form-help">월간 캘린더에서는 행사 제목을 최대 두 줄로 표시하며 길면 …으로 생략됩니다.</p></div>
    <div class="field-row"><label for="eventTitle">모임·일정 타이틀</label><input class="field" id="eventTitle" maxlength="150" required placeholder="예: 에세이 글쓰기 모임"></div>
+   <div class="field-row" id="newsLinkRow">
+    <label for="newsPostSelect">연결할 모임·행사 게시물 (선택)</label>
+    <select class="field" id="newsPostSelect"><option value="">연결하지 않음</option></select>
+    <p class="form-help">연결된 게시물의 대표 사진과 소개를 행사 상세 및 검색 정보에 재사용합니다.</p>
+   </div>
+   <div class="field-row" id="seoPriceRow" hidden>
+    <label for="seoPrice">1인 참가비 (원, 선택)</label>
+    <input class="field" id="seoPrice" type="number" min="0" max="10000000" step="1" inputmode="numeric" placeholder="예: 30000 (무료면 0)">
+    <p class="form-help">실제 공개 금액과 일치하도록 입력하세요. 미정이면 비워 두며 메모의 금액은 자동 추출하지 않습니다.</p>
+   </div>
    <div class="field-row">
     <label for="memoEditor">메모 (선택)</label>
     <div class="memo-tools" aria-label="메모 서식">
@@ -203,7 +213,7 @@ td.actions{white-space:nowrap}
 <script>
 (()=>{'use strict';
  const $=id=>document.getElementById(id);
- let token='',items=[],holidays={},busy=false,requestSeq=0,selectedDate=null;
+ let token='',items=[],holidays={},newsOptions=[],busy=false,requestSeq=0,selectedDate=null;
  const sharedSession=window.JAKAdminSession;
  const fmt=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Seoul',year:'numeric',month:'numeric',day:'numeric'});
  const todayParts=fmt.formatToParts(new Date()),part=k=>Number(todayParts.find(p=>p.type===k)?.value||0);
@@ -233,12 +243,26 @@ td.actions{white-space:nowrap}
   if(!response.ok){const err=Error(body.error||'요청에 실패했습니다. (HTTP '+response.status+')');err.status=response.status;throw err;}
   return body;
  }
+ function fillNewsOptions(){
+  const select=$('newsPostSelect'),chosen=select.value;
+  select.replaceChildren(new Option('연결하지 않음',''));
+  for(const post of newsOptions)select.add(new Option(post.title+(post.event_date_start?' · '+post.event_date_start:''),post.id));
+  if([...select.options].some(option=>option.value===chosen))select.value=chosen;
+  syncLink();
+ }
+ function syncLink(){
+  const enabled=['meeting','custom'].includes($('eventType').value);
+  $('newsLinkRow').hidden=!enabled;
+  if(!enabled)$('newsPostSelect').value='';
+  $('seoPriceRow').hidden=!enabled||!$('newsPostSelect').value;
+  if($('seoPriceRow').hidden)$('seoPrice').value='';
+ }
  function newEvent(preferredDate){
   $('eventForm').reset();$('eventId').value='';$('memoEditor').innerHTML='';
   const candidate=typeof preferredDate==='string'?preferredDate:(todayKey().startsWith(monthKey())?todayKey():monthKey()+'-01');
   $('eventDate').value=candidate<OPEN_DATE?OPEN_DATE:candidate;
   $('eventType').value='meeting';$('eventStart').value='10:00';$('eventEnd').value='12:00';
-  $('formHeading').textContent='새 일정 등록';syncCustom();syncWeekday();toggleForm(true);notice('');
+  $('formHeading').textContent='새 일정 등록';syncCustom();syncLink();syncWeekday();toggleForm(true);notice('');
  }
  function syncCustom(){
   const category=$('eventType').value,custom=category==='custom',closure=category==='closure';
@@ -251,7 +275,7 @@ td.actions{white-space:nowrap}
   $('eventId').value=e.id;$('eventDate').value=e.event_date;
   $('eventType').value=e.category;$('customLabel').value=e.category_label||'';
   $('eventTitle').value=e.title;$('memoEditor').innerHTML=e.memo||'';$('eventStart').value=hhmm(e.start_time);$('eventEnd').value=hhmm(e.end_time);
-  $('formHeading').textContent='일정 수정';syncCustom();syncWeekday();if(e.category==='custom')$('customLabel').value=e.category_label||'';
+  $('formHeading').textContent='일정 수정';syncCustom();$('newsPostSelect').value=e.news_post_id||'';syncLink();$('seoPrice').value=e.price_krw??'';syncWeekday();if(e.category==='custom')$('customLabel').value=e.category_label||'';
   notice('');toggleForm(true);
  }
  function text(tag,cls,value){const e=document.createElement(tag);if(cls)e.className=cls;if(value!==undefined)e.textContent=value;return e;}
@@ -376,7 +400,7 @@ td.actions{white-space:nowrap}
    const data=await api('/api/schedule-admin?month='+monthKey());
    if(id!==requestSeq)return;
    items=Array.isArray(data.items)?data.items:[];
-   holidays=data.holidays||{};
+   holidays=data.holidays||{};newsOptions=Array.isArray(data.news_options)?data.news_options:[];fillNewsOptions();
    render();
    if(focusDate&&focusDate.slice(0,7)===monthKey())showDay(focusDate);
    else{selectedDate=null;$('sc-detail-view').hidden=true;$('sc-month').hidden=false;}
@@ -392,9 +416,10 @@ td.actions{white-space:nowrap}
  }
  $('eventType').addEventListener('change',()=>{
   const leavingClosure=$('eventStart').disabled&&$('eventType').value!=='closure';
-  syncCustom();
+  syncCustom();syncLink();
   if(leavingClosure){$('eventStart').value='10:00';$('eventEnd').value='12:00';}
  });
+ $('newsPostSelect').addEventListener('change',syncLink);
  $('eventDate').addEventListener('input',syncWeekday);
  $('eventDate').addEventListener('change',syncWeekday);
  $('newBtn').addEventListener('click',()=>newEvent());
@@ -437,7 +462,7 @@ td.actions{white-space:nowrap}
   if(overlap)return notice('등록 불가: '+overlap.title+' ('+(overlap.category==='closure'?'종일 휴무':hhmm(overlap.start_time)+'–'+hhmm(overlap.end_time))+') 일정과 겹칩니다.',true);
   const memo=$('memoEditor').innerHTML.trim();
   if(memo.length>30000)return notice('메모가 너무 깁니다. 내용을 줄여 주세요.',true);
-  const body={id,event_date:date,category,category_label:categoryLabel,title,memo,start_time:closure?null:start,end_time:closure?null:end};
+  const body={id,event_date:date,category,category_label:categoryLabel,title,memo,start_time:closure?null:start,end_time:closure?null:end,news_post_id:$('newsPostSelect').value,price_krw:$('seoPrice').value};
   busy=true;$('saveBtn').disabled=true;notice('일정을 저장하는 중입니다.');
   try{
    await api('/api/schedule-admin',{method:id?'PATCH':'POST',body:JSON.stringify(body)});
@@ -454,7 +479,7 @@ td.actions{white-space:nowrap}
   }catch(err){notice('로그인 실패: '+err.message,true);}
   finally{$('loginBtn').disabled=false;}
  });
- $('logout').addEventListener('click',()=>{token='';sharedSession?.clear();items=[];holidays={};requestSeq++;selectedDate=null;$('memoEditor').innerHTML='';$('adminView').hidden=true;$('loginView').hidden=false;$('logout').hidden=true;$('eventForm').reset();notice('로그아웃했습니다.');});
+ $('logout').addEventListener('click',()=>{token='';sharedSession?.clear();items=[];holidays={};newsOptions=[];requestSeq++;selectedDate=null;$('memoEditor').innerHTML='';$('adminView').hidden=true;$('loginView').hidden=false;$('logout').hidden=true;$('eventForm').reset();notice('로그아웃했습니다.');});
  async function restoreAdminSession(){
   const cached=sharedSession?.read();
   if(!cached)return;
@@ -463,7 +488,7 @@ td.actions{white-space:nowrap}
   try{
    const payload=await api('/api/schedule-admin?month='+monthKey());
    items=Array.isArray(payload.items)?payload.items:[];
-   holidays=payload.holidays||{};
+   holidays=payload.holidays||{};newsOptions=Array.isArray(payload.news_options)?payload.news_options:[];fillNewsOptions();
    render();notice('');
   }catch(err){
    if(err.status===401||err.status===403){
