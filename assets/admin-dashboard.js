@@ -105,6 +105,8 @@
       return ['Clarity 연동 설정 대기',['Microsoft Clarity 연결 상태를 확인해 주세요.']];
      const snapshots=clarity.latest||{};
      const overall=snapshots.Overall;
+     if(clarity.status==='failed')return ['Clarity 수집 실패',['Microsoft API 응답 또는 스냅샷 저장을 확인하세요.']];
+     if(clarity.status==='partial'||clarity.status==='overdue')return ['Clarity 최신 통계 미확인',[clarity.status==='partial'?'일부 항목 수집 미완료':'정기 수집 지연']];
      if(!overall)return ['Clarity 집계 대기',[
       'Clarity 연결 완료 · 첫 정기 수집 결과가 아직 없습니다.',
       '수집된 통계가 들어오면 방문 세션·방문자·유입 출처를 표시합니다.'
@@ -123,7 +125,7 @@
      const lines=[];
      if(Number.isFinite(Date.parse(overall.collected_at)))
       lines.push('최근 수집 · '+new Date(overall.collected_at).toLocaleString('ko-KR',{timeZone:'Asia/Seoul'}));
-     lines.push('집계 기준 · 최근 24시간 이동 구간(UTC)');
+     lines.push('집계 기준 · 최근 72시간 이동 구간(UTC)');
      for(const [dimension,title] of [['Channel','유입 채널'],['Source','유입 출처']]){
       for(const row of metric(snapshots[dimension],'Traffic').filter(item=>typeof item?.[dimension]==='string').slice(0,3)){
        const count=numeric(row.totalSessionCount);

@@ -8,10 +8,11 @@
   if(value==='1'||value==='0')return value==='1';
   try{return localStorage.getItem(EXCLUDE_KEY)==='1';}catch{return false;}
  };
+ const permitted=()=>{try{return !excluded()&&localStorage.getItem('jakgastudio.visitor-insights-consent.v2')==='yes'}catch{return false}};
  let measurementId;
  const syncExclusion=()=>{
-  if(measurementId)window['ga-disable-'+measurementId]=excluded();
-  if(excluded())pending.length=0;
+  if(measurementId)window['ga-disable-'+measurementId]=!permitted();
+  if(!permitted())pending.length=0;
  };
  window.addEventListener('storage',event=>{
   if(event.key===EXCLUDE_KEY||event.key===null){
@@ -23,7 +24,7 @@
  const pending=[];
  const track=(name)=>{
   syncExclusion();
-  if(excluded()||!events.has(name))return;
+  if(!permitted()||!events.has(name))return;
   if(measurementId)window.gtag('event',name,{send_to:measurementId});
   else if(pending.length<30)pending.push(name);
  };
@@ -45,9 +46,10 @@
   else if(/^\/books\/[^/]+\/?$/.test(url.pathname))track('book_detail_open');
  });
 
- if(excluded())return;
+ function start(){
+ if(!permitted())return;
  fetch('/api/admin?action=analytics',{cache:'no-store'}).then(response=>response.ok?response.json():null).then(config=>{
-  if(excluded())return;
+  if(!permitted()||measurementId)return;
   if(!/^G-[A-Z0-9]+$/.test(config?.measurementId||''))return;
   measurementId=config.measurementId;
   syncExclusion();
@@ -61,6 +63,7 @@
   }
   let referrer='';
   try{const url=new URL(document.referrer);if(/^https?:$/.test(url.protocol))referrer=url.origin+'/';}catch{}
+  window.gtag('consent','default',{analytics_storage:'granted',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied'});
   window.gtag('js',new Date());
   window.gtag('config',measurementId,{send_page_view:false,allow_google_signals:false,allow_ad_personalization_signals:false,page_location:page.href,page_referrer:referrer});
   window.gtag('event','page_view',{send_to:measurementId,page_location:page.href,page_referrer:referrer});
@@ -70,4 +73,7 @@
   tag.src='https://www.googletagmanager.com/gtag/js?id='+measurementId;
   document.head.append(tag);
  }).catch(()=>{});
+ }
+ window.addEventListener('jakga-analytics-consent',start);
+ start();
 })();
