@@ -47,7 +47,11 @@ module.exports=async(req,res)=>{
     }
   }else rows=await query(q);
   if(!listing&&!rows.length)return res.status(404).send('소식이 없습니다.');
-  let body='',script='';
+  let body='',script='',sessions=[];
+  if(rows[0]?.operator_type==='studio'){
+    const links=await query('/rest/v1/calendar_event_news?select=schedule_events(id,event_date,start_time,end_time)&news_post_id=eq.'+encodeURIComponent(rows[0].id));
+    sessions=links.map(link=>link.schedule_events).filter(Boolean).sort((a,b)=>(a.event_date+a.start_time).localeCompare(b.event_date+b.start_time));
+  }
   if(listing){
     body='<div class="cards">'+rows.map(card).join('')+'</div>';
     if(!rows.length)body='<p style="text-align:center;margin:70px 0;color:#857a72">종료된 소식이 없습니다.</p>';
@@ -60,6 +64,8 @@ module.exports=async(req,res)=>{
     '<div class="event-tags">'+[eventLabels[p.event_type],operatorLabels[p.operator_type]].filter(Boolean).map(x=>'<span class="event-tag">'+esc(x)+'</span>').join('')+'</div>'+
     (p.operator_type==='rental'&&p.external_organizer?'<p class="event-owner"><strong>주최</strong> '+esc(p.external_organizer)+' &nbsp;·&nbsp; <strong>장소</strong> 작가작업실 JEJU (제주 이호테우)</p>':
       p.operator_type==='studio'?'<p class="event-owner"><strong>운영</strong> 작가작업실 JEJU</p>':'');
+    if(sessions.length)body+='<p class="event-owner">'+sessions.map(e=>esc(e.event_date+' '+e.start_time.slice(0,5)+'–'+e.end_time.slice(0,5))).join('<br>')+'</p>';
+    if(p.price_krw!=null)body+='<p class="event-owner"><strong>1인 참가비</strong> '+(p.price_krw===0?'무료':p.price_krw.toLocaleString('ko-KR')+'원')+'</p>';
     body+='<div class="photos" id="photos">'+images.map((img,i)=>'<button type="button" class="photo-button" data-viewer="'+i+'" aria-label="'+(i+1)+'번째 사진 크게 보기">'+thumbnail(img,displayBrand(p.title)+' 사진 '+(i+1))+'</button>').join('')+'</div>';
     body+='<article class="content">'+displayBrand(renderContent(p.content))+'</article>';
     if(p.operator_type==='rental')body+='<aside class="rental-link"><h3>이런 모임을 준비하고 계신가요?</h3><p>제주 이호테우 작가작업실 JEJU의 공간대관 안내를 확인해 보세요.</p><a href="/space">공간 대관 안내 보기 ↗</a></aside>';
@@ -113,7 +119,7 @@ module.exports=async(req,res)=>{
     '<meta name="twitter:title" content="'+esc(seoTitle)+'">'+
     '<meta name="twitter:description" content="'+esc(seoDescription)+'">'+
     '<meta name="twitter:image" content="'+esc(seoImage)+'">'+
-    '<script type="application/ld+json">'+jsonLd({'@context':'https://schema.org','@graph':[schema,require('../lib/search-info').breadcrumb(base,[['모임·행사','/news'],[entryTitle,'/news/'+encodeURIComponent(slug)]])]})+'</script>';
+    '<script type="application/ld+json">'+jsonLd({'@context':'https://schema.org','@graph':[schema,...require('../lib/news-event').eventGraph(entry,sessions,seoUrl,seoDescription,cover),require('../lib/search-info').breadcrumb(base,[['모임·행사','/news'],[entryTitle,'/news/'+encodeURIComponent(slug)]])]})+'</script>';
 
   res.setHeader('Content-Type','text/html; charset=utf-8');
   res.setHeader('Cache-Control','no-store');

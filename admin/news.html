@@ -161,6 +161,12 @@ tbody tr:last-child td{border-bottom:0}
             <option value="rental">대관 행사</option>
           </select><p class="note">대관 행사에서는 공간 제공과 실제 주최자를 구분합니다.</p></div>
       </div>
+      <div class="form-row"><label class="label" for="feeType">참가비 구분</label>
+        <select class="field" id="feeType"><option value="unknown">미정</option><option value="free">무료</option><option value="paid">유료</option></select>
+      </div>
+      <div class="form-row" id="feeRow" hidden><label class="label" for="feeAmount">1인 참가비 (원)</label>
+        <input class="field" type="number" id="feeAmount" min="1" max="10000000" step="1" inputmode="numeric">
+      </div>
       <div class="form-row" id="organizerRow" hidden>
         <label class="label" for="externalOrganizer">외부 주최자 · 대관 행사 필수</label>
         <input class="field" id="externalOrganizer" maxlength="160" placeholder="주최 단체 또는 진행자 이름">
@@ -311,6 +317,13 @@ tbody tr:last-child td{border-bottom:0}
     $('externalOrganizer').required=rental;
     if(!rental)$('externalOrganizer').value='';
   }
+  function syncFee(){
+    const paid=$('feeType').value==='paid';
+    $('feeRow').hidden=!paid;
+    $('feeAmount').disabled=!paid;
+    $('feeAmount').required=paid;
+  }
+  $('feeType').addEventListener('change',syncFee);
   $('operatorType').addEventListener('change',syncOperator);
   function updateSeoPreview(){
     $('seoPreviewTitle').textContent=($('title').value.trim()||'제주 모임·행사')+' | 작가작업실 JEJU';
@@ -472,7 +485,7 @@ tbody tr:last-child td{border-bottom:0}
     $('sort').value = 0;
     $('status').value='ongoing';
     $('eventType').value='';
-    $('operatorType').value='';
+    $('operatorType').value='';$('feeType').value='unknown';$('feeAmount').value='';syncFee();
     $('externalOrganizer').value='';
     syncOperator();updateSeoPreview();
     $('dateMode').value='none';
@@ -498,6 +511,8 @@ tbody tr:last-child td{border-bottom:0}
     $('status').value=p.status||'ongoing';
     $('eventType').value=p.event_type||'';
     $('operatorType').value=p.operator_type||'';
+    $('feeType').value=p.price_krw==null?'unknown':p.price_krw===0?'free':'paid';
+    $('feeAmount').value=p.price_krw||'';syncFee();
     $('externalOrganizer').value=p.external_organizer||'';
     syncOperator();updateSeoPreview();
     $('sort').value=p.sort_order||0;
@@ -611,7 +626,9 @@ tbody tr:last-child td{border-bottom:0}
     if(mode==='range'&&(!end||end<start))return message('종료일은 시작일 이후로 설정해 주세요.',true);
     if(!$('eventType').value||!$('operatorType').value)return message('콘텐츠 유형과 운영 구분을 선택해 주세요.',true);
     if($('operatorType').value==='rental'&&!$('externalOrganizer').value.trim())return message('대관 행사 주최자를 입력해 주세요.',true);
-    const payload={id,title:$('title').value.trim(),slug:$('slug').value.trim(),content:$('content').innerHTML,images:imgs.slice(),cover_index:cover,status:$('status').value,sort_order:Number($('sort').value)||0,date_mode:mode,event_date_start:start,event_date_end:end,event_type:$('eventType').value,operator_type:$('operatorType').value,external_organizer:$('externalOrganizer').value.trim()};
+    const price=$('feeType').value==='paid'?Number($('feeAmount').value):$('feeType').value==='free'?0:null;
+    if($('feeType').value==='paid'&&(!Number.isSafeInteger(price)||price<1||price>10000000))return message('1인 참가비는 1~10,000,000원의 정수로 입력해 주세요.',true);
+    const payload={id,price_krw:price,title:$('title').value.trim(),slug:$('slug').value.trim(),content:$('content').innerHTML,images:imgs.slice(),cover_index:cover,status:$('status').value,sort_order:Number($('sort').value)||0,date_mode:mode,event_date_start:start,event_date_end:end,event_type:$('eventType').value,operator_type:$('operatorType').value,external_organizer:$('externalOrganizer').value.trim()};
     saving=true;$('saveBtn').disabled=true;message('게시물을 저장하는 중…');
     try {
       await api('/api/admin',{method:id?'PATCH':'POST',body:JSON.stringify(payload)});

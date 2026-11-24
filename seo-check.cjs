@@ -44,7 +44,7 @@ async function main(){
  assert.equal(sitemap.koreaToday(now),'2026-11-16');
  const xml=await sitemap.build(now);
  const locs=[...xml.matchAll(/<loc>(.*?)<\/loc>/g)].map(match=>match[1]);
- assert.equal(locs.length,15); // 11 stable URLs + 1 book + 2 NEWS + 1 event
+ assert.equal(locs.length,14); // 11 stable URLs + 1 book + 2 NEWS
  assert.equal(new Set(locs).size,locs.length);
  assert(locs.every(url=>url.startsWith('https://www.jakgastudio.com/')));
  assert(!locs.includes('https://www.jakgastudio.com/programs'));
@@ -53,7 +53,7 @@ async function main(){
  assert(locs.includes('https://www.jakgastudio.com/news/news-100'));
  assert(locs.includes('https://www.jakgastudio.com/news/news-101'));
  assert(locs.includes('https://www.jakgastudio.com/books/'+uuid));
- assert(locs.includes('https://www.jakgastudio.com/calendar/events/'+eventUuid));
+ assert(!locs.some(url=>url.includes('/calendar/events/')));
  assert(!locs.some(url=>url.includes('draft')||url.includes('bad/slug')));
  assert(xml.includes('<lastmod>2026-11-15T02:00:00.000Z</lastmod>'));
  assert(queries.some(q=>q.includes('&offset=0')));
@@ -100,16 +100,17 @@ async function main(){
   assert.equal(book.author['@id'],about.mainEntity['@id']);
   assert(book.sameAs.startsWith('https://www.yes24.com/product/goods/'));
  }
- const eventBuilder=require('./api/calendar-page').eventSchema;
- const sample={id:eventUuid,category:'meeting',title:'독서모임',start_time:'10:00:00',end_time:'12:00:00',updated_at:'2026-11-15T00:00:00Z'};
- const event=eventBuilder(base,sample,'2026-11-18','독서모임','제주 독서모임');
- assert.equal(event['@type'],'Event');
- assert.equal(event.startDate,'2026-11-18T10:00:00+09:00');
- assert.equal(event.endDate,'2026-11-18T12:00:00+09:00');
- assert.equal(event.organizer['@id'],shop['@id']);
- assert.equal(event.location.address.addressCountry,'KR');
- assert(!event.offers && !event.image);
- assert.equal(eventBuilder(base,{...sample,category:'custom'},'2026-11-18','공개 행사','특별행사').organizer,undefined);
+ const {eventGraph}=require('./lib/news-event');
+ const post={title:'독서모임',operator_type:'studio',event_date_start:'2026-11-18',price_krw:null};
+ const url=base+'/news/news-100';
+ const sample={id:eventUuid,event_date:'2026-11-18',start_time:'10:00:00',end_time:'12:00:00'};
+ const node=eventGraph(post,[sample],url,'독서모임','')[0];
+ assert.equal(node.startDate,'2026-11-18T10:00:00+09:00');
+ assert.equal(node.url,url);
+ assert(!node.offers);
+ for(const price of [0,30000])assert.equal(eventGraph({...post,price_krw:price},[],url,'','')[0].offers.price,price);
+ assert.deepEqual(eventGraph({...post,operator_type:'rental'},[],url,'',''),[]);
+ assert.deepEqual(eventGraph({...post,event_date_start:null},[],url,'',''),[]);
  const indexnow=require('./lib/indexnow');
  const bypass=await indexnow.notify({headers:{host:'jakgastudio-temp.vercel.app'}},['/news']);
  assert.equal(bypass.skipped,'non-production');

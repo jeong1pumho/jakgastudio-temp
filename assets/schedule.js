@@ -125,7 +125,7 @@
     const card=text('article','sc-detail '+classFor(e));
     card.append(text('div','sc-detail-kind',titleFor(e)),text('div','sc-detail-title',eventTitle(e)),text('div','sc-detail-clock',rangeFor(e)));
     if(e.lunch_excluded)card.appendChild(text('div','sc-detail-lunch','(점심시간 12-13시)'));
-    if(['meeting','custom'].includes(e.category)&&/^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(e.id||'')){const link=text('a','sc-event-link','행사 상세 보기 →');link.href='/calendar/events/'+encodeURIComponent(e.id);card.appendChild(link);}
+    if(e.news_path){const link=text('a','sc-event-link','행사 상세 보기 →');link.href=e.news_path;card.appendChild(link);}
     list.appendChild(card);
   }
  }

@@ -74,6 +74,11 @@ module.exports=async(req,res)=>{try{
    return send(res,400,{error:'대관 행사 주최자 이름을 1~160자로 입력해 주세요.'});
   const cover_index=images.length?Math.max(0,Math.min(images.length-1,Number(b.cover_index)||0)):0;
   const post={slug,title,content,images,cover_index,status,sort_order:Number(b.sort_order)||0,event_date_start,event_date_end,event_type,operator_type,external_organizer};
+  if(Object.hasOwn(b,'price_krw')){
+   if(b.price_krw!==null&&(!Number.isInteger(b.price_krw)||b.price_krw<0||b.price_krw>10000000))
+    return send(res,400,{error:'1인 참가비를 확인해 주세요.'});
+   post.price_krw=b.price_krw;
+  }
   if(req.method==='PATCH'){
    if(!/^[a-f0-9-]{36}$/i.test(b.id||''))return send(res,400,{error:'ID 오류'});
    const rows=await query('/rest/v1/news_posts?select=id,published_at,slug&id=eq.'+encodeURIComponent(b.id),'GET',undefined,token);

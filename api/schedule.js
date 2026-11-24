@@ -1,6 +1,7 @@
 'use strict';
 const {query,ready,send}=require('../lib/core');
 const {holidaysForYear,MAX_YEAR}=require('../lib/holidays');
+const {linkColumns,postPath}=require('../lib/calendar-news');
 const columns='id,event_date,category,category_label,title,start_time,end_time';
 const {publicCalendarEnd}=require('../lib/public-calendar-range');
 function monthRange(value){
@@ -17,10 +18,11 @@ module.exports=async(req,res)=>{
     if(typeof req.query?.month==='string'&&/^\d{4}-(0[1-9]|1[0-2])$/.test(req.query.month)&&req.query.month>=publicCalendarEnd().slice(0,7))return send(res,400,{error:'공개 일정은 다음 달까지만 조회할 수 있습니다.'});
     const range=monthRange(req.query?.month);
     if(!range)return send(res,400,{error:'조회할 월을 YYYY-MM 형식으로 입력해 주세요.'});
-    const url='/rest/v1/schedule_events?select='+columns+
+    const url='/rest/v1/schedule_events?select='+columns+','+linkColumns+
       '&event_date=gte.'+range.start+'&event_date=lt.'+range.end+
       '&order=event_date.asc,start_time.asc&limit=500';
-    const items=await query(url);
+    const rows=await query(url);
+    const items=rows.map(row=>{const {calendar_event_news,...item}=row;return {...item,news_path:postPath(row)};});
     return send(res,200,{month:req.query.month,items,holidays:holidaysForYear(Number(req.query.month.slice(0,4)))});
   }catch(e){
     return send(res,e.status||500,{error:e.status>=500?'일정을 불러오는 중 오류가 발생했습니다.':e.message});

@@ -134,12 +134,7 @@ td.actions{white-space:nowrap}
    <div class="field-row" id="newsLinkRow">
     <label for="newsPostSelect">연결할 모임·행사 게시물 (선택)</label>
     <select class="field" id="newsPostSelect"><option value="">연결하지 않음</option></select>
-    <p class="form-help">연결된 게시물의 대표 사진과 소개를 행사 상세 및 검색 정보에 재사용합니다.</p>
-   </div>
-   <div class="field-row" id="seoPriceRow" hidden>
-    <label for="seoPrice">1인 참가비 (원, 선택)</label>
-    <input class="field" id="seoPrice" type="number" min="0" max="10000000" step="1" inputmode="numeric" placeholder="예: 30000 (무료면 0)">
-    <p class="form-help">실제 공개 금액과 일치하도록 입력하세요. 미정이면 비워 두며 메모의 금액은 자동 추출하지 않습니다.</p>
+    <p class="form-help">작가작업실 JEJU가 운영하는 공개 게시물을 선택하면 방문자가 해당 상세페이지로 이동합니다.</p>
    </div>
    <div class="field-row">
     <label for="memoEditor">메모 (선택)</label>
@@ -152,7 +147,7 @@ td.actions{white-space:nowrap}
      <button type="button" id="memoClear" title="서식 제거">서식 제거</button>
     </div>
     <div id="memoEditor" class="memo-editor" contenteditable="true" role="textbox" aria-multiline="true" data-placeholder="일정 구분에 맞는 안내사항을 입력하세요."></div>
-    <p class="form-help">모임·특별일정의 메모는 방문자용 ‘행사 상세 보기’에 공개됩니다. 그 밖의 일정 메모는 관리자만 볼 수 있습니다.</p>
+    <p class="form-help">메모는 관리자만 확인하고 편집할 수 있습니다.</p>
    </div>
    <div class="grid" id="timeFields">
     <div class="field-row"><label for="eventStart">시작시간 (24시간)</label><input id="eventStart" class="field" type="text" inputmode="numeric" autocomplete="off" maxlength="5" pattern="(?:[01][0-9]|2[0-3]):[0-5][0-9]" title="24시간 형식으로 입력해 주세요. 예: 10:00" placeholder="10:00" required value="10:00"></div>
@@ -254,8 +249,6 @@ td.actions{white-space:nowrap}
   const enabled=['meeting','custom'].includes($('eventType').value);
   $('newsLinkRow').hidden=!enabled;
   if(!enabled)$('newsPostSelect').value='';
-  $('seoPriceRow').hidden=!enabled||!$('newsPostSelect').value;
-  if($('seoPriceRow').hidden)$('seoPrice').value='';
  }
  function newEvent(preferredDate){
   $('eventForm').reset();$('eventId').value='';$('memoEditor').innerHTML='';
@@ -275,7 +268,7 @@ td.actions{white-space:nowrap}
   $('eventId').value=e.id;$('eventDate').value=e.event_date;
   $('eventType').value=e.category;$('customLabel').value=e.category_label||'';
   $('eventTitle').value=e.title;$('memoEditor').innerHTML=e.memo||'';$('eventStart').value=hhmm(e.start_time);$('eventEnd').value=hhmm(e.end_time);
-  $('formHeading').textContent='일정 수정';syncCustom();$('newsPostSelect').value=e.news_post_id||'';syncLink();$('seoPrice').value=e.price_krw??'';syncWeekday();if(e.category==='custom')$('customLabel').value=e.category_label||'';
+  $('formHeading').textContent='일정 수정';syncCustom();$('newsPostSelect').value=e.news_post_id||'';syncLink();syncWeekday();if(e.category==='custom')$('customLabel').value=e.category_label||'';
   notice('');toggleForm(true);
  }
  function text(tag,cls,value){const e=document.createElement(tag);if(cls)e.className=cls;if(value!==undefined)e.textContent=value;return e;}
@@ -462,7 +455,7 @@ td.actions{white-space:nowrap}
   if(overlap)return notice('등록 불가: '+overlap.title+' ('+(overlap.category==='closure'?'종일 휴무':hhmm(overlap.start_time)+'–'+hhmm(overlap.end_time))+') 일정과 겹칩니다.',true);
   const memo=$('memoEditor').innerHTML.trim();
   if(memo.length>30000)return notice('메모가 너무 깁니다. 내용을 줄여 주세요.',true);
-  const body={id,event_date:date,category,category_label:categoryLabel,title,memo,start_time:closure?null:start,end_time:closure?null:end,news_post_id:$('newsPostSelect').value,price_krw:$('seoPrice').value};
+  const body={id,event_date:date,category,category_label:categoryLabel,title,memo,start_time:closure?null:start,end_time:closure?null:end,news_post_id:$('newsPostSelect').value};
   busy=true;$('saveBtn').disabled=true;notice('일정을 저장하는 중입니다.');
   try{
    await api('/api/schedule-admin',{method:id?'PATCH':'POST',body:JSON.stringify(body)});

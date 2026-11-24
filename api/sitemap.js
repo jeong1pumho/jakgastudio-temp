@@ -2,7 +2,6 @@
 const {query,ready}=require('../lib/core');
 const {origin,xmlEscape,isoDate}=require('../lib/seo');
 const {programs}=require('../lib/programs-page');
-const {publicCalendarEnd}=require('../lib/public-calendar-range');
 
 // Only indexable canonical routes. /programs redirects to /programs/bookstore.
 const STATIC_PATHS=['/','/news','/calendar','/books','/space','/visit'];
@@ -44,12 +43,9 @@ async function build(now=new Date()){
   const urls=STATIC_PATHS.map(path=>({path}));
   urls.push(...programs.map(program=>({path:'/programs/'+program.slug})));
 
-  const [books,posts,events]=await Promise.all([
+  const [books,posts]=await Promise.all([
     allRows('/rest/v1/recommended_books?select=id,updated_at&published=eq.true&order=id.asc'),
-    allRows('/rest/v1/news_posts?select=slug,status,published_at,updated_at&status=in.(ongoing,ended)&published_at=not.is.null&order=published_at.desc,id.desc'),
-    allRows('/rest/v1/schedule_events?select=id,event_date,category,updated_at'+
-      '&event_date=gte.'+koreaToday(now)+'&event_date=lt.'+publicCalendarEnd(now)+
-      '&category=in.(meeting,custom)&order=event_date.asc,start_time.asc,id.asc')
+    allRows('/rest/v1/news_posts?select=slug,status,published_at,updated_at&status=in.(ongoing,ended)&published_at=not.is.null&order=published_at.desc,id.desc')
   ]);
 
   for(const book of books){
@@ -59,10 +55,6 @@ async function build(now=new Date()){
   for(const post of posts){
     if(!SLUG.test(String(post.slug||''))||!['ongoing','ended'].includes(post.status)||!post.published_at)continue;
     urls.push({path:'/news/'+post.slug,lastmod:isoDate(post.updated_at||post.published_at)});
-  }
-  for(const event of events){
-    if(!UUID.test(String(event.id||''))||!['meeting','custom'].includes(event.category))continue;
-    urls.push({path:'/calendar/events/'+event.id,lastmod:isoDate(event.updated_at)});
   }
   return toXml(origin(),urls);
 }
