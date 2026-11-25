@@ -15,50 +15,11 @@ function get(k){try{return localStorage.getItem(k)}catch{return k===ck?'no':null
 
 if(!page)return;
 const denied=()=>get(ck)==='no'||(!get(ck)&&get('jakgastudio.visitor-insights-consent.v1')==='no');
-function emit(kind,path,detail,campaign=''){
+function emit(kind,path,detail,campaign='',visit=''){
  if(denied()||excluded()||!valid.test(path))return;
  fetch('/api/visit-analytics',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',
-  referrerPolicy:'no-referrer',keepalive:true,body:JSON.stringify({kind,path,detail,campaign})}).catch(()=>{});
+  referrerPolicy:'no-referrer',keepalive:true,body:JSON.stringify({kind,path,detail,campaign,visit,entry:kind==='click'&&ctx?ctx.source:undefined})}).catch(()=>{});
 }
-function externalAllowed(){
- return !excluded()&&!denied()&&!document.hidden&&!location.search&&!location.hash;
-}
-async function startExternal(){
- if(!externalAllowed())return;
- const response=await fetch('/api/visit-analytics?config=2',{cache:'no-store',referrerPolicy:'no-referrer'});
- if(!response.ok)return;
- const ids=await response.json();
- if(!externalAllowed())return;
- const addScript=src=>{
-  const script=document.createElement('script');
-  script.async=true;script.referrerPolicy='no-referrer';script.src=src;document.head.append(script);
- };
- let active=false;
- if(/^G-[A-Z0-9]+$/.test(ids.ga||'')){
-  active=true;
-  window.dataLayer=window.dataLayer||[];
-  function gtag(){window.dataLayer.push(arguments)}
-  window.gtag=gtag;
-  gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied'});
-  gtag('set','ads_data_redaction',true);
-  gtag('js',new Date());
-  gtag('config',ids.ga,{send_page_view:false,allow_google_signals:false,allow_ad_personalization_signals:false,page_location:location.origin+page,page_referrer:'',page_title:'공개 페이지'});
-  gtag('event','page_view',{send_to:ids.ga});
-  addScript('https://www.googletagmanager.com/gtag/js?id='+ids.ga);
- }
- if(/^[a-z0-9]{5,24}$/i.test(ids.clarity||'')){
-  active=true;
-  document.documentElement.setAttribute('data-clarity-mask','true');
-  window.clarity=function(){(window.clarity.q=window.clarity.q||[]).push(arguments)};
-  window.clarity('consentv2',{ad_Storage:'denied',analytics_Storage:'denied'});
-  addScript('https://www.clarity.ms/tag/'+ids.clarity);
- }
- if(active){
-  const stop=()=>{if(excluded()||denied()){if(ids.ga)window['ga-disable-'+ids.ga]=true;window.clarity?.('stop');location.reload()}};
-  window.addEventListener('storage',stop);window.addEventListener('pageshow',stop);document.addEventListener('visibilitychange',stop);
- }
-}
-startExternal().catch(()=>{});
 const params=new URLSearchParams(location.search);
 const sourceNames={instagram:'Instagram',naver:'Naver',google:'Google',threads:'Threads',kakao:'Kakao'};
 let previous;
@@ -79,9 +40,63 @@ const campaignPattern=/^(?:booknight|jangsakkunclub|readingclub|bookclub|writing
 const creativePattern=/^(?:feed|story|reel|profile|post|poster)(?:-[1-9]\d?)?$/;
 const code=params.get('utm_campaign')||'', creative=params.get('utm_content')||'';
 const campaign=campaignPattern.test(code)?code+(creativePattern.test(creative)?'/'+creative:''):'';
-emit('page_view',page,source(),campaign);
-if(previous?.origin===location.origin&&previous.pathname!==page&&valid.test(previous.pathname))
- emit('transition',previous.pathname,page);
+
+const sessionKey='jakga.visit.context.v1', idle=30*60*1000;
+const thresholds=[10,30,60,120,300,600];
+let ctx, elapsed=0, shownAt=null, level=0, recorded=false, available=true;
+function blocked(){return denied()||excluded()}
+function forget(){ctx=null;recorded=false;shownAt=null;try{sessionStorage.removeItem(sessionKey)}catch{}}
+function save(){try{sessionStorage.setItem(sessionKey,JSON.stringify(ctx))}catch{available=false}}
+function shortPath(value){
+ if(/^\/news\/news-\d{1,18}$/.test(value)||/^\/books\/[a-f0-9-]{36}$/.test(value))return value;
+ if(['/','/space','/visit','/calendar','/books','/news','/programs','/programs/bookstore','/programs/book-club','/programs/writing-class','/programs/space-rental','/programs/event-planning'].includes(value))return value;
+ return '/'+value.split('/')[1];
+}
+function marker(seconds){
+ if(available)emit('transition',page,['route',ctx.source,ctx.trail.join(','),seconds].join('|'));
+}
+function begin(resume=false){
+ if(blocked()){forget();return}
+ let prior;
+ try{prior=JSON.parse(sessionStorage.getItem(sessionKey));sessionStorage.setItem(sessionKey,'{}')}catch{available=false}
+ const now=Date.now(),channel=source();
+ const reload=performance.getEntriesByType('navigation')[0]?.type==='reload';
+ const continued=!resume&&prior&&Array.isArray(prior.trail)&&now-prior.last<idle&&now>=prior.last&&
+  (reload||(previous?.origin===location.origin&&channel==='사이트 내부'));
+ const origin=continued?prior.source:resume||channel==='사이트 내부'?'직접·확인 불가':channel;
+ const trail=continued?[...prior.trail,prior.page+'~'+prior.level].slice(-8):[];
+ while(trail.join(',').length>128)trail.shift();
+ ctx={source:origin,last:now,page:shortPath(page),level:0,trail};
+ save();recorded=true;elapsed=0;level=0;shownAt=document.hidden?null:now;
+ emit('page_view',page,continued?'사이트 내부':origin,campaign,available?(continued?'continue':'start'):'unknown');
+ if(continued&&prior.page!==shortPath(page))emit('transition',prior.page,shortPath(page));
+ marker(0);
+}
+function tick(){
+ if(blocked()){forget();return}
+ if(!recorded||!ctx||shownAt===null)return;
+ const now=Date.now();
+ elapsed+=Math.max(0,Math.min(now,ctx.last+idle)-shownAt);shownAt=now;
+ while(level<thresholds.length&&elapsed>=thresholds[level]*1000){
+  ctx.level=thresholds[level++];marker(ctx.level);save();
+ }
+}
+function activity(){
+ if(blocked()){forget();return}
+ if(!recorded||Date.now()-ctx.last>=idle){tick();begin(true);return}
+ tick();if(Date.now()-ctx.last>1000){ctx.last=Date.now();save()}
+}
+function show(){
+ if(document.hidden){tick();shownAt=null;return}
+ activity();shownAt=Date.now();
+}
+begin();
+setInterval(tick,5000);
+document.addEventListener('visibilitychange',show);
+window.addEventListener('pagehide',()=>{tick();shownAt=null});
+window.addEventListener('pageshow',e=>{if(e.persisted)begin()});
+for(const name of ['pointerdown','keydown','scroll'])document.addEventListener(name,activity,{passive:true});
+window.addEventListener('storage',()=>{if(blocked())forget()});
 window.JakAnalytics=Object.freeze({track(name){if(name==='sms_signup_complete')emit('click',page,'문자 신청 완료')}});
 document.addEventListener('click',e=>{
  const a=e.target.closest?.('button,a[href]');if(!a)return;
