@@ -7,7 +7,8 @@
   const parts=Object.fromEntries(dateFormat.formatToParts(value).map(part=>[part.type,part.value]));
   return parts.year+'-'+parts.month+'-'+parts.day;
  };
- const smsStatus='https://qrbavxempotptnmflqoq.supabase.co/functions/v1/studio-sms-news';
+ const smsProject=location.hostname==='jakgastudio-temp.vercel.app'?'qrbavxempotptnmflqoq':'dolgltddpnxzwlqigtjw';
+ const smsStatus='https://'+smsProject+'.supabase.co/functions/v1/studio-sms-news';
  let generation=0;
  const EXCLUDE_KEY='jakgastudio.analytics-excluded.v1';
  const EXCLUSION_COOKIE='jakgastudio_analytics_excluded_v1';
@@ -100,39 +101,9 @@
     traffic:async()=>{
      const data=await request('/api/visit-analytics',token);
      if(run===generation)enforceAdminExclusion();
-     const clarity=data.clarity||{};
-     if(!clarity.projectConfigured||!clarity.apiConfigured)
-      return ['Clarity 연동 설정 대기',['Microsoft Clarity 연결 상태를 확인해 주세요.']];
-     const snapshots=clarity.latest||{};
-     const overall=snapshots.Overall;
-     if(clarity.status==='failed')return ['Clarity 수집 실패',['Microsoft API 응답 또는 스냅샷 저장을 확인하세요.']];
-     if(clarity.status==='partial'||clarity.status==='overdue')return ['Clarity 최신 통계 미확인',[clarity.status==='partial'?'일부 항목 수집 미완료':'정기 수집 지연']];
-     if(!overall)return ['Clarity 집계 대기',[
-      'Clarity 연결 완료 · 첫 정기 수집 결과가 아직 없습니다.',
-      '수집된 통계가 들어오면 방문 세션·방문자·유입 출처를 표시합니다.'
-     ]];
-     const number=new Intl.NumberFormat('ko-KR');
-     const metric=(record,name)=>{
-      const rows=Array.isArray(record?.payload)?record.payload:[];
-      const information=rows.find(row=>row.metricName===name)?.information;
-      return Array.isArray(information)?information:[];
-     };
-     const numeric=value=>value!==undefined&&value!==null&&value!==''&&Number.isFinite(Number(value))
-      ?number.format(Number(value)):null;
-     const total=metric(overall,'Traffic')[0]||{};
-     const sessions=numeric(total.totalSessionCount);
-     const visitors=numeric(total.distinctUserCount??total.distantUserCount??total.totalDistinctUserCount);
-     const lines=[];
-     if(Number.isFinite(Date.parse(overall.collected_at)))
-      lines.push('최근 수집 · '+new Date(overall.collected_at).toLocaleString('ko-KR',{timeZone:'Asia/Seoul'}));
-     lines.push('집계 기준 · 최근 72시간 이동 구간(UTC)');
-     for(const [dimension,title] of [['Channel','유입 채널'],['Source','유입 출처']]){
-      for(const row of metric(snapshots[dimension],'Traffic').filter(item=>typeof item?.[dimension]==='string').slice(0,3)){
-       const count=numeric(row.totalSessionCount);
-       if(count!==null)lines.push(title+' · '+row[dimension]+' '+count+'회');
-      }
-     }
-     return ['방문 세션 '+(sessions??'—')+'회 · 방문자 '+(visitors??'—')+'명',lines];
+     const rows=data.counts.filter(row=>row.day===today);
+     const sum=kind=>rows.filter(row=>row.kind===kind).reduce((total,row)=>total+Number(row.event_count),0);
+     return ['오늘 페이지 조회 '+sum('page_view')+'회',['버튼·링크 클릭 '+sum('click')+'회','한국 시간 기준 · 자체 집계']];
     },
     calendar:async()=>{
      const {items}=await request('/api/schedule?month='+month);
