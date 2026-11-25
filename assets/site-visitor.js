@@ -20,6 +20,45 @@ function emit(kind,path,detail,campaign=''){
  fetch('/api/visit-analytics',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',
   referrerPolicy:'no-referrer',keepalive:true,body:JSON.stringify({kind,path,detail,campaign})}).catch(()=>{});
 }
+function externalAllowed(){
+ return !excluded()&&!denied()&&!document.hidden&&!location.search&&!location.hash;
+}
+async function startExternal(){
+ if(!externalAllowed())return;
+ const response=await fetch('/api/visit-analytics?config=2',{cache:'no-store',referrerPolicy:'no-referrer'});
+ if(!response.ok)return;
+ const ids=await response.json();
+ if(!externalAllowed())return;
+ const addScript=src=>{
+  const script=document.createElement('script');
+  script.async=true;script.referrerPolicy='no-referrer';script.src=src;document.head.append(script);
+ };
+ let active=false;
+ if(/^G-[A-Z0-9]+$/.test(ids.ga||'')){
+  active=true;
+  window.dataLayer=window.dataLayer||[];
+  function gtag(){window.dataLayer.push(arguments)}
+  window.gtag=gtag;
+  gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied'});
+  gtag('set','ads_data_redaction',true);
+  gtag('js',new Date());
+  gtag('config',ids.ga,{send_page_view:false,allow_google_signals:false,allow_ad_personalization_signals:false,page_location:location.origin+page,page_referrer:'',page_title:'공개 페이지'});
+  gtag('event','page_view',{send_to:ids.ga});
+  addScript('https://www.googletagmanager.com/gtag/js?id='+ids.ga);
+ }
+ if(/^[a-z0-9]{5,24}$/i.test(ids.clarity||'')){
+  active=true;
+  document.documentElement.setAttribute('data-clarity-mask','true');
+  window.clarity=function(){(window.clarity.q=window.clarity.q||[]).push(arguments)};
+  window.clarity('consentv2',{ad_Storage:'denied',analytics_Storage:'denied'});
+  addScript('https://www.clarity.ms/tag/'+ids.clarity);
+ }
+ if(active){
+  const stop=()=>{if(excluded()||denied()){if(ids.ga)window['ga-disable-'+ids.ga]=true;window.clarity?.('stop');location.reload()}};
+  window.addEventListener('storage',stop);window.addEventListener('pageshow',stop);document.addEventListener('visibilitychange',stop);
+ }
+}
+startExternal().catch(()=>{});
 const params=new URLSearchParams(location.search);
 const sourceNames={instagram:'Instagram',naver:'Naver',google:'Google',threads:'Threads',kakao:'Kakao'};
 let previous;
