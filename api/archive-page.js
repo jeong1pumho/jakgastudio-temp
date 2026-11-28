@@ -29,7 +29,7 @@ const intro='제주 독서모임, 글쓰기 클래스, 북토크 등 작가작�
 function pageNumber(raw){if(raw===undefined)return 1;if(typeof raw!=='string'||! /^[1-9][0-9]{0,5}$/.test(raw))throw Object.assign(Error('Invalid page'),{status:400});return Number(raw);}
 function urlFor(ongoing,ended,rental,anchor=''){const q=new URLSearchParams();if(ongoing>1)q.set('ongoing',ongoing);if(ended>1)q.set('ended',ended);if(rental)q.set('operator','rental');return '/news'+(q.size?'?'+q:'')+(anchor?'#'+anchor:'');}
 async function load(status,page,rental){
- if(status==='ended')return require('../lib/news-order').loadEnded(page,6,rental);
+ if(status==='ended')return require('../lib/news-order').loadEnded(page,8,rental);
  const response=await fetch(root()+'/rest/v1/news_posts?select='+selected+'&published_at=not.is.null&status=eq.'+status+(rental?'&operator_type=eq.rental':'')+'&order=sort_order.desc,published_at.desc.nullslast,created_at.desc,id.desc&limit=6&offset='+((page-1)*6),{headers:{apikey:key(),Accept:'application/json',Prefer:'count=exact'}});
  if(response.status===416)throw Object.assign(Error('Missing page'),{status:404});
  if(!response.ok)throw Error('List unavailable');
